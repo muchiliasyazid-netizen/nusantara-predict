@@ -87,17 +87,18 @@
 <body id="app-body" class="bg-nusa-bg text-nusa-text font-sans h-screen flex overflow-hidden selection:bg-nusa-primary selection:text-white transition-all duration-300">
 
     <!-- Sidebar (Desktop) -->
-    <aside class="w-16 bg-nusa-card border-r border-gray-800 hidden md:flex flex-col items-center py-6 justify-between z-20">
+    <aside class="w-16 bg-nusa-card border-r border-gray-800 hidden md:flex flex-col items-center py-6 justify-between z-20 relative">
         <div class="flex flex-col gap-8 w-full items-center">
             <a href="#" class="text-nusa-primary text-2xl hover:scale-110 transition-transform"><i class="fa-solid fa-layer-group"></i></a>
             <div class="w-8 h-px bg-gray-700 my-2"></div>
-            <a href="#" class="text-white bg-nusa-primary p-3 rounded-xl shadow-lg shadow-nusa-primary/40"><i class="fa-solid fa-house"></i></a>
-            <a href="#" class="text-nusa-textMuted hover:text-white transition-colors p-3"><i class="fa-regular fa-circle-question"></i></a>
-            <a href="#" class="text-nusa-textMuted hover:text-white transition-colors p-3"><i class="fa-regular fa-calendar"></i></a>
-            <a href="#" class="text-nusa-textMuted hover:text-white transition-colors p-3"><i class="fa-solid fa-trophy"></i></a>
-            <a href="#" class="text-nusa-textMuted hover:text-white transition-colors p-3"><i class="fa-solid fa-sliders"></i></a>
+            <!-- Interactive Sidebar Buttons -->
+            <a href="javascript:void(0)" class="sidebar-btn active bg-nusa-primary text-white p-3 rounded-xl shadow-lg shadow-nusa-primary/40 transition-all" data-target="tab-pasar" title="Pasar Aktif"><i class="fa-solid fa-house"></i></a>
+            <a href="javascript:void(0)" class="text-nusa-textMuted hover:text-white hover:bg-gray-800 transition-all p-3 rounded-xl" onclick="showToast('Fitur Bantuan segera hadir!')" title="Bantuan"><i class="fa-regular fa-circle-question"></i></a>
+            <a href="javascript:void(0)" class="sidebar-btn text-nusa-textMuted hover:text-white hover:bg-gray-800 transition-all p-3 rounded-xl" data-target="tab-jurnal" title="Jurnal Saya"><i class="fa-regular fa-calendar"></i></a>
+            <a href="javascript:void(0)" class="sidebar-btn text-nusa-textMuted hover:text-white hover:bg-gray-800 transition-all p-3 rounded-xl" data-target="tab-kredi" title="Kredibilitas"><i class="fa-solid fa-trophy"></i></a>
+            <a href="javascript:void(0)" class="text-nusa-textMuted hover:text-white hover:bg-gray-800 transition-all p-3 rounded-xl" onclick="showToast('Fitur Pengaturan segera hadir!')" title="Pengaturan"><i class="fa-solid fa-sliders"></i></a>
         </div>
-        <a href="#" class="text-nusa-textMuted hover:text-white transition-colors p-3 mt-auto"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+        <a href="javascript:void(0)" class="text-nusa-textMuted hover:text-white hover:bg-red-500/20 hover:text-nusa-primary transition-all p-3 mt-auto rounded-xl" onclick="showToast('Fitur Keluar / Logout segera hadir!')" title="Keluar"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
     </aside>
 
     <!-- Main Content -->
@@ -134,32 +135,45 @@
                 <div class="hidden lg:flex items-center gap-3 mr-4">
                     <span class="text-sm text-nusa-textMuted" data-i18n="mode">Mode:</span>
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" value="" class="sr-only peer" checked>
+                        <input type="checkbox" value="" class="sr-only peer" checked onclick="showToast('Mode layar telah diubah!')">
                         <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusa-primary"></div>
                     </label>
                     <span class="text-sm text-nusa-textMuted" data-i18n="device">Desktop / Handphone</span>
                     
-                    <button class="ml-2 border border-nusa-primary text-nusa-primary px-3 py-1 rounded-md text-sm flex items-center gap-2 hover:bg-nusa-primary hover:text-white transition-colors">
+                    <button class="ml-2 border border-nusa-primary text-nusa-primary px-3 py-1 rounded-md text-sm flex items-center gap-2 hover:bg-nusa-primary hover:text-white transition-colors" onclick="showToast('Mikrofon dan Kamera diaktifkan')">
                         <i class="fa-solid fa-microphone"></i> <span data-i18n="camVoice">Kamera/Suara</span>
                     </button>
                 </div>
 
                 <!-- Notifications & Profile -->
-                <button class="relative text-nusa-textMuted hover:text-white">
-                    <i class="fa-regular fa-bell text-xl"></i>
-                    <span class="absolute -top-1 -right-1 bg-nusa-primary text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">2</span>
-                </button>
-                </div>
+                <div class="relative flex items-center gap-4">
+                    <!-- Notification Bell Button -->
+                    <button id="notif-btn" class="relative text-nusa-textMuted hover:text-white transition-colors">
+                        <i class="fa-regular fa-bell text-xl"></i>
+                        <span class="absolute -top-1.5 -right-1.5 bg-nusa-primary text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center shadow-sm">3</span>
+                    </button>
 
-                <!-- Notifications & Profile -->
-                <button class="relative text-nusa-textMuted hover:text-white">
-                    <i class="fa-regular fa-bell text-xl"></i>
-                    <span class="absolute -top-1 -right-1 bg-nusa-red text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">2</span>
-                </button>
-                <div class="flex items-center gap-2 bg-nusa-card border border-gray-700 rounded-full pl-1 pr-3 py-1 cursor-pointer hover:border-gray-500 transition-colors">
-                    <img src="https://placehold.co/100x100/334155/ffffff?text=U" alt="User" class="w-7 h-7 rounded-full">
-                    <span class="text-sm hidden sm:block">Kamera...</span>
-                    <i class="fa-solid fa-chevron-down text-xs text-nusa-textMuted hidden sm:block"></i>
+                    <!-- Interactive Notification Dropdown Menu -->
+                    <div id="notif-dropdown" class="absolute top-10 right-10 w-72 bg-nusa-card/95 backdrop-blur-xl border border-gray-700 rounded-xl shadow-2xl hidden flex-col overflow-hidden z-50 transform origin-top-right transition-all">
+                        <div class="p-3 border-b border-gray-800 font-bold text-sm text-white bg-black/20">Notifikasi Baru</div>
+                        <div class="p-3 border-b border-gray-800 hover:bg-gray-800/80 cursor-pointer text-sm transition-colors" onclick="showToast('Membuka obrolan dengan Sari...')">
+                            <span class="text-nusa-primary font-bold">Sari (AI)</span> membalas pesanmu. <span class="block text-xs text-nusa-textMuted mt-1">2 menit yang lalu</span>
+                        </div>
+                        <div class="p-3 border-b border-gray-800 hover:bg-gray-800/80 cursor-pointer text-sm transition-colors" onclick="showToast('Menampilkan hasil simulasi Timnas...')">
+                            Hasil simulasi <span class="text-nusa-green font-bold">Timnas vs Arab Saudi</span> telah keluar! <span class="block text-xs text-nusa-textMuted mt-1">15 menit yang lalu</span>
+                        </div>
+                        <div class="p-3 border-b border-gray-800 hover:bg-gray-800/80 cursor-pointer text-sm transition-colors" onclick="showToast('Membuka halaman Kredibilitas...')">
+                            Skor kredibilitasmu naik <span class="text-nusa-primary font-bold">+30 PTS!</span> <span class="block text-xs text-nusa-textMuted mt-1">1 jam yang lalu</span>
+                        </div>
+                        <div class="p-2 hover:bg-gray-800/50 cursor-pointer text-nusa-primary font-semibold text-xs text-center transition-colors" onclick="showToast('Memuat semua notifikasi...')">Lihat Semua</div>
+                    </div>
+
+                    <!-- User Profile Area -->
+                    <div class="flex items-center gap-2 bg-nusa-card border border-gray-700 rounded-full pl-1 pr-3 py-1 cursor-pointer hover:border-gray-500 transition-colors" onclick="showToast('Menu profil pengguna akan segera hadir')">
+                        <img src="https://placehold.co/100x100/334155/ffffff?text=U" alt="User" class="w-7 h-7 rounded-full">
+                        <span class="text-sm hidden sm:block">Kamera...</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-nusa-textMuted hidden sm:block"></i>
+                    </div>
                 </div>
             </div>
         </header>
@@ -457,6 +471,51 @@
         </div>
     </div>
 
+    <!-- Prediction Modal -->
+    <div id="predictModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[60] hidden items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-nusa-card border border-gray-700 p-6 rounded-2xl shadow-2xl max-w-md w-full mx-4 transform scale-95 transition-transform duration-300 relative overflow-hidden" id="predictModalContent">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-nusa-primary to-orange-500"></div>
+            
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-xl font-bold text-white" data-i18n="predictTitle">Buat Prediksi</h3>
+                    <p class="text-sm text-nusa-textMuted font-semibold mt-1" id="predictModalMatch">Tim A vs Tim B</p>
+                </div>
+                <button onclick="closePredictModal()" class="text-gray-400 hover:text-white bg-gray-800 rounded-full w-8 h-8 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="mb-5 mt-6">
+                <label class="block text-xs text-gray-400 mb-2 font-semibold uppercase tracking-wider" data-i18n="selectTeam">Pilih Hasil / Tim</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button class="pred-team-btn bg-gray-800 border border-gray-600 rounded-lg py-2 text-sm font-bold text-white hover:border-nusa-primary transition-all" onclick="selectTeam(this)">Tuan Rumah</button>
+                    <button class="pred-team-btn bg-gray-800 border border-gray-600 rounded-lg py-2 text-sm font-bold text-white hover:border-nusa-primary transition-all" onclick="selectTeam(this)">Seri</button>
+                    <button class="pred-team-btn bg-gray-800 border border-gray-600 rounded-lg py-2 text-sm font-bold text-white hover:border-nusa-primary transition-all" onclick="selectTeam(this)">Tamu</button>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="block text-xs text-gray-400 font-semibold uppercase tracking-wider" data-i18n="confidenceLvl">Tingkat Keyakinan</label>
+                    <span class="text-nusa-primary font-black text-2xl" id="confidenceValue">5</span>
+                </div>
+                <input type="range" min="1" max="10" value="5" class="w-full mt-2" id="confidenceSlider" oninput="document.getElementById('confidenceValue').innerText = this.value">
+                <div class="flex justify-between text-[10px] text-gray-500 mt-2 font-bold uppercase">
+                    <span>Rendah (1)</span>
+                    <span>Tinggi (10)</span>
+                </div>
+            </div>
+
+            <button onclick="submitPrediction()" class="w-full bg-nusa-primary text-white font-bold py-3 rounded-xl hover:bg-red-600 hover:shadow-[0_0_15px_rgba(229,9,20,0.6)] transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check"></i> <span data-i18n="confirmPredict">Simpan Prediksi</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
     <!-- Application Logic -->
     <script>
         // Translations Dictionary
@@ -470,6 +529,11 @@
                 activeMarket: "Pasar Aktif",
                 myJournal: "Jurnal Saya",
                 credibility: "Kredibilitas",
+                community: "Komunitas",
+                all: "Semua Event",
+                sports: "Olahraga",
+                esports: "E-Sports",
+                culture: "Kultur & Politik",
                 radarTitle: "Radar Odds Discrepancy",
                 compare: "Bandingkan",
                 bookmaker: "Bandar",
@@ -488,7 +552,11 @@
                 pastPicks: "Riwayat Prediksi",
                 status: "Status",
                 win: "MENANG",
-                loss: "KALAH"
+                loss: "KALAH",
+                predictTitle: "Buat Prediksi",
+                selectTeam: "Pilih Hasil / Tim",
+                confidenceLvl: "Tingkat Keyakinan (1-10)",
+                confirmPredict: "Simpan Prediksi"
             },
             en: {
                 title: "NUSA PREDICT",
@@ -499,6 +567,11 @@
                 activeMarket: "Active Market",
                 myJournal: "My Journal",
                 credibility: "Credibility",
+                community: "Community",
+                all: "All Events",
+                sports: "Sports",
+                esports: "E-Sports",
+                culture: "Culture",
                 radarTitle: "Odds Discrepancy Radar",
                 compare: "Compare",
                 bookmaker: "Bookmaker",
@@ -517,7 +590,11 @@
                 pastPicks: "Prediction History",
                 status: "Status",
                 win: "WIN",
-                loss: "LOSS"
+                loss: "LOSS",
+                predictTitle: "Make a Prediction",
+                selectTeam: "Select Outcome",
+                confidenceLvl: "Confidence Level (1-10)",
+                confirmPredict: "Save Prediction"
             },
             ar: {
                 title: "نوسانتارا بريديكت",
@@ -528,6 +605,11 @@
                 activeMarket: "السوق النشط",
                 myJournal: "يومياتي",
                 credibility: "المصداقية",
+                community: "المجتمع",
+                all: "كل الأحداث",
+                sports: "رياضة",
+                esports: "الرياضات الإلكترونية",
+                culture: "ثقافة",
                 radarTitle: "رادار تباين الاحتمالات",
                 compare: "مقارنة",
                 bookmaker: "مراهن",
@@ -546,19 +628,28 @@
                 pastPicks: "سجل التوقعات",
                 status: "الحالة",
                 win: "فوز",
-                loss: "خسارة"
+                loss: "خسارة",
+                predictTitle: "قم بعمل توقع",
+                selectTeam: "اختر النتيجة",
+                confidenceLvl: "مستوى الثقة (1-10)",
+                confirmPredict: "حفظ التوقع"
             }
         };
 
         // --- Dynamic Matches Data ---
         const matchesData = [
-            { id: 1, league: "Liga 1", match: "Persija vs Persib", home: "Persija", away: "Persib", oddsBook: "+120 - 2.80", oddsChain: "1.45", discrepancy: 15, isTrending: true },
-            { id: 2, league: "Kualifikasi PD", match: "Indonesia vs Arab Saudi", home: "Indonesia", away: "Arab Saudi", oddsBook: "+100 - 3.00", oddsChain: "1.50", discrepancy: 20, isTrending: true },
-            { id: 3, league: "Kualifikasi PD", match: "Indonesia vs Australia", home: "Indonesia", away: "Australia", oddsBook: "+150 - 4.00", oddsChain: "1.80", discrepancy: 10, isTrending: false },
-            { id: 4, league: "EPL", match: "Man Utd vs Arsenal", home: "Man Utd", away: "Arsenal", oddsBook: "+110 - 2.50", oddsChain: "1.60", discrepancy: 5, isTrending: false },
-            { id: 5, league: "MPL S13", match: "RRQ vs ONIC", home: "RRQ", away: "ONIC", oddsBook: "-150 - 1.80", oddsChain: "1.95", discrepancy: -8, isTrending: true },
-            { id: 6, league: "Pop Culture", match: "Oscar Best Picture", home: "Oppenheimer", away: "Barbie", oddsBook: "-200 - 1.20", oddsChain: "1.10", discrepancy: 2, isTrending: false }
+            { id: 1, type: "sports", league: "Liga 1", match: "Persija vs Persib", home: "Persija", away: "Persib", oddsBook: "+120 - 2.80", oddsChain: "1.45", discrepancy: 15, isTrending: true },
+            { id: 2, type: "sports", league: "Kualifikasi PD", match: "Indonesia vs Arab Saudi", home: "Indonesia", away: "Arab Saudi", oddsBook: "+100 - 3.00", oddsChain: "1.50", discrepancy: 20, isTrending: true },
+            { id: 3, type: "sports", league: "Kualifikasi PD", match: "Indonesia vs Australia", home: "Indonesia", away: "Australia", oddsBook: "+150 - 4.00", oddsChain: "1.80", discrepancy: 10, isTrending: false },
+            { id: 4, type: "sports", league: "EPL", match: "Man Utd vs Arsenal", home: "Man Utd", away: "Arsenal", oddsBook: "+110 - 2.50", oddsChain: "1.60", discrepancy: 5, isTrending: false },
+            { id: 5, type: "esports", league: "MPL S13", match: "RRQ vs ONIC", home: "RRQ", away: "ONIC", oddsBook: "-150 - 1.80", oddsChain: "1.95", discrepancy: -8, isTrending: true },
+            { id: 6, type: "esports", league: "VCT Pacific", match: "PRX vs DRX", home: "PRX", away: "DRX", oddsBook: "-110 - 1.90", oddsChain: "1.85", discrepancy: 3, isTrending: false },
+            { id: 7, type: "culture", league: "Pop Culture", match: "Oscar Best Picture", home: "Oppenheimer", away: "Barbie", oddsBook: "-200 - 1.20", oddsChain: "1.10", discrepancy: 2, isTrending: false },
+            { id: 8, type: "culture", league: "Pemilu 2029", match: "Kandidat A vs B", home: "Kand. A", away: "Kand. B", oddsBook: "+105 - 2.10", oddsChain: "2.30", discrepancy: -12, isTrending: true }
         ];
+
+        let currentCategory = 'all';
+        let searchQuery = '';
 
         function renderMatches() {
             const radarContainer = document.getElementById('radar-matches-container');
@@ -568,14 +659,26 @@
                 let radarHTML = '';
                 let journalHTML = '';
 
-                matchesData.forEach((item, index) => {
-                    // Logic styling
+                // Application of Filters (Search Bar + Category Pills)
+                const filteredMatches = matchesData.filter(m => {
+                    const matchSearch = m.match.toLowerCase().includes(searchQuery.toLowerCase());
+                    const matchCat = currentCategory === 'all' || m.type === currentCategory;
+                    return matchSearch && matchCat;
+                });
+
+                if (filteredMatches.length === 0) {
+                    radarHTML = '<div class="text-center text-sm text-gray-500 py-4 font-bold">Tidak ada event yang ditemukan.</div>';
+                    journalHTML = '<tr><td colspan="4" class="text-center text-sm text-gray-500 py-4 font-bold">Tidak ada event yang ditemukan.</td></tr>';
+                }
+
+                filteredMatches.forEach((item, index) => {
                     const badgeColor = item.isTrending ? 'bg-nusa-primary text-white' : 'bg-gray-700 text-gray-300';
                     const discrepancyColor = item.discrepancy > 10 ? 'text-nusa-primary' : (item.discrepancy < 0 ? 'text-blue-400' : 'text-nusa-green');
                     const barWidth = Math.min(Math.abs(item.discrepancy) * 4, 100);
                     
+                    // Radar Matches Content Update
                     radarHTML += `
-                    <div class="bg-black/40 backdrop-blur-md border border-white/5 rounded-lg p-3 hover:border-nusa-primary/50 transition-colors cursor-pointer relative overflow-hidden group">
+                    <div onclick="openPredictModal('${item.match}')" class="bg-black/40 backdrop-blur-md border border-white/5 rounded-lg p-3 hover:border-nusa-primary/50 transition-colors cursor-pointer relative overflow-hidden group">
                         <div class="absolute left-0 top-0 bottom-0 w-1 ${item.isTrending ? 'bg-nusa-primary shadow-[0_0_10px_#E50914]' : 'bg-gray-600'}"></div>
                         <div class="flex justify-between items-center mb-2 pl-2">
                             <div class="flex gap-2 items-center">
@@ -600,6 +703,7 @@
                         </div>
                     </div>`;
 
+                    // Journal Content Update with enhanced button
                     journalHTML += `
                     <tr class="border-b border-gray-800/50 hover:bg-white/5 transition-colors">
                         <td class="py-3 px-2">
@@ -620,8 +724,8 @@
                             ${'<i class="fa-solid fa-star text-gray-700"></i>'.repeat(index % 3)}
                         </td>
                         <td class="py-3 text-right pr-2">
-                            <button onclick="showSimulationModal('${item.match}')" class="bg-gray-800/80 backdrop-blur border border-gray-600 text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-nusa-primary hover:border-nusa-primary transition-all shadow-lg" data-i18n="simResult">
-                                Simulasi Hasil
+                            <button onclick="openPredictModal('${item.match}')" class="bg-nusa-primary text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-red-600 transition-all shadow-lg shadow-nusa-primary/20">
+                                <i class="fa-solid fa-pen mr-1"></i> Prediksi
                             </button>
                         </td>
                     </tr>`;
@@ -632,102 +736,200 @@
             }
         }
 
-        // Jalankan render array
         renderMatches();
+
+        // Search Bar Event Hook
+        const searchInput = document.getElementById('search-input');
+        if(searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                renderMatches();
+            });
+        }
+
+        // Filter Pill Buttons hook
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('active', 'bg-nusa-primary', 'text-white', 'border-nusa-primary', 'shadow-[0_0_10px_rgba(229,9,20,0.3)]');
+                    b.classList.add('bg-gray-800', 'text-nusa-textMuted', 'border-gray-700');
+                });
+                const target = e.target;
+                target.classList.add('active', 'bg-nusa-primary', 'text-white', 'border-nusa-primary', 'shadow-[0_0_10px_rgba(229,9,20,0.3)]');
+                target.classList.remove('bg-gray-800', 'text-nusa-textMuted', 'border-gray-700');
+                
+                currentCategory = target.getAttribute('data-filter');
+                renderMatches();
+            });
+        });
 
         // Language Switcher Logic
         const langSwitch = document.getElementById('lang-switch');
         const appBody = document.getElementById('app-body');
 
         function changeLanguage(lang) {
-            // Set RTL if Arabic
-            if (lang === 'ar') {
-                appBody.setAttribute('dir', 'rtl');
-            } else {
-                appBody.setAttribute('dir', 'ltr');
-            }
-
-            // Update text content
+            if (lang === 'ar') appBody.setAttribute('dir', 'rtl');
+            else appBody.setAttribute('dir', 'ltr');
+            
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
-                    el.innerHTML = translations[lang][key]; // Using innerHTML for bold tags in mascotMsg
-                }
+                if (translations[lang][key]) el.innerHTML = translations[lang][key];
             });
-
-            // Update placeholders
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
-                if (translations[lang][key]) {
-                    el.setAttribute('placeholder', translations[lang][key]);
-                }
+                if (translations[lang][key]) el.setAttribute('placeholder', translations[lang][key]);
             });
         }
 
-        langSwitch.addEventListener('change', (e) => {
-            changeLanguage(e.target.value);
-        });
-
-        // Initialize default language
+        langSwitch.addEventListener('change', (e) => changeLanguage(e.target.value));
         changeLanguage('id');
 
-        // Tab functionality Logic
-        const tabs = document.querySelectorAll('.nav-tab');
+        // Navigation Sync Logic (Desktop & Mobile)
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+        const mobileNavBtns = document.querySelectorAll('.mobile-nav-btn');
         const tabContents = document.querySelectorAll('.tab-content');
 
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // 1. Remove active classes from all tabs
-                tabs.forEach(t => {
+        function switchTab(targetId) {
+            navTabs.forEach(t => {
+                if (t.getAttribute('data-target') === targetId) {
+                    t.classList.remove('border-transparent', 'text-nusa-textMuted');
+                    t.classList.add('border-nusa-primary', 'text-nusa-primary', 'active');
+                } else {
                     t.classList.remove('border-nusa-primary', 'text-nusa-primary', 'active');
                     t.classList.add('border-transparent', 'text-nusa-textMuted');
-                });
-                
-                // 2. Add active class to the clicked tab
-                tab.classList.remove('border-transparent', 'text-nusa-textMuted');
-                tab.classList.add('border-nusa-primary', 'text-nusa-primary', 'active');
-
-                // 3. Hide all tab contents, show the targeted one
-                const targetId = tab.getAttribute('data-target');
-                tabContents.forEach(content => {
-                    if (content.id === targetId) {
-                        content.classList.remove('hidden');
-                        content.classList.add('block'); // ensure it displays
-                    } else {
-                        content.classList.add('hidden');
-                        content.classList.remove('block');
-                    }
-                });
+                }
             });
+
+            sidebarBtns.forEach(btn => {
+                if (btn.getAttribute('data-target') === targetId) {
+                    btn.classList.remove('text-nusa-textMuted', 'hover:text-white', 'hover:bg-gray-800');
+                    btn.classList.add('bg-nusa-primary', 'text-white', 'shadow-lg', 'shadow-nusa-primary/40');
+                } else {
+                    btn.classList.add('text-nusa-textMuted', 'hover:text-white', 'hover:bg-gray-800');
+                    btn.classList.remove('bg-nusa-primary', 'text-white', 'shadow-lg', 'shadow-nusa-primary/40');
+                }
+            });
+
+            mobileNavBtns.forEach(btn => {
+                if (btn.getAttribute('data-target') === targetId) {
+                    btn.classList.remove('text-nusa-textMuted', 'hover:text-white');
+                    btn.classList.add('bg-nusa-primary', 'text-white');
+                } else {
+                    btn.classList.add('text-nusa-textMuted', 'hover:text-white');
+                    btn.classList.remove('bg-nusa-primary', 'text-white');
+                }
+            });
+
+            tabContents.forEach(content => {
+                if (content.id === targetId) {
+                    content.classList.remove('hidden');
+                    content.classList.add('block');
+                } else {
+                    content.classList.add('hidden');
+                    content.classList.remove('block');
+                }
+            });
+            
+            document.getElementById('mobile-menu').classList.add('-translate-x-full');
+        }
+
+        navTabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.getAttribute('data-target'))));
+        sidebarBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.getAttribute('data-target'))));
+        mobileNavBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.getAttribute('data-target'))));
+
+        // Mobile Menu Toggle
+        document.getElementById('open-mobile-menu').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.remove('-translate-x-full');
+        });
+        document.getElementById('close-mobile-menu').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.add('-translate-x-full');
         });
 
-        // Custom Modal Logic
-        const modal = document.getElementById('simModal');
-        const modalContent = document.getElementById('simModalContent');
-        const modalText = document.getElementById('simModalText');
+        // Notification Dropdown Logic
+        const notifBtn = document.getElementById('notif-btn');
+        const notifDropdown = document.getElementById('notif-dropdown');
+        notifBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notifDropdown.classList.toggle('hidden');
+            notifDropdown.classList.toggle('flex');
+        });
+        document.addEventListener('click', (e) => {
+            if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
+                notifDropdown.classList.add('hidden');
+                notifDropdown.classList.remove('flex');
+            }
+        });
 
+        // Interactive Toast Notification System
+        window.showToast = function(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-nusa-card/95 backdrop-blur-xl border-l-4 border-nusa-primary text-white px-5 py-3 rounded-lg shadow-[0_10px_30px_rgba(0,0,0,0.5)] transform transition-all duration-300 translate-y-[-20px] opacity-0 text-sm font-semibold flex items-center gap-3 mt-2';
+            toast.innerHTML = `<i class="fa-solid fa-circle-info text-nusa-primary"></i> <span>${msg}</span>`;
+            container.appendChild(toast);
+            
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-20px]', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Sim Modal functions (from previous version)
+        const simModal = document.getElementById('simModal');
+        const simModalContent = document.getElementById('simModalContent');
         window.showSimulationModal = function(matchName) {
-            modalText.innerText = `Menjalankan simulasi prediksi untuk ${matchName} berdasarkan data on-chain terkini...`;
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            // Small delay for transition to work
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modalContent.classList.remove('scale-95');
-            }, 10);
+            document.getElementById('simModalText').innerText = `Menjalankan simulasi prediksi untuk ${matchName} berdasarkan data on-chain terkini...`;
+            simModal.classList.remove('hidden'); simModal.classList.add('flex');
+            setTimeout(() => { simModal.classList.remove('opacity-0'); simModalContent.classList.remove('scale-95'); }, 10);
         }
-
-        window.simulateAll = function() {
-            showSimulationModal("semua jurnal prediksi aktif Anda");
-        }
-
+        window.simulateAll = function() { showSimulationModal("semua jurnal prediksi aktif Anda"); }
         window.closeModal = function() {
-            modal.classList.add('opacity-0');
-            modalContent.classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }, 300); // match duration
+            simModal.classList.add('opacity-0'); simModalContent.classList.add('scale-95');
+            setTimeout(() => { simModal.classList.add('hidden'); simModal.classList.remove('flex'); }, 300);
+        }
+
+        // Prediction Modal Logic
+        const predictModal = document.getElementById('predictModal');
+        const predictModalContent = document.getElementById('predictModalContent');
+        
+        window.openPredictModal = function(matchName) {
+            document.getElementById('predictModalMatch').innerText = matchName;
+            
+            document.querySelectorAll('.pred-team-btn').forEach(b => {
+                b.classList.remove('bg-nusa-primary', 'border-nusa-primary');
+                b.classList.add('bg-gray-800', 'border-gray-600');
+            });
+            document.getElementById('confidenceSlider').value = 5;
+            document.getElementById('confidenceValue').innerText = "5";
+
+            predictModal.classList.remove('hidden'); predictModal.classList.add('flex');
+            setTimeout(() => { predictModal.classList.remove('opacity-0'); predictModalContent.classList.remove('scale-95'); }, 10);
+        }
+        
+        window.closePredictModal = function() {
+            predictModal.classList.add('opacity-0'); predictModalContent.classList.add('scale-95');
+            setTimeout(() => { predictModal.classList.add('hidden'); predictModal.classList.remove('flex'); }, 300);
+        }
+
+        window.selectTeam = function(btn) {
+            document.querySelectorAll('.pred-team-btn').forEach(b => {
+                b.classList.remove('bg-nusa-primary', 'border-nusa-primary');
+                b.classList.add('bg-gray-800', 'border-gray-600');
+            });
+            btn.classList.remove('bg-gray-800', 'border-gray-600');
+            btn.classList.add('bg-nusa-primary', 'border-nusa-primary');
+        }
+
+        window.submitPrediction = function() {
+            closePredictModal();
+            setTimeout(() => showToast('Prediksi berhasil disimpan ke dalam Jurnal Anda!'), 300);
         }
     </script>
 </body>
