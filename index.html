@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nusantara Predict</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        nusa: {
+                            bg: '#0B0C10',
+                            card: '#1F2833',
+                            primary: '#E50914', /* Deep Red / Indonesian Red */
+                            green: '#10b981',
+                            red: '#E50914',
+                            text: '#f8fafc',
+                            textMuted: '#94a3b8'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for sleek look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0C10;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E50914;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b30710;
+        }
+        
+        /* Card glowing top borders (Glassmorphism) */
+        .card-glow-primary {
+            background: rgba(31, 40, 51, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 2px solid #E50914;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 -2px 15px rgba(229, 9, 20, 0.15);
+        }
+        .card-glow-green {
+            background: rgba(31, 40, 51, 0.4);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 2px solid #10b981;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 -2px 10px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Input styling overrides */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body id="app-body" class="bg-nusa-bg text-nusa-text font-sans h-screen flex overflow-hidden selection:bg-nusa-primary selection:text-white transition-all duration-300">
+
+    <!-- Sidebar (Desktop) -->
+    <aside class="w-16 bg-nusa-card border-r border-gray-800 hidden md:flex flex-col items-center py-6 justify-between z-20">
+        <div class="flex flex-col gap-8 w-full items-center">
+            <a href="#" class="text-nusa-primary text-2xl hover:scale-110 transition-transform"><i class="fa-solid fa-layer-group"></i></a>
+            <div class="w-8 h-px bg-gray-700 my-2"></div>
+            <a href="#" class="text-white bg-nusa-primary p-3 rounded-xl shadow-lg shadow-nusa-primary/40"><i class="fa-solid fa-house"></i></a>
+            <a href="#" class="text-nusa-textMuted hover:text-white transition-colors p-3"><i class="fa-regular fa-circle-question"></i></a>
+            <a href="#" class="text-nusa-textMuted hover:text-white transition-colors p-3"><i class="fa-regular fa-calendar"></i></a>
+            <a href="#" class="text-nusa-textMuted hover:text-white transition-colors p-3"><i class="fa-solid fa-trophy"></i></a>
+            <a href="#" class="text-nusa-textMuted hover:text-white transition-colors p-3"><i class="fa-solid fa-sliders"></i></a>
+        </div>
+        <a href="#" class="text-nusa-textMuted hover:text-white transition-colors p-3 mt-auto"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full relative">
+        
+        <!-- Header -->
+        <header class="h-16 border-b border-gray-800 bg-nusa-bg/80 backdrop-blur-md flex items-center justify-between px-4 lg:px-6 z-10">
+            <div class="flex items-center gap-3">
+                <!-- Mobile Menu Toggle -->
+                <button class="md:hidden text-nusa-textMuted hover:text-white">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-nusa-primary text-xl md:hidden"></i>
+                    <h1 class="font-bold text-lg tracking-wider hidden sm:block"><span data-i18n="title">NUSANTARA PREDICT</span></h1>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Language Switcher -->
+                <select id="lang-switch" class="bg-nusa-card border border-gray-700 text-sm rounded-md px-2 py-1 text-nusa-text focus:border-nusa-primary outline-none cursor-pointer hover:border-gray-500 transition-colors">
+                    <option value="id">🇮🇩 ID</option>
+                    <option value="en">🇬🇧 EN</option>
+                    <option value="ar">🇸🇦 AR</option>
+                </select>
+
+                <!-- Search -->
+                <div class="hidden md:flex items-center bg-nusa-card rounded-full px-4 py-1.5 border border-gray-700 focus-within:border-nusa-primary transition-colors">
+                    <i class="fa-solid fa-magnifying-glass text-nusa-textMuted text-sm"></i>
+                    <input type="text" id="search-input" placeholder="Cari Event..." data-i18n-placeholder="searchPlaceholder" class="bg-transparent border-none outline-none text-sm ml-2 w-48 text-white placeholder-nusa-textMuted">
+                </div>
+
+                <!-- Toggles (Desktop only for space) -->
+                <div class="hidden lg:flex items-center gap-3 mr-4">
+                    <span class="text-sm text-nusa-textMuted" data-i18n="mode">Mode:</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" value="" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-nusa-primary"></div>
+                    </label>
+                    <span class="text-sm text-nusa-textMuted" data-i18n="device">Desktop / Handphone</span>
+                    
+                    <button class="ml-2 border border-nusa-primary text-nusa-primary px-3 py-1 rounded-md text-sm flex items-center gap-2 hover:bg-nusa-primary hover:text-white transition-colors">
+                        <i class="fa-solid fa-microphone"></i> <span data-i18n="camVoice">Kamera/Suara</span>
+                    </button>
+                </div>
+
+                <!-- Notifications & Profile -->
+                <button class="relative text-nusa-textMuted hover:text-white">
+                    <i class="fa-regular fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-nusa-primary text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">2</span>
+                </button>
+                </div>
+
+                <!-- Notifications & Profile -->
+                <button class="relative text-nusa-textMuted hover:text-white">
+                    <i class="fa-regular fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-nusa-red text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">2</span>
+                </button>
+                <div class="flex items-center gap-2 bg-nusa-card border border-gray-700 rounded-full pl-1 pr-3 py-1 cursor-pointer hover:border-gray-500 transition-colors">
+                    <img src="https://placehold.co/100x100/334155/ffffff?text=U" alt="User" class="w-7 h-7 rounded-full">
+                    <span class="text-sm hidden sm:block">Kamera...</span>
+                    <i class="fa-solid fa-chevron-down text-xs text-nusa-textMuted hidden sm:block"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sub Navigation -->
+        <nav class="flex gap-1 px-4 lg:px-6 pt-4 border-b border-gray-800 overflow-x-auto whitespace-nowrap hide-scrollbar">
+            <button class="nav-tab active px-4 py-2 text-sm font-medium border-b-2 border-nusa-primary text-nusa-primary transition-colors" data-target="tab-pasar">
+                <span data-i18n="activeMarket">Pasar Aktif</span> <span class="ml-1 bg-white text-nusa-primary font-bold text-[10px] px-1.5 py-0.5 rounded-full">8</span>
+            </button>
+            <button class="nav-tab px-4 py-2 text-sm font-medium border-b-2 border-transparent text-nusa-textMuted hover:text-white hover:border-gray-600 transition-colors" data-target="tab-jurnal" data-i18n="myJournal">Jurnal Saya</button>
+            <button class="nav-tab px-4 py-2 text-sm font-medium border-b-2 border-transparent text-nusa-textMuted hover:text-white hover:border-gray-600 transition-colors" data-target="tab-kredi" data-i18n="credibility">Kredibilitas</button>
+        </nav>
+
+        <!-- Dashboard Grid (Tab Content Wrappers) -->
+        <div class="flex-1 overflow-y-auto p-4 lg:p-6 bg-nusa-bg">
+            
+            <!-- TAB 1: PASAR AKTIF -->
+            <div id="tab-pasar" class="tab-content block">
+                <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- 1. Radar Odds Discrepancy (Spans 2 cols on Desktop) -->
+                    <section class="lg:col-span-2 bg-nusa-card border border-gray-700 rounded-xl p-5 card-glow-primary flex flex-col gap-4">
+                            <i class="fa-solid fa-plus"></i> <span data-i18n="compare">Compare</span>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Bookmaker Column -->
+                        <div class="bg-[#111827] rounded-lg p-4 border border-gray-800">
+                            <div class="flex justify-between items-center mb-4 text-sm text-nusa-textMuted">
+                                <span data-i18n="bookmaker">Bookmaker</span>
+                                <span data-i18n="onchain">Onchain</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="text-xl font-bold text-nusa-green">bet365</div>
+                                <div class="flex flex-col items-end">
+                                    <div class="flex items-center gap-1">
+                                        <i class="fa-solid fa-cube text-blue-400"></i>
+                                        <span class="font-semibold text-sm">Polymarket</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-xs text-nusa-textMuted border-b border-gray-800 pb-2 mb-2">
+                                <span>09:00 <span class="text-nusa-green">+0.00</span></span>
+                                <span>10:00 <span class="text-nusa-primary">-15.55</span></span>
+                            </div>
+                            
+                            <div class="text-center text-xs text-nusa-textMuted mb-4" data-i18n="radarTitle">Radar Odds Discrepancy</div>
+                            
+                            <div class="flex items-center justify-between bg-gray-800/50 rounded p-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-4 bg-red-600 border border-white relative"><div class="absolute top-0 w-full h-1/2 bg-white"></div></div>
+                                    <span class="text-sm font-semibold">TIND</span>
+                                </div>
+                                <span class="text-xs text-nusa-textMuted">VS</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-semibold">ARAB</span>
+                                    <div class="w-6 h-4 bg-green-700 flex items-center justify-center"><i class="fa-solid fa-star text-[6px] text-white"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Matches List -->
+                        <div class="flex flex-col gap-3">
+                            <div class="flex justify-between text-xs text-nusa-textMuted mb-2 px-2 border-b border-gray-800 pb-2">
+                                <span data-i18n="bookmaker">Market</span>
+                                <span data-i18n="onchain">Odds Discrepancy</span>
+                            </div>
+                            
+                            <div id="radar-matches-container" class="flex flex-col gap-3 overflow-y-auto max-h-[350px] pr-1 hide-scrollbar">
+                                <!-- JS Dynamically Loads Matches Here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Leaderboard Analis -->
+                <section class="bg-nusa-card border border-gray-700 rounded-xl p-5 card-glow-primary flex flex-col gap-4">
+                    <h2 class="text-lg font-semibold tracking-wide border-b border-gray-800 pb-3" data-i18n="leaderboard">Leaderboard Analis</h2>
+                    
+                    <div class="flex flex-col gap-3">
+                        <!-- Rank 1 -->
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-gray-800/30 hover:bg-gray-800/80 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center text-yellow-500"><i class="fa-solid fa-medal text-xl"></i></div>
+                                <img src="https://placehold.co/100x100/10b981/ffffff?text=A" alt="Avatar" class="w-10 h-10 rounded-full border border-gray-600">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-semibold">Anmofindonto</span>
+                                    <span class="text-xs text-nusa-textMuted" data-i18n="analyst">Analis</span>
+                                </div>
+                            </div>
+                            <span class="text-nusa-primary font-bold text-sm">+35 PTS</span>
+                        </div>
+                        
+                        <!-- Rank 2 -->
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-800/50 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center text-gray-400"><i class="fa-solid fa-medal text-lg"></i></div>
+                                <img src="https://placehold.co/100x100/3b82f6/ffffff?text=M" alt="Avatar" class="w-10 h-10 rounded-full border border-gray-600">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-semibold">Multoux</span>
+                                    <span class="text-xs text-nusa-textMuted" data-i18n="analyst">Fereusis</span>
+                                </div>
+                            </div>
+                            <span class="text-nusa-primary font-bold text-sm">+35 PTS</span>
+                        </div>
+                        
+                        <!-- Rank 3 -->
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-800/50 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 text-center text-orange-400"><i class="fa-solid fa-medal text-md"></i></div>
+                                <img src="https://placehold.co/100x100/ef4444/ffffff?text=R" alt="Avatar" class="w-10 h-10 rounded-full border border-gray-600">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-semibold">Ren Alkamin</span>
+                                    <span class="text-xs text-nusa-textMuted" data-i18n="analyst">Analis</span>
+                                </div>
+                            </div>
+                            <span class="text-nusa-primary font-bold text-sm">+35 PTS</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Jurnal Prediksi & Skor -->
+                <section class="lg:col-span-3 bg-nusa-card border border-gray-700 rounded-xl p-5 card-glow-primary flex flex-col gap-4 relative overflow-hidden">
+                    
+                    <div class="flex justify-between items-center relative z-10">
+                        <div>
+                            <h2 class="text-lg font-semibold tracking-wide text-white" data-i18n="journalTitle">Jurnal Prediksi & Skor</h2>
+                            <p class="text-sm text-nusa-textMuted" data-i18n="journalSub">Slow your prediction picks.</p>
+                        </div>
+                        <button onclick="simulateAll()" class="text-xs bg-nusa-primary text-white px-4 py-2 rounded hover:bg-red-500 font-bold flex items-center gap-2 transition-all shadow-lg shadow-nusa-primary/30">
+                            <i class="fa-solid fa-play"></i> <span data-i18n="simResult">Simulasi Hasil</span>
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto relative z-10">
+                        <table class="w-full min-w-[500px] text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-nusa-textMuted border-b border-gray-800">
+                                    <th class="py-3 font-normal" data-i18n="predPick">Prediction Pick</th>
+                                    <th class="py-3 font-normal text-center" data-i18n="position">Position</th>
+                                    <th class="py-3 font-normal text-center" data-i18n="confidence">Confidence</th>
+                                    <th class="py-3 font-normal text-right" data-i18n="action">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="journal-matches-container" class="text-sm">
+                                <!-- JS Dynamically Loads Journal Rows Here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                
+                <!-- Bottom decorative banner (Desktop only) moved inside Tab Pasar -->
+                <div class="lg:col-span-3 mt-4 hidden lg:flex items-center justify-center pb-4 opacity-90 pointer-events-none">
+                    <div class="bg-nusa-card/60 backdrop-blur-xl border border-white/10 rounded-2xl p-4 px-8 flex items-center gap-6 shadow-2xl relative border-t-2 border-t-white border-b-2 border-b-nusa-primary w-full max-w-4xl justify-center">
+                        <img src="10.png" alt="Sari Mascot Happy" class="w-40 h-40 object-contain absolute left-8 bottom-0 animate-float drop-shadow-2xl z-10">
+                        <div class="pl-32 text-center z-20">
+                            <h3 class="text-2xl text-white drop-shadow-md">Yuk, <span class="font-black text-nusa-primary drop-shadow-[0_0_10px_rgba(229,9,20,0.8)] tracking-wide">tebak hasil pertandingan</span></h3>
+                            <p class="text-lg text-white/90 font-medium mt-1">dari berbagai liga hari ini bareng Sari!</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB 2: JURNAL SAYA -->
+            <div id="tab-jurnal" class="tab-content hidden">
+                <div class="max-w-7xl mx-auto flex flex-col gap-6">
+                    <section class="bg-nusa-card border border-gray-700 rounded-xl p-5 card-glow-primary flex flex-col gap-4">
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                            <div>
+                                <h2 class="text-xl font-bold tracking-wide text-white" data-i18n="myJournal">Jurnal Saya</h2>
+                                <p class="text-sm text-nusa-textMuted" data-i18n="pastPicks">Riwayat Prediksi</p>
+                            </div>
+                            <div class="bg-gray-800 rounded-lg px-3 py-1 flex gap-2">
+                                <span class="text-nusa-green font-bold text-sm">W: 12</span>
+                                <span class="text-gray-500">|</span>
+                                <span class="text-nusa-primary font-bold text-sm">L: 3</span>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[500px] text-left border-collapse">
+                                <thead>
+                                    <tr class="text-xs text-nusa-textMuted border-b border-gray-800">
+                                        <th class="py-3 font-normal" data-i18n="predPick">Prediction Pick</th>
+                                        <th class="py-3 font-normal text-center" data-i18n="position">Position (Tebakan)</th>
+                                        <th class="py-3 font-normal text-center">Skor Akhir</th>
+                                        <th class="py-3 font-normal text-right" data-i18n="status">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm">
+                                    <!-- History Row 1 (Win) -->
+                                    <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+                                        <td class="py-3">
+                                            <div class="font-semibold text-white">Timnas Indonesia vs Vietnam</div>
+                                            <div class="text-xs text-nusa-textMuted">Kualifikasi Piala Dunia</div>
+                                        </td>
+                                        <td class="py-3 text-center font-bold text-white">2 : 0</td>
+                                        <td class="py-3 text-center font-bold text-white">2 : 0</td>
+                                        <td class="py-3 text-right">
+                                            <span class="bg-green-500/20 text-green-400 border border-green-500/50 px-2 py-1 rounded text-xs font-bold" data-i18n="win">MENANG</span>
+                                            <div class="text-xs text-nusa-green mt-1">+50 PTS</div>
+                                        </td>
+                                    </tr>
+                                    <!-- History Row 2 (Loss) -->
+                                    <tr class="hover:bg-gray-800/30 transition-colors">
+                                        <td class="py-3">
+                                            <div class="font-semibold text-white">Timnas Indonesia vs Irak</div>
+                                            <div class="text-xs text-nusa-textMuted">Piala Asia</div>
+                                        </td>
+                                        <td class="py-3 text-center font-bold text-white">1 : 0</td>
+                                        <td class="py-3 text-center font-bold text-nusa-primary">1 : 3</td>
+                                        <td class="py-3 text-right">
+                                            <span class="bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-1 rounded text-xs font-bold" data-i18n="loss">KALAH</span>
+                                            <div class="text-xs text-nusa-primary mt-1">-10 PTS</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- TAB 3: KREDIBILITAS -->
+            <div id="tab-kredi" class="tab-content hidden">
+                <div class="max-w-4xl mx-auto flex flex-col gap-6">
+                    <section class="bg-nusa-card border border-gray-700 rounded-xl p-8 card-glow-primary text-center relative overflow-hidden">
+                        <!-- Decorative bg -->
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-white via-nusa-primary to-white"></div>
+                        
+                        <div class="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-nusa-primary shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                            <i class="fa-solid fa-medal text-4xl text-yellow-400"></i>
+                        </div>
+                        
+                        <h2 class="text-2xl font-bold text-white mb-2" data-i18n="credibility">Kredibilitas</h2>
+                        <p class="text-nusa-textMuted mb-6" data-i18n="credibilityDesc">Tingkat kepercayaan analis Anda di atas rata-rata!</p>
+                        
+                        <div class="text-6xl font-black text-white my-4 drop-shadow-md">
+                            850 <span class="text-xl text-nusa-primary font-bold">PTS</span>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="w-full max-w-md mx-auto mt-8">
+                            <div class="flex justify-between text-xs font-bold mb-1">
+                                <span class="text-white">Analis Pemula</span>
+                                <span class="text-nusa-primary">Master Analis (1000)</span>
+                            </div>
+                            <div class="w-full bg-gray-800 rounded-full h-3 border border-gray-700 overflow-hidden">
+                                <div class="bg-nusa-primary h-3 rounded-full relative" style="width: 85%">
+                                    <div class="absolute top-0 right-0 bottom-0 left-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] animate-[progress_1s_linear_infinite]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Floating AI Chat Widget (Mascot Sari) -->
+    <div id="floating-mascot" class="fixed bottom-6 right-6 z-50 flex items-end gap-3 flex-col sm:flex-row pointer-events-none">
+        <div id="mascot-msg-box" class="bg-nusa-card/90 backdrop-blur-xl border border-nusa-primary text-white p-4 rounded-2xl rounded-br-none shadow-[0_0_20px_rgba(229,9,20,0.4)] max-w-[280px] pointer-events-auto transform transition-all duration-500 scale-100 origin-bottom-right">
+            <button onclick="document.getElementById('mascot-msg-box').classList.add('scale-0', 'opacity-0')" class="absolute -top-2 -left-2 bg-gray-800 rounded-full w-6 h-6 flex items-center justify-center text-xs text-gray-400 hover:text-white border border-gray-600 hover:bg-nusa-primary transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-3 border-b border-white/10 pb-2">
+                <img src="2.png" alt="Sari Avatar" class="w-8 h-8 rounded-full bg-slate-800 object-cover border border-nusa-primary shadow-[0_0_8px_rgba(229,9,20,0.6)]">
+                <span class="font-bold text-sm tracking-wider">Sari (AI)</span>
+            </div>
+            <p class="text-sm font-medium leading-relaxed" data-i18n="mascotMsg">Prediksi kamu jitu banget!<br>Skor kredibilitasmu naik <span class="text-nusa-primary font-bold block mt-1">+30 PTS! 🔥</span></p>
+        </div>
+        <div class="pointer-events-auto cursor-pointer hover:-translate-y-2 transition-transform" onclick="document.getElementById('mascot-msg-box').classList.remove('scale-0', 'opacity-0')">
+            <img src="1.png" alt="Sari Mascot Peace" class="animate-float drop-shadow-lg w-32 h-32 object-contain">
+        </div>
+    </div>
+
+    <!-- Custom Modal for Simulation Alerts -->
+    <div id="simModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-nusa-card border-2 border-nusa-primary p-6 rounded-2xl shadow-[0_0_30px_rgba(239,68,68,0.3)] max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="simModalContent">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-nusa-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-nusa-primary">
+                    <i class="fa-solid fa-robot text-3xl text-nusa-primary"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-white">Simulasi Dijalankan</h3>
+                <p class="text-nusa-textMuted text-sm mb-6" id="simModalText">Menjalankan simulasi on-chain untuk pertandingan...</p>
+                <button onclick="closeModal()" class="w-full bg-nusa-primary text-white font-bold py-2 rounded-lg hover:bg-red-500 transition-colors shadow-lg">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // Translations Dictionary
+        const translations = {
+            id: {
+                title: "NUSANTARA PREDICT",
+                searchPlaceholder: "Cari Event...",
+                mode: "Mode:",
+                device: "Desktop / Handphone",
+                camVoice: "Kamera/Suara",
+                activeMarket: "Pasar Aktif",
+                myJournal: "Jurnal Saya",
+                credibility: "Kredibilitas",
+                radarTitle: "Radar Odds Discrepancy",
+                compare: "Bandingkan",
+                bookmaker: "Bandar",
+                onchain: "Onchain",
+                leaderboard: "Leaderboard Analis",
+                analyst: "Analis",
+                journalTitle: "Jurnal Prediksi & Skor",
+                journalSub: "Catat pilihan prediksi Anda.",
+                simResult: "Simulasi Hasil",
+                predPick: "Pilihan Prediksi",
+                position: "Posisi",
+                confidence: "Keyakinan",
+                action: "Aksi",
+                mascotMsg: "Prediksi kamu jitu banget!<br>Skor kredibilitasmu naik <span class='text-nusa-primary font-bold block mt-1'>+30 PTS! 🔥</span>",
+                credibilityDesc: "Tingkat kepercayaan analis Anda di atas rata-rata!",
+                pastPicks: "Riwayat Prediksi",
+                status: "Status",
+                win: "MENANG",
+                loss: "KALAH"
+            },
+            en: {
+                title: "NUSA PREDICT",
+                searchPlaceholder: "Search Event...",
+                mode: "Mode:",
+                device: "Desktop / Mobile",
+                camVoice: "Cam/Voice",
+                activeMarket: "Active Market",
+                myJournal: "My Journal",
+                credibility: "Credibility",
+                radarTitle: "Odds Discrepancy Radar",
+                compare: "Compare",
+                bookmaker: "Bookmaker",
+                onchain: "Onchain",
+                leaderboard: "Analyst Leaderboard",
+                analyst: "Analyst",
+                journalTitle: "Prediction & Score Journal",
+                journalSub: "Log your prediction picks.",
+                simResult: "Simulate Result",
+                predPick: "Prediction Pick",
+                position: "Position",
+                confidence: "Confidence",
+                action: "Action",
+                mascotMsg: "Your prediction is spot on!<br>Credibility score increased by <span class='text-nusa-primary font-bold block mt-1'>+30 PTS! 🔥</span>",
+                credibilityDesc: "Your analyst trust level is above average!",
+                pastPicks: "Prediction History",
+                status: "Status",
+                win: "WIN",
+                loss: "LOSS"
+            },
+            ar: {
+                title: "نوسانتارا بريديكت",
+                searchPlaceholder: "ابحث عن حدث...",
+                mode: "الوضع:",
+                device: "سطح المكتب / هاتف",
+                camVoice: "كاميرا/صوت",
+                activeMarket: "السوق النشط",
+                myJournal: "يومياتي",
+                credibility: "المصداقية",
+                radarTitle: "رادار تباين الاحتمالات",
+                compare: "مقارنة",
+                bookmaker: "مراهن",
+                onchain: "على السلسلة",
+                leaderboard: "لوحة الصدارة",
+                analyst: "محلل",
+                journalTitle: "يوميات التوقعات والنتائج",
+                journalSub: "سجل اختيارات توقعاتك.",
+                simResult: "محاكاة النتيجة",
+                predPick: "اختيار التوقع",
+                position: "المركز",
+                confidence: "الثقة",
+                action: "إجراء",
+                mascotMsg: "توقعك دقيق جداً!<br>زادت درجة مصداقيتك بمقدار <span class='text-nusa-primary font-bold block mt-1'>+30 نقطة! 🔥</span>",
+                credibilityDesc: "مستوى ثقة المحلل الخاص بك أعلى من المتوسط!",
+                pastPicks: "سجل التوقعات",
+                status: "الحالة",
+                win: "فوز",
+                loss: "خسارة"
+            }
+        };
+
+        // --- Dynamic Matches Data ---
+        const matchesData = [
+            { id: 1, league: "Liga 1", match: "Persija vs Persib", home: "Persija", away: "Persib", oddsBook: "+120 - 2.80", oddsChain: "1.45", discrepancy: 15, isTrending: true },
+            { id: 2, league: "Kualifikasi PD", match: "Indonesia vs Arab Saudi", home: "Indonesia", away: "Arab Saudi", oddsBook: "+100 - 3.00", oddsChain: "1.50", discrepancy: 20, isTrending: true },
+            { id: 3, league: "Kualifikasi PD", match: "Indonesia vs Australia", home: "Indonesia", away: "Australia", oddsBook: "+150 - 4.00", oddsChain: "1.80", discrepancy: 10, isTrending: false },
+            { id: 4, league: "EPL", match: "Man Utd vs Arsenal", home: "Man Utd", away: "Arsenal", oddsBook: "+110 - 2.50", oddsChain: "1.60", discrepancy: 5, isTrending: false },
+            { id: 5, league: "MPL S13", match: "RRQ vs ONIC", home: "RRQ", away: "ONIC", oddsBook: "-150 - 1.80", oddsChain: "1.95", discrepancy: -8, isTrending: true },
+            { id: 6, league: "Pop Culture", match: "Oscar Best Picture", home: "Oppenheimer", away: "Barbie", oddsBook: "-200 - 1.20", oddsChain: "1.10", discrepancy: 2, isTrending: false }
+        ];
+
+        function renderMatches() {
+            const radarContainer = document.getElementById('radar-matches-container');
+            const journalContainer = document.getElementById('journal-matches-container');
+            
+            if(radarContainer && journalContainer) {
+                let radarHTML = '';
+                let journalHTML = '';
+
+                matchesData.forEach((item, index) => {
+                    // Logic styling
+                    const badgeColor = item.isTrending ? 'bg-nusa-primary text-white' : 'bg-gray-700 text-gray-300';
+                    const discrepancyColor = item.discrepancy > 10 ? 'text-nusa-primary' : (item.discrepancy < 0 ? 'text-blue-400' : 'text-nusa-green');
+                    const barWidth = Math.min(Math.abs(item.discrepancy) * 4, 100);
+                    
+                    radarHTML += `
+                    <div class="bg-black/40 backdrop-blur-md border border-white/5 rounded-lg p-3 hover:border-nusa-primary/50 transition-colors cursor-pointer relative overflow-hidden group">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 ${item.isTrending ? 'bg-nusa-primary shadow-[0_0_10px_#E50914]' : 'bg-gray-600'}"></div>
+                        <div class="flex justify-between items-center mb-2 pl-2">
+                            <div class="flex gap-2 items-center">
+                                <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded ${badgeColor}">${item.league}</span>
+                                <span class="text-sm font-semibold text-white group-hover:text-nusa-primary transition-colors">${item.match}</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end pl-2">
+                            <div class="w-1/2">
+                                <div class="flex justify-between text-[10px] text-nusa-textMuted mb-1">
+                                    <span>Discrepancy</span>
+                                    <span class="${discrepancyColor} font-bold">${item.discrepancy > 0 ? '+' : ''}${item.discrepancy}%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                                    <div class="${item.discrepancy > 10 ? 'bg-nusa-primary' : 'bg-nusa-green'} h-full rounded-full" style="width: ${barWidth}%"></div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end text-sm">
+                                <span class="text-nusa-text font-medium bg-gray-800 px-2 py-0.5 rounded border border-gray-700 shadow-inner">${item.oddsBook}</span>
+                                <span class="text-nusa-primary font-bold mt-1 text-[11px] uppercase tracking-wide"><i class="fa-solid fa-link text-gray-500 mr-1"></i> Onchain: ${item.oddsChain}</span>
+                            </div>
+                        </div>
+                    </div>`;
+
+                    journalHTML += `
+                    <tr class="border-b border-gray-800/50 hover:bg-white/5 transition-colors">
+                        <td class="py-3 px-2">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-nusa-primary font-bold mb-0.5 uppercase tracking-wider">${item.league}</span>
+                                <span class="font-semibold text-white text-sm">${item.home} <span class="text-xs text-nusa-textMuted mx-1">vs</span> ${item.away}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <input type="number" min="0" max="20" class="w-10 bg-black/50 border border-gray-700 rounded p-1 text-center focus:border-nusa-primary focus:ring-1 focus:ring-nusa-primary outline-none text-white font-bold transition-all" value="0">
+                                <span class="text-gray-500 font-bold">:</span>
+                                <input type="number" min="0" max="20" class="w-10 bg-black/50 border border-gray-700 rounded p-1 text-center focus:border-nusa-primary focus:ring-1 focus:ring-nusa-primary outline-none text-white font-bold transition-all" value="0">
+                            </div>
+                        </td>
+                        <td class="py-3 text-center text-yellow-500 text-[10px] sm:text-xs">
+                            ${'<i class="fa-solid fa-star drop-shadow-[0_0_3px_rgba(234,179,8,0.5)]"></i>'.repeat(Math.max(1, 5 - (index % 3)))}
+                            ${'<i class="fa-solid fa-star text-gray-700"></i>'.repeat(index % 3)}
+                        </td>
+                        <td class="py-3 text-right pr-2">
+                            <button onclick="showSimulationModal('${item.match}')" class="bg-gray-800/80 backdrop-blur border border-gray-600 text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-nusa-primary hover:border-nusa-primary transition-all shadow-lg" data-i18n="simResult">
+                                Simulasi Hasil
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+
+                radarContainer.innerHTML = radarHTML;
+                journalContainer.innerHTML = journalHTML;
+            }
+        }
+
+        // Jalankan render array
+        renderMatches();
+
+        // Language Switcher Logic
+        const langSwitch = document.getElementById('lang-switch');
+        const appBody = document.getElementById('app-body');
+
+        function changeLanguage(lang) {
+            // Set RTL if Arabic
+            if (lang === 'ar') {
+                appBody.setAttribute('dir', 'rtl');
+            } else {
+                appBody.setAttribute('dir', 'ltr');
+            }
+
+            // Update text content
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key]; // Using innerHTML for bold tags in mascotMsg
+                }
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang][key]) {
+                    el.setAttribute('placeholder', translations[lang][key]);
+                }
+            });
+        }
+
+        langSwitch.addEventListener('change', (e) => {
+            changeLanguage(e.target.value);
+        });
+
+        // Initialize default language
+        changeLanguage('id');
+
+        // Tab functionality Logic
+        const tabs = document.querySelectorAll('.nav-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 1. Remove active classes from all tabs
+                tabs.forEach(t => {
+                    t.classList.remove('border-nusa-primary', 'text-nusa-primary', 'active');
+                    t.classList.add('border-transparent', 'text-nusa-textMuted');
+                });
+                
+                // 2. Add active class to the clicked tab
+                tab.classList.remove('border-transparent', 'text-nusa-textMuted');
+                tab.classList.add('border-nusa-primary', 'text-nusa-primary', 'active');
+
+                // 3. Hide all tab contents, show the targeted one
+                const targetId = tab.getAttribute('data-target');
+                tabContents.forEach(content => {
+                    if (content.id === targetId) {
+                        content.classList.remove('hidden');
+                        content.classList.add('block'); // ensure it displays
+                    } else {
+                        content.classList.add('hidden');
+                        content.classList.remove('block');
+                    }
+                });
+            });
+        });
+
+        // Custom Modal Logic
+        const modal = document.getElementById('simModal');
+        const modalContent = document.getElementById('simModalContent');
+        const modalText = document.getElementById('simModalText');
+
+        window.showSimulationModal = function(matchName) {
+            modalText.innerText = `Menjalankan simulasi prediksi untuk ${matchName} berdasarkan data on-chain terkini...`;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // Small delay for transition to work
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            }, 10);
+        }
+
+        window.simulateAll = function() {
+            showSimulationModal("semua jurnal prediksi aktif Anda");
+        }
+
+        window.closeModal = function() {
+            modal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300); // match duration
+        }
+    </script>
+</body>
+</html>
