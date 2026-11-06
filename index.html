@@ -188,6 +188,8 @@
                     <div class="flex flex-wrap gap-3 mb-2">
                         <button class="filter-btn active px-5 py-2 rounded-full glass bg-red-600 shadow-[0_0_10px_rgba(255,0,0,0.5)] border border-red-400 font-bold transition" onclick="filterMatches('Semua', this)">Semua</button>
                         <button class="filter-btn px-5 py-2 rounded-full glass hover:bg-white/10 font-bold transition border border-transparent hover:border-white/20" onclick="filterMatches('Sepak Bola', this)">Sepak Bola</button>
+                        <button class="filter-btn px-5 py-2 rounded-full glass hover:bg-white/10 font-bold transition border border-transparent hover:border-white/20" onclick="filterMatches('Basket', this)">Basket</button>
+                        <button class="filter-btn px-5 py-2 rounded-full glass hover:bg-white/10 font-bold transition border border-transparent hover:border-white/20" onclick="filterMatches('Badminton', this)">Badminton</button>
                         <button class="filter-btn px-5 py-2 rounded-full glass hover:bg-white/10 font-bold transition border border-transparent hover:border-white/20" onclick="filterMatches('E-Sports', this)">E-Sports</button>
                     </div>
 
@@ -384,8 +386,13 @@
         // CATATAN: Pilihan Pilpres (id:3 sebelumnya) telah dihapus dengan sempurna sesuai permintaan.
         const defaultMatches = [
             { id: 1, title: 'Timnas Indonesia vs Arab Saudi', category: 'Sepak Bola', odds1: '3.00', odds2: '1.50', teams: ['Indonesia Menang', 'Seri', 'Arab Saudi Menang'] },
-            { id: 2, title: 'ONIC Esports vs AP Bren', category: 'E-Sports', odds1: '1.85', odds2: '1.95', teams: ['ONIC Menang', 'AP Bren Menang'] },
-            { id: 4, title: 'Real Madrid vs Barcelona', category: 'Sepak Bola', odds1: '2.20', odds2: '2.50', teams: ['Madrid Menang', 'Seri', 'Barcelona Menang'] }
+            { id: 2, title: 'Arsenal vs Manchester City', category: 'Sepak Bola', odds1: '2.60', odds2: '2.40', teams: ['Arsenal Menang', 'Seri', 'Man City Menang'] },
+            { id: 3, title: 'Persija vs Persib Bandung', category: 'Sepak Bola', odds1: '2.10', odds2: '2.80', teams: ['Persija Menang', 'Seri', 'Persib Menang'] },
+            { id: 4, title: 'Real Madrid vs Barcelona', category: 'Sepak Bola', odds1: '2.20', odds2: '2.50', teams: ['Madrid Menang', 'Seri', 'Barcelona Menang'] },
+            { id: 5, title: 'LA Lakers vs Golden State Warriors', category: 'Basket', odds1: '1.90', odds2: '1.85', teams: ['Lakers Menang', 'Warriors Menang'] },
+            { id: 6, title: 'Jonatan Christie vs Viktor Axelsen', category: 'Badminton', odds1: '2.75', odds2: '1.45', teams: ['Jonatan Menang', 'Viktor Menang'] },
+            { id: 7, title: 'ONIC Esports vs AP Bren', category: 'E-Sports', odds1: '1.85', odds2: '1.95', teams: ['ONIC Menang', 'AP Bren Menang'] },
+            { id: 8, title: 'T1 vs Gen.G', category: 'E-Sports', odds1: '1.70', odds2: '2.10', teams: ['T1 Menang', 'Gen.G Menang'] }
         ];
         
         let currentUser = null;
