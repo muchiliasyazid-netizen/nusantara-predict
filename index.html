@@ -35,18 +35,24 @@
         }
         /* Mode Bahasa Arab (RTL) */
         .rtl { direction: rtl; }
+        
+        /* Custom Scrollbar for Chat & App */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.5); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,0,0,0.8); }
     </style>
 </head>
 <body class="antialiased min-h-screen font-sans">
 
     <!-- Container untuk Notifikasi Toast (Pop-up atas) -->
-    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2"></div>
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-full max-w-sm px-4 md:px-0"></div>
 
     <!-- LAYAR LOGIN & DAFTAR -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md transition-opacity duration-500">
-        <div class="glass p-8 rounded-3xl w-full max-w-md text-center transform transition-all shadow-[0_0_50px_rgba(255,0,0,0.4)] border border-red-500/50">
+        <div class="glass p-8 rounded-3xl w-11/12 max-w-md text-center transform transition-all shadow-[0_0_50px_rgba(255,0,0,0.4)] border border-red-500/50">
             <!-- Maskot Selamat Datang -->
-            <img src="10.png" alt="Welcome Mascot" class="w-40 h-40 mx-auto mb-2 mascot-float drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+            <img src="10.png" alt="Welcome Mascot" class="w-40 h-40 mx-auto mb-2 mascot-float drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
             <h1 class="text-3xl font-extrabold mb-1 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-white text-glow">Nusantara Predict</h1>
             <p class="text-gray-400 mb-8 text-sm">Masuk untuk memulai prediksi On-Chain</p>
             
@@ -129,7 +135,7 @@
                     </div>
                     
                     <!-- Pilihan Bahasa -->
-                    <select id="lang-selector" onchange="changeLanguage()" class="bg-black/80 border border-red-500/50 text-white rounded-lg p-2 text-sm focus:outline-none focus:border-red-400 font-bold">
+                    <select id="lang-selector" onchange="changeLanguage()" class="bg-black/80 border border-red-500/50 text-white rounded-lg p-2 text-sm focus:outline-none focus:border-red-400 font-bold cursor-pointer">
                         <option value="id">🇮🇩 ID</option>
                         <option value="en">🇬🇧 EN</option>
                         <option value="ar">🇸🇦 AR</option>
@@ -139,7 +145,7 @@
                     <div class="relative">
                         <button onclick="toggleElement('notif-dropdown')" class="relative p-2 text-gray-300 hover:text-white hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] transition">
                             <i class="fas fa-bell text-xl"></i>
-                            <span id="notif-badge" class="absolute top-0 right-0 w-4 h-4 bg-red-600 rounded-full text-[10px] flex items-center justify-center font-bold border border-black animate-pulse">2</span>
+                            <span id="notif-badge" class="absolute top-0 right-0 w-4 h-4 bg-red-600 rounded-full text-[10px] flex items-center justify-center font-bold border border-black animate-pulse">1</span>
                         </button>
                         <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-72 glass rounded-2xl shadow-2xl border border-red-500/50 overflow-hidden z-50">
                             <div class="p-3 border-b border-red-500/30 flex justify-between items-center bg-black/80">
@@ -158,7 +164,7 @@
                     <!-- Tombol Profil Akun -->
                     <button onclick="showModal('profile-modal')" class="flex items-center gap-2 bg-black/40 hover:bg-white/10 p-1.5 pr-4 rounded-full border border-red-500/30 transition">
                         <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-red-600 to-red-400 flex items-center justify-center text-white font-bold shadow-lg" id="profile-initial">A</div>
-                        <span class="hidden sm:block font-bold text-sm" id="profile-name">User</span>
+                        <span class="hidden sm:block font-bold text-sm truncate max-w-[100px]" id="profile-name">User</span>
                     </button>
                 </div>
             </header>
@@ -171,10 +177,10 @@
                     <!-- Banner Selamat Datang -->
                     <div class="glass rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between relative overflow-hidden bg-gradient-to-r from-red-900/60 to-black/80 border border-red-500/40">
                         <div class="z-10 text-center md:text-left">
-                            <h2 class="text-2xl md:text-4xl font-extrabold mb-2 text-glow">Siap Tebak, <span id="welcome-name" class="text-red-400">Bosku</span>?</h2>
+                            <h2 class="text-2xl md:text-4xl font-extrabold mb-2 text-glow">Siap Tebak, <span id="welcome-name" class="text-red-400 truncate inline-block max-w-[200px] align-bottom">Bosku</span>?</h2>
                             <p class="text-gray-300 text-sm md:text-base">Kalahkan analis lain. Analisis data on-chain, buat prediksi akurat, dan raih posisi teratas di papan peringkat global.</p>
                         </div>
-                        <img src="10.png" class="w-32 h-32 md:w-40 md:h-40 z-10 mt-4 md:mt-0 drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] mascot-float">
+                        <img src="10.png" class="w-32 h-32 md:w-40 md:h-40 z-10 mt-4 md:mt-0 drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] mascot-float" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
                         <div class="absolute -right-10 -bottom-20 w-64 h-64 bg-red-600/30 rounded-full blur-[60px]"></div>
                     </div>
 
@@ -201,7 +207,7 @@
                                     <tr>
                                         <th class="p-4 rounded-tl-xl font-bold">Event / Pertandingan</th>
                                         <th class="p-4 font-bold">Pilihan Anda</th>
-                                        <th class="p-4 font-bold">Tingkat Keyakinan</th>
+                                        <th class="p-4 font-bold">Keyakinan</th>
                                         <th class="p-4 font-bold">Status</th>
                                         <th class="p-4 rounded-tr-xl font-bold">Waktu Disimpan</th>
                                     </tr>
@@ -234,7 +240,7 @@
                         <!-- Kartu Rank -->
                         <div class="glass p-8 rounded-3xl text-center flex flex-col items-center border border-red-500/50 bg-gradient-to-b from-black/80 to-red-900/40 relative overflow-hidden">
                             <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-                            <img src="10.png" class="w-32 h-32 mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] z-10">
+                            <img src="10.png" class="w-32 h-32 mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] z-10" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
                             <h3 class="text-3xl font-extrabold text-glow text-white z-10">Rank: <span class="text-red-500">Master Analis</span></h3>
                             <p class="text-gray-300 text-sm mt-2 z-10">Akurasi prediksi Anda mengalahkan 85% pengguna lain.</p>
                             
@@ -276,8 +282,8 @@
                                 <div class="flex items-center justify-between p-3 bg-red-900/50 rounded-xl border border-red-500 text-white transform scale-[1.02] shadow-[0_0_15px_rgba(255,0,0,0.3)] mt-6">
                                     <div class="flex items-center gap-4">
                                         <div class="w-10 h-10 bg-red-600 text-white font-extrabold flex items-center justify-center rounded-xl">42</div>
-                                        <div>
-                                            <div class="font-bold text-white" id="leaderboard-name">Anda</div>
+                                        <div class="overflow-hidden">
+                                            <div class="font-bold text-white truncate max-w-[120px]" id="leaderboard-name">Anda</div>
                                             <div class="text-xs text-red-200">Terus tingkatkan analisamu!</div>
                                         </div>
                                     </div>
@@ -295,10 +301,10 @@
     <!-- AI CHAT MENGAPUNG (SARI) -->
     <div class="fixed bottom-20 md:bottom-8 right-6 z-50 flex flex-col items-end">
         <!-- Kotak Chat -->
-        <div id="chat-box" class="hidden w-[340px] glass rounded-3xl shadow-2xl overflow-hidden border border-red-500/50 flex-col h-[450px] mb-4 transform transition-all duration-300">
+        <div id="chat-box" class="hidden w-full max-w-[340px] glass rounded-3xl shadow-2xl overflow-hidden border border-red-500/50 flex-col h-[450px] mb-4 transform transition-all duration-300 origin-bottom-right">
             <div class="bg-gradient-to-r from-red-800 to-black p-4 flex justify-between items-center border-b border-red-500/30">
                 <div class="flex items-center gap-3">
-                    <img src="2.png" class="w-12 h-12 rounded-full border-2 border-red-400 bg-black/50 shadow-[0_0_10px_rgba(255,0,0,0.5)]">
+                    <img src="2.png" class="w-12 h-12 rounded-full border-2 border-red-400 bg-black/50 shadow-[0_0_10px_rgba(255,0,0,0.5)]" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">
                     <div>
                         <div class="font-bold text-white text-md">Sari AI</div>
                         <div class="text-xs text-green-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse"></span> Asisten Aktif</div>
@@ -307,10 +313,10 @@
                 <button onclick="toggleElement('chat-box')" class="text-white/50 hover:text-white bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fas fa-times"></i></button>
             </div>
             
-            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-black/80">
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-black/80 scroll-smooth">
                 <div class="flex gap-3 max-w-[85%]">
-                    <img src="2.png" class="w-8 h-8 mt-1 border border-red-500/50 rounded-full bg-black">
-                    <div class="bg-red-900/60 border border-red-500/30 text-white text-sm p-3 rounded-2xl rounded-tl-none shadow-md">
+                    <img src="2.png" class="w-8 h-8 mt-1 border border-red-500/50 rounded-full bg-black shrink-0" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">
+                    <div class="bg-red-900/60 border border-red-500/30 text-white text-sm p-3 rounded-2xl rounded-tl-none shadow-md leading-relaxed">
                         Halo Bosku! Aku Sari. Butuh bocoran data on-chain atau mau ngobrol soal prediksi hari ini? 📈
                     </div>
                 </div>
@@ -318,13 +324,13 @@
             
             <div class="p-3 bg-black/90 border-t border-red-500/30 flex gap-2">
                 <input type="text" id="chat-input" placeholder="Tanya sesuatu ke Sari..." class="flex-1 bg-white/5 border border-white/20 rounded-full px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 focus:bg-white/10 transition" onkeypress="if(event.key === 'Enter') sendChatMessage()">
-                <button onclick="sendChatMessage()" class="w-11 h-11 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-white shadow-[0_0_10px_rgba(255,0,0,0.5)] hover:scale-110 transition"><i class="fas fa-paper-plane"></i></button>
+                <button onclick="sendChatMessage()" class="w-11 h-11 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-white shadow-[0_0_10px_rgba(255,0,0,0.5)] hover:scale-110 transition shrink-0"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
 
         <!-- Tombol Pemicu Chat -->
         <button onclick="toggleElement('chat-box')" class="relative transform transition hover:scale-110 active:scale-95 drop-shadow-[0_0_20px_rgba(255,0,0,0.6)]">
-            <img src="1.png" alt="Chat with Sari" class="w-20 h-20 md:w-24 md:h-24 mascot-float">
+            <img src="1.png" alt="Chat with Sari" class="w-20 h-20 md:w-24 md:h-24 mascot-float" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
             <span class="absolute top-2 right-2 w-4 h-4 bg-green-500 border-2 border-black rounded-full animate-bounce"></span>
         </button>
     </div>
@@ -333,13 +339,13 @@
     <div id="predict-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/80 backdrop-blur-md px-4">
         <div class="glass p-6 rounded-3xl w-full max-w-md transform scale-95 transition-transform duration-300 border border-red-500/50 shadow-[0_0_40px_rgba(255,0,0,0.3)]">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-glow text-white" id="modal-match-title">Loading...</h3>
-                <button onclick="closeModal('predict-modal')" class="text-gray-400 hover:text-white bg-white/10 w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+                <h3 class="text-xl font-bold text-glow text-white pr-4" id="modal-match-title">Loading...</h3>
+                <button onclick="closeModal('predict-modal')" class="text-gray-400 hover:text-white bg-white/10 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fas fa-times"></i></button>
             </div>
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-bold text-red-300 mb-2 uppercase tracking-wider">Tentukan Pemenang</label>
-                    <select id="predict-selection" class="w-full bg-black/60 border border-red-500/30 rounded-xl p-4 text-white focus:outline-none focus:border-red-500 text-lg font-bold appearance-none">
+                    <select id="predict-selection" class="w-full bg-black/60 border border-red-500/30 rounded-xl p-4 text-white focus:outline-none focus:border-red-500 text-lg font-bold cursor-pointer">
                         <!-- Otomatis diisi JS -->
                     </select>
                 </div>
@@ -349,7 +355,7 @@
                     </label>
                     <input type="range" id="predict-confidence" min="10" max="100" step="5" value="70" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-500" oninput="document.getElementById('conf-value').innerText = this.value + '%'">
                 </div>
-                <button onclick="savePrediction()" class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-extrabold py-4 rounded-xl shadow-[0_0_20px_rgba(255,0,0,0.6)] hover:scale-[1.02] transition">Kunci Prediksi ke Jurnal & On-Chain</button>
+                <button onclick="savePrediction()" class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-extrabold py-4 rounded-xl shadow-[0_0_20px_rgba(255,0,0,0.6)] hover:scale-[1.02] transition">Kunci Prediksi ke Jurnal</button>
             </div>
         </div>
     </div>
@@ -360,12 +366,12 @@
             <h3 class="text-2xl font-bold mb-6 text-center text-glow">Pengaturan Profil</h3>
             <div class="text-center mb-6">
                 <div class="w-24 h-24 bg-gradient-to-br from-red-500 to-red-800 rounded-full mx-auto flex items-center justify-center text-4xl font-extrabold mb-3 shadow-[0_0_15px_rgba(255,0,0,0.5)] border-2 border-red-400" id="modal-profile-initial">A</div>
-                <h4 class="font-bold text-xl text-white" id="modal-profile-name">Username</h4>
+                <h4 class="font-bold text-xl text-white truncate px-2" id="modal-profile-name">Username</h4>
                 <p class="text-green-400 text-sm font-bold mt-1">Status: Aktif Terverifikasi</p>
             </div>
             <div class="space-y-3">
                 <button onclick="clearData()" class="w-full bg-red-900/50 border border-red-500 text-red-300 font-bold py-3 rounded-xl hover:bg-red-600 hover:text-white transition shadow-lg flex items-center justify-center gap-2">
-                    <i class="fas fa-trash-alt"></i> Hapus Semua Data (Reset)
+                    <i class="fas fa-trash-alt"></i> Reset Data Akun
                 </button>
                 <button onclick="closeModal('profile-modal')" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl transition border border-white/10">Kembali</button>
             </div>
@@ -375,10 +381,10 @@
     <!-- JAVASCRIPT: MESIN PENGGERAK APLIKASI -->
     <script>
         // --- 1. DATA MASTER ---
+        // CATATAN: Pilihan Pilpres (id:3 sebelumnya) telah dihapus dengan sempurna sesuai permintaan.
         const defaultMatches = [
             { id: 1, title: 'Timnas Indonesia vs Arab Saudi', category: 'Sepak Bola', odds1: '3.00', odds2: '1.50', teams: ['Indonesia Menang', 'Seri', 'Arab Saudi Menang'] },
             { id: 2, title: 'ONIC Esports vs AP Bren', category: 'E-Sports', odds1: '1.85', odds2: '1.95', teams: ['ONIC Menang', 'AP Bren Menang'] },
-            { id: 3, title: 'Pemilihan Gubernur Jakarta', category: 'Kultur', odds1: '1.75', odds2: '2.10', teams: ['Kandidat 01', 'Kandidat 02', 'Kandidat 03'] },
             { id: 4, title: 'Real Madrid vs Barcelona', category: 'Sepak Bola', odds1: '2.20', odds2: '2.50', teams: ['Madrid Menang', 'Seri', 'Barcelona Menang'] }
         ];
         
@@ -397,7 +403,6 @@
         function checkAuth() {
             currentUser = localStorage.getItem('nusa_user');
             if (currentUser) {
-                // Sembunyikan layar login perlahan
                 document.getElementById('login-screen').classList.add('opacity-0', 'pointer-events-none');
                 setTimeout(() => {
                     document.getElementById('login-screen').classList.add('hidden');
@@ -406,7 +411,6 @@
                     loadApp();
                 }, 500);
             } else {
-                // Tampilkan layar login
                 document.getElementById('login-screen').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
                 document.getElementById('app-screen').classList.add('hidden', 'opacity-0');
             }
@@ -416,9 +420,9 @@
             e.preventDefault();
             const user = document.getElementById('username').value.trim();
             if(user) {
-                localStorage.setItem('nusa_user', user); // Simpan nama ke penyimpanan lokal browser
+                localStorage.setItem('nusa_user', user); 
                 if(!localStorage.getItem('nusa_predictions')) {
-                    localStorage.setItem('nusa_predictions', JSON.stringify([])); // Inisialisasi database prediksi
+                    localStorage.setItem('nusa_predictions', JSON.stringify([])); 
                 }
                 showToast('Login Berhasil! Selamat Datang, ' + user);
                 checkAuth();
@@ -430,13 +434,12 @@
                 localStorage.removeItem('nusa_user');
                 document.getElementById('username').value = '';
                 document.getElementById('password').value = '';
-                checkAuth(); // Kembali ke layar login
+                checkAuth(); 
             }
         }
 
         // --- 3. MUAT DATA APLIKASI (DASHBOARD) ---
         function loadApp() {
-            // Pasang nama pengguna ke elemen-elemen UI
             document.getElementById('profile-name').innerText = currentUser;
             document.getElementById('welcome-name').innerText = currentUser;
             document.getElementById('leaderboard-name').innerText = currentUser;
@@ -446,7 +449,6 @@
             document.getElementById('profile-initial').innerText = initial;
             document.getElementById('modal-profile-initial').innerText = initial;
 
-            // Muat prediksi dari penyimapanan browser
             predictions = JSON.parse(localStorage.getItem('nusa_predictions') || '[]');
             
             renderMatches('Semua');
@@ -460,7 +462,6 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
             
-            // Ubah gaya tombol menu aktif
             document.querySelectorAll('.nav-btn').forEach(el => {
                 el.classList.remove('active', 'text-white', 'bg-red-600', 'shadow-[0_0_10px_rgba(255,0,0,0.5)]', 'border-red-400');
                 el.classList.add('text-gray-400');
@@ -469,7 +470,6 @@
             activeBtn.classList.remove('text-gray-400');
             activeBtn.classList.add('active', 'text-white', 'bg-red-600', 'shadow-[0_0_10px_rgba(255,0,0,0.5)]', 'border-red-400');
 
-            // Ganti Judul Atas
             const titles = { 'pasar': 'Pasar Aktif', 'jurnal': 'Jurnal Saya', 'komunitas': 'Forum Komunitas', 'kredibilitas': 'Kredibilitas Profil' };
             document.getElementById('header-title').innerText = titles[tabId];
         }
@@ -503,13 +503,13 @@
             
             filtered.forEach(match => {
                 grid.innerHTML += `
-                    <div class="glass p-5 rounded-3xl hover:shadow-[0_0_30px_rgba(255,0,0,0.4)] transition transform hover:-translate-y-2 border border-white/5">
+                    <div class="glass p-5 rounded-3xl hover:shadow-[0_0_30px_rgba(255,0,0,0.4)] transition transform hover:-translate-y-2 border border-white/5 flex flex-col h-full">
                         <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
                             <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-red-900/50 text-red-200 border border-red-500/30">${match.category}</span>
                             <span class="text-xs text-green-400 font-bold bg-green-900/30 px-2 py-1 rounded border border-green-500/30"><i class="fas fa-link"></i> On-chain</span>
                         </div>
-                        <h4 class="font-extrabold text-xl mb-5 text-white tracking-wide">${match.title}</h4>
-                        <div class="flex justify-between items-center bg-black/60 p-3 rounded-xl border border-white/10 mb-5 shadow-inner">
+                        <h4 class="font-extrabold text-xl mb-5 text-white tracking-wide flex-1">${match.title}</h4>
+                        <div class="flex justify-between items-center bg-black/60 p-3 rounded-xl border border-white/10 mb-5 shadow-inner mt-auto">
                             <div class="text-center w-1/2 border-r border-white/10">
                                 <div class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Bookmaker</div>
                                 <div class="font-black text-red-400 text-lg">${match.odds1}</div>
@@ -519,19 +519,22 @@
                                 <div class="font-black text-blue-400 text-lg">${match.odds2}</div>
                             </div>
                         </div>
-                        <button onclick='openPredictModal(${JSON.stringify(match).replace(/'/g, "&#39;")})' class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white py-3 rounded-xl font-bold shadow-lg transition transform active:scale-95">Tebak & Simulasi Hasil</button>
+                        <button onclick="openPredictModal(${match.id})" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white py-3 rounded-xl font-bold shadow-lg transition transform active:scale-95 mt-auto">Tebak & Simulasi Hasil</button>
                     </div>
                 `;
             });
         }
 
         let currentMatchData = null;
-        function openPredictModal(match) {
-            currentMatchData = match;
-            document.getElementById('modal-match-title').innerText = match.title;
+        function openPredictModal(matchId) {
+            // Perbaikan passing data via ID untuk menghindari masalah karakter kutip pada parameter onclick
+            currentMatchData = defaultMatches.find(m => m.id === matchId);
+            if(!currentMatchData) return;
+            
+            document.getElementById('modal-match-title').innerText = currentMatchData.title;
             const select = document.getElementById('predict-selection');
             select.innerHTML = '';
-            match.teams.forEach(team => {
+            currentMatchData.teams.forEach(team => {
                 select.innerHTML += `<option value="${team}">${team}</option>`;
             });
             showModal('predict-modal');
@@ -542,16 +545,18 @@
             const selection = document.getElementById('predict-selection').value;
             const confidence = document.getElementById('predict-confidence').value;
             
-            // Simpan Data Baru
+            // Format waktu lebih sempurna (Tanggal + Jam)
+            const timeStr = new Date().toLocaleString('id-ID', {day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit'});
+            
             const newPred = {
                 title: currentMatchData.title,
                 selection: selection,
                 confidence: confidence,
-                time: new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})
+                time: timeStr
             };
             
             predictions.unshift(newPred);
-            localStorage.setItem('nusa_predictions', JSON.stringify(predictions)); // Permanen
+            localStorage.setItem('nusa_predictions', JSON.stringify(predictions)); 
             
             closeModal('predict-modal');
             showToast('✅ Prediksi Berhasil Disimpan ke Jurnal!');
@@ -569,7 +574,7 @@
             predictions.forEach(p => {
                 list.innerHTML += `
                     <tr class="hover:bg-white/5 transition group">
-                        <td class="p-4 font-bold text-white group-hover:text-red-300 transition">${p.title}</td>
+                        <td class="p-4 font-bold text-white group-hover:text-red-300 transition whitespace-normal min-w-[200px]">${p.title}</td>
                         <td class="p-4 text-red-400 font-semibold">${p.selection}</td>
                         <td class="p-4">
                             <div class="flex items-center gap-3">
@@ -587,9 +592,8 @@
         function updateStats() {
             const basePts = 0;
             const totalPreds = predictions.length;
-            document.getElementById('user-pts').innerText = (basePts + (totalPreds * 30)).toLocaleString(); // Setiap prediksi dapat 30 poin
+            document.getElementById('user-pts').innerText = (basePts + (totalPreds * 30)).toLocaleString(); 
             
-            // Kalkulasi Win Rate Buatan
             let wr = "0%";
             if(totalPreds > 0) wr = Math.min(100, 60 + (totalPreds * 2)) + "%"; 
             document.getElementById('user-winrate').innerText = wr;
@@ -602,8 +606,8 @@
             feed.innerHTML = '';
             communityFeed.forEach(post => {
                 const avatar = post.isAI ? 
-                    '<img src="2.png" class="w-12 h-12 rounded-full border-2 border-red-500 bg-black shadow-lg">' : 
-                    `<div class="w-12 h-12 rounded-full bg-gradient-to-tr from-gray-600 to-gray-800 border-2 border-gray-400 flex items-center justify-center font-extrabold text-lg shadow-lg">${post.user.charAt(0)}</div>`;
+                    '<img src="2.png" class="w-12 h-12 rounded-full border-2 border-red-500 bg-black shadow-lg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">' : 
+                    `<div class="w-12 h-12 rounded-full bg-gradient-to-tr from-gray-600 to-gray-800 border-2 border-gray-400 flex items-center justify-center font-extrabold text-lg shadow-lg shrink-0">${post.user.charAt(0).toUpperCase()}</div>`;
                 
                 feed.innerHTML += `
                     <div class="glass p-5 rounded-3xl border border-white/5 hover:border-white/10 transition">
@@ -635,7 +639,6 @@
             if(!text) return;
             
             const chatBox = document.getElementById('chat-messages');
-            // Pesan Anda
             chatBox.innerHTML += `
                 <div class="flex justify-end gap-3 max-w-[100%]">
                     <div class="bg-white/10 border border-white/20 text-white text-sm p-3 rounded-2xl rounded-tr-none shadow-md">
@@ -644,9 +647,10 @@
                 </div>
             `;
             input.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // Perbaikan smooth scroll chat
+            chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 
-            // Efek mengetik AI
             setTimeout(() => {
                 const responses = [
                     "Siap Bosku! Analisanya tajam sekali. 🚀",
@@ -659,13 +663,13 @@
                 
                 chatBox.innerHTML += `
                     <div class="flex gap-3 max-w-[85%] mt-2">
-                        <img src="2.png" class="w-8 h-8 mt-1 border border-red-500/50 rounded-full bg-black">
-                        <div class="bg-red-900/60 border border-red-500/30 text-white text-sm p-3 rounded-2xl rounded-tl-none shadow-md">
+                        <img src="2.png" class="w-8 h-8 mt-1 border border-red-500/50 rounded-full bg-black shrink-0" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">
+                        <div class="bg-red-900/60 border border-red-500/30 text-white text-sm p-3 rounded-2xl rounded-tl-none shadow-md leading-relaxed">
                             ${reply}
                         </div>
                     </div>
                 `;
-                chatBox.scrollTop = chatBox.scrollHeight;
+                chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
             }, 1000);
         }
 
@@ -688,7 +692,7 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = 'bg-black/90 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,0,0,0.5)] transform transition-all translate-y-[-20px] opacity-0 text-sm font-bold flex items-center gap-3 border border-red-500';
-            toast.innerHTML = `<i class="fas fa-bell text-red-500"></i> ${msg}`;
+            toast.innerHTML = `<i class="fas fa-bell text-red-500 shrink-0"></i> <span>${msg}</span>`;
             container.appendChild(toast);
             
             setTimeout(() => { toast.classList.remove('translate-y-[-20px]', 'opacity-0'); }, 10);
