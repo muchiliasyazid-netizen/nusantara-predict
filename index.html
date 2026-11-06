@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nusantara Predict</title>
+    <title>Nusantara Predict - Edisi Ultimate</title>
     <!-- Tailwind CSS (Framework Desain) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome (Ikon) -->
@@ -14,16 +14,19 @@
             background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000') center/cover fixed; 
             color: white; 
             overflow-x: hidden; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .glass { 
             background: rgba(20, 0, 0, 0.6); 
-            backdrop-filter: blur(12px); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 50, 50, 0.2); 
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); 
         }
         .glass-panel { 
             background: rgba(0, 0, 0, 0.7); 
             backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); 
         }
         .text-glow { text-shadow: 0 0 10px rgba(255, 50, 50, 0.8); }
@@ -33,284 +36,281 @@
             50% { transform: translateY(-10px); } 
             100% { transform: translateY(0); } 
         }
-        /* Mode Bahasa Arab (RTL) */
-        .rtl { direction: rtl; }
-        
         /* Custom Scrollbar for Chat & App */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
         ::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.5); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,0,0,0.8); }
+        
+        /* Utility classes for guaranteed hide/show */
+        .force-hide { display: none !important; }
+        .force-show { display: block !important; }
     </style>
 </head>
-<body class="antialiased min-h-screen font-sans">
+<body class="antialiased min-h-screen flex flex-col relative">
 
-    <!-- Container untuk Notifikasi Toast (Pop-up atas) -->
-    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 w-full max-w-sm px-4 md:px-0"></div>
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
 
-    <!-- LAYAR LOGIN & DAFTAR -->
-    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md transition-opacity duration-500">
-        <div class="glass p-8 rounded-3xl w-11/12 max-w-md text-center transform transition-all shadow-[0_0_50px_rgba(255,0,0,0.4)] border border-red-500/50">
-            <!-- Maskot Selamat Datang -->
-            <img src="10.png" alt="Welcome Mascot" class="w-40 h-40 mx-auto mb-2 mascot-float drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
-            <h1 class="text-3xl font-extrabold mb-1 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-white text-glow">Nusantara Predict</h1>
-            <p class="text-gray-400 mb-6 text-sm" id="auth-subtitle">Masuk untuk memulai prediksi On-Chain</p>
+    <!-- LAYAR OTENTIKASI (LOGIN & DAFTAR) -->
+    <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl transition-opacity duration-500">
+        <div class="glass p-8 rounded-3xl w-11/12 max-w-md text-center shadow-[0_0_50px_rgba(255,0,0,0.3)] border border-red-500/30 relative overflow-hidden">
+            <!-- Dekorasi Latar -->
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-red-600 rounded-full blur-[80px] opacity-50 pointer-events-none"></div>
+            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-600 rounded-full blur-[80px] opacity-30 pointer-events-none"></div>
             
-            <!-- Tab Mode Autentikasi -->
-            <div class="flex bg-black/50 p-1 rounded-xl mb-6 border border-white/10 relative cursor-pointer">
-                <div id="auth-tab-slider" class="absolute top-1 left-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-red-600 rounded-lg transition-all duration-300 pointer-events-none"></div>
-                <button type="button" onclick="toggleAuth('login')" id="tab-login" class="w-1/2 py-2 text-white font-bold relative z-10 transition cursor-pointer">Masuk</button>
-                <button type="button" onclick="toggleAuth('register')" id="tab-register" class="w-1/2 py-2 text-gray-400 font-bold relative z-10 transition hover:text-white cursor-pointer">Daftar</button>
+            <img src="10.png" alt="Mascot" class="w-32 h-32 mx-auto mb-4 mascot-float drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] relative z-10" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
+            <h1 class="text-3xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-white text-glow relative z-10">Nusantara Predict</h1>
+            <p id="auth-subtitle" class="text-gray-400 mb-6 text-sm relative z-10">Pintu masuk ke prediksi On-Chain</p>
+            
+            <!-- TAB NAVIGASI YANG 100% AMAN DARI BUG KLIK -->
+            <div class="flex bg-black/60 p-1.5 rounded-xl mb-6 border border-white/10 relative z-20 shadow-inner">
+                <!-- Slider Latar (Menggunakan pointer-events-none agar tidak menghalangi klik) -->
+                <div id="tab-slider" class="absolute top-1.5 left-1.5 w-[calc(50%-6px)] bottom-1.5 bg-gradient-to-r from-red-600 to-red-800 rounded-lg transition-all duration-300 shadow-md pointer-events-none z-0"></div>
+                
+                <!-- Tombol (z-10 membuatnya berada di atas slider) -->
+                <button type="button" id="btn-tab-login" onclick="switchAuth('login')" class="flex-1 py-2.5 text-white font-bold text-sm tracking-wide relative z-10 transition-colors cursor-pointer">
+                    MASUK
+                </button>
+                <button type="button" id="btn-tab-register" onclick="switchAuth('register')" class="flex-1 py-2.5 text-gray-400 font-bold text-sm tracking-wide relative z-10 transition-colors cursor-pointer hover:text-gray-200">
+                    DAFTAR
+                </button>
             </div>
             
-            <!-- Form Login -->
-            <form id="login-form" class="space-y-4" style="display: block;">
+            <!-- FORM LOGIN -->
+            <form id="form-login" class="space-y-4 force-show relative z-20">
                 <div class="relative">
-                    <i class="fas fa-user absolute left-4 top-4 text-red-500"></i>
-                    <input type="text" id="username" required placeholder="Nama Pengguna" class="w-full bg-black/50 border border-red-500/30 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition">
+                    <i class="fas fa-envelope absolute left-4 top-[18px] text-red-400"></i>
+                    <input type="text" id="login-username" required placeholder="Nama Pengguna" class="w-full bg-black/50 border border-red-500/30 rounded-xl pl-12 pr-4 py-3.5 text-white focus:outline-none focus:border-red-500 focus:bg-black/80 transition-all shadow-inner">
                 </div>
                 <div class="relative">
-                    <i class="fas fa-lock absolute left-4 top-4 text-red-500"></i>
-                    <input type="password" id="password" required placeholder="Kata Sandi" class="w-full bg-black/50 border border-red-500/30 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition">
+                    <i class="fas fa-lock absolute left-4 top-[18px] text-red-400"></i>
+                    <input type="password" id="login-password" required placeholder="Kata Sandi" class="w-full bg-black/50 border border-red-500/30 rounded-xl pl-12 pr-4 py-3.5 text-white focus:outline-none focus:border-red-500 focus:bg-black/80 transition-all shadow-inner">
                 </div>
-                <button type="submit" class="w-full mt-4 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(255,0,0,0.5)] transition transform hover:scale-105 active:scale-95">Masuk Aplikasi</button>
+                <button type="submit" class="w-full mt-2 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-extrabold py-4 rounded-xl shadow-[0_0_15px_rgba(255,0,0,0.4)] transition-all transform hover:-translate-y-1 active:scale-95 uppercase tracking-wider">
+                    Masuk Sekarang
+                </button>
             </form>
 
-            <!-- Form Register (Hidden by default) -->
-            <form id="register-form" class="space-y-4" style="display: none;">
+            <!-- FORM REGISTER -->
+            <form id="form-register" class="space-y-4 force-hide relative z-20">
                 <div class="relative">
-                    <i class="fas fa-user-plus absolute left-4 top-4 text-blue-500"></i>
-                    <input type="text" id="reg-username" required placeholder="Buat Nama Pengguna" class="w-full bg-black/50 border border-blue-500/30 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                    <i class="fas fa-user-plus absolute left-4 top-[18px] text-blue-400"></i>
+                    <input type="text" id="reg-username" required placeholder="Buat Username Baru" class="w-full bg-black/50 border border-blue-500/30 rounded-xl pl-12 pr-4 py-3.5 text-white focus:outline-none focus:border-blue-500 focus:bg-black/80 transition-all shadow-inner">
                 </div>
                 <div class="relative">
-                    <i class="fas fa-lock absolute left-4 top-4 text-blue-500"></i>
-                    <input type="password" id="reg-password" required placeholder="Buat Kata Sandi" class="w-full bg-black/50 border border-blue-500/30 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                    <i class="fas fa-key absolute left-4 top-[18px] text-blue-400"></i>
+                    <input type="password" id="reg-password" required placeholder="Buat Kata Sandi Kuat" class="w-full bg-black/50 border border-blue-500/30 rounded-xl pl-12 pr-4 py-3.5 text-white focus:outline-none focus:border-blue-500 focus:bg-black/80 transition-all shadow-inner">
                 </div>
-                <button type="submit" class="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(0,100,255,0.5)] transition transform hover:scale-105 active:scale-95">Daftar Akun Baru</button>
+                <button type="submit" class="w-full mt-2 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white font-extrabold py-4 rounded-xl shadow-[0_0_15px_rgba(0,100,255,0.4)] transition-all transform hover:-translate-y-1 active:scale-95 uppercase tracking-wider">
+                    Daftar Akun
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- LAYAR APLIKASI UTAMA (Disembunyikan sampai Login) -->
-    <div id="app-screen" class="hidden h-screen flex flex-col md:flex-row overflow-hidden transition-opacity duration-500 opacity-0">
+    <!-- LAYAR APLIKASI UTAMA (Disembunyikan saat belum login) -->
+    <div id="app-screen" class="hidden h-screen flex flex-col md:flex-row overflow-hidden opacity-0 transition-opacity duration-700 relative z-10">
         
-        <!-- SIDEBAR (Menu Kiri) -->
-        <nav class="glass w-full md:w-20 lg:w-64 h-16 md:h-full flex-shrink-0 flex md:flex-col items-center justify-between md:justify-start py-4 px-2 md:px-0 fixed md:relative bottom-0 md:bottom-auto z-40">
-            <div class="hidden md:block w-full text-center mb-8 mt-2">
-                <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-800 rounded-xl mx-auto flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.8)] border border-red-400">
-                    <i class="fas fa-chart-pie text-2xl"></i>
+        <!-- SIDEBAR MENU -->
+        <nav class="glass w-full md:w-20 lg:w-64 h-16 md:h-full flex-shrink-0 flex md:flex-col items-center justify-between md:justify-start py-4 px-2 md:px-0 fixed md:relative bottom-0 md:bottom-auto z-40 border-t md:border-t-0 md:border-r border-white/10">
+            <div class="hidden md:block w-full text-center mb-8 mt-4">
+                <div class="w-14 h-14 bg-gradient-to-br from-red-600 to-black rounded-2xl mx-auto flex items-center justify-center shadow-[0_0_20px_rgba(255,0,0,0.6)] border border-red-500/50">
+                    <i class="fas fa-bolt text-3xl text-yellow-400"></i>
                 </div>
-                <h2 class="text-white font-bold mt-3 hidden lg:block text-glow">Nusantara</h2>
+                <h2 class="text-white font-black mt-4 hidden lg:block text-glow tracking-widest uppercase text-sm">Nusa Predict</h2>
             </div>
             
-            <!-- Tombol Navigasi -->
             <div class="flex md:flex-col w-full justify-around md:justify-start gap-2 md:gap-4 px-2 md:px-4">
-                <button onclick="switchTab('pasar')" id="nav-pasar" class="nav-btn active flex items-center justify-center lg:justify-start gap-3 w-full p-3 rounded-xl transition-all duration-300 text-white shadow-[0_0_10px_rgba(255,0,0,0.5)] bg-red-600 border border-red-400">
-                    <i class="fas fa-home text-xl"></i>
-                    <span class="hidden lg:block font-semibold">Pasar Aktif</span>
+                <button onclick="changeTab('market')" id="nav-market" class="nav-item flex items-center justify-center lg:justify-start gap-3 w-full p-3.5 rounded-xl transition-all duration-300 text-white bg-gradient-to-r from-red-600 to-red-800 shadow-[0_0_15px_rgba(255,0,0,0.5)] font-bold">
+                    <i class="fas fa-fire text-xl lg:text-lg"></i>
+                    <span class="hidden lg:block">Pasar Aktif</span>
                 </button>
-                <button onclick="switchTab('jurnal')" id="nav-jurnal" class="nav-btn flex items-center justify-center lg:justify-start gap-3 w-full p-3 rounded-xl transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/10">
-                    <i class="fas fa-book text-xl"></i>
-                    <span class="hidden lg:block font-semibold">Jurnal Saya</span>
+                <button onclick="changeTab('journal')" id="nav-journal" class="nav-item flex items-center justify-center lg:justify-start gap-3 w-full p-3.5 rounded-xl transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/10 font-bold">
+                    <i class="fas fa-book text-xl lg:text-lg"></i>
+                    <span class="hidden lg:block">Jurnal Prediksi</span>
                 </button>
-                <button onclick="switchTab('komunitas')" id="nav-komunitas" class="nav-btn flex items-center justify-center lg:justify-start gap-3 w-full p-3 rounded-xl transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/10">
-                    <i class="fas fa-users text-xl"></i>
-                    <span class="hidden lg:block font-semibold">Komunitas</span>
+                <button onclick="changeTab('forum')" id="nav-forum" class="nav-item flex items-center justify-center lg:justify-start gap-3 w-full p-3.5 rounded-xl transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/10 font-bold">
+                    <i class="fas fa-comments text-xl lg:text-lg"></i>
+                    <span class="hidden lg:block">Forum Analis</span>
                 </button>
-                <button onclick="switchTab('kredibilitas')" id="nav-kredibilitas" class="nav-btn flex items-center justify-center lg:justify-start gap-3 w-full p-3 rounded-xl transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/10">
-                    <i class="fas fa-trophy text-xl"></i>
-                    <span class="hidden lg:block font-semibold">Kredibilitas</span>
+                <button onclick="changeTab('leaderboard')" id="nav-leaderboard" class="nav-item flex items-center justify-center lg:justify-start gap-3 w-full p-3.5 rounded-xl transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/10 font-bold">
+                    <i class="fas fa-trophy text-xl lg:text-lg"></i>
+                    <span class="hidden lg:block">Papan Peringkat</span>
                 </button>
             </div>
             
-            <div class="hidden md:flex flex-col mt-auto w-full px-4 gap-2 mb-4">
-                <button onclick="showToast('Sistem sedang dioptimalkan!')" class="flex items-center justify-center lg:justify-start gap-3 w-full p-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition">
-                    <i class="fas fa-cog text-xl"></i>
-                    <span class="hidden lg:block font-semibold">Pengaturan</span>
+            <div class="hidden md:flex flex-col mt-auto w-full px-4 gap-3 mb-6">
+                <button onclick="resetAccountData()" class="flex items-center justify-center lg:justify-start gap-3 w-full p-3 rounded-xl text-yellow-500 hover:text-white hover:bg-yellow-900/40 transition border border-transparent hover:border-yellow-500/50">
+                    <i class="fas fa-history text-lg"></i>
+                    <span class="hidden lg:block font-semibold">Reset Riwayat</span>
                 </button>
-                <button onclick="logout()" class="flex items-center justify-center lg:justify-start gap-3 w-full p-3 rounded-xl text-red-500 hover:text-white hover:bg-red-900/50 border border-transparent hover:border-red-500 transition">
-                    <i class="fas fa-sign-out-alt text-xl"></i>
-                    <span class="hidden lg:block font-semibold">Keluar</span>
+                <button onclick="executeLogout()" class="flex items-center justify-center lg:justify-start gap-3 w-full p-3 rounded-xl text-red-400 hover:text-white hover:bg-red-900/50 transition border border-transparent hover:border-red-500/50">
+                    <i class="fas fa-power-off text-lg"></i>
+                    <span class="hidden lg:block font-semibold">Keluar Akun</span>
                 </button>
             </div>
         </nav>
 
-        <!-- KONTEN UTAMA -->
-        <main class="flex-1 flex flex-col h-full overflow-hidden pb-16 md:pb-0 relative">
-            
-            <!-- Topbar (Atas) -->
-            <header class="glass-panel p-4 flex justify-between items-center z-30 shadow-lg">
-                <h2 class="text-xl md:text-2xl font-bold text-white text-glow tracking-wide" id="header-title">Pasar Aktif</h2>
+        <!-- AREA KONTEN -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden pb-20 md:pb-0">
+            <!-- HEADER -->
+            <header class="glass-panel px-6 py-4 flex justify-between items-center z-30 border-b border-white/10">
+                <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-red-200 tracking-wide" id="page-title">Pasar Olahraga Aktif</h2>
                 
-                <div class="flex items-center gap-3 md:gap-5">
-                    <!-- Status Koin / Poin -->
-                    <div class="hidden sm:flex gap-4 bg-black/50 px-4 py-2 rounded-xl border border-red-500/30">
-                        <div class="text-center">
-                            <div class="text-[10px] text-gray-400 uppercase tracking-wider">Total PTS</div>
-                            <div class="font-bold text-yellow-400" id="user-pts">0</div>
-                        </div>
-                        <div class="text-center border-l border-white/20 pl-4">
-                            <div class="text-[10px] text-gray-400 uppercase tracking-wider">Akurasi</div>
-                            <div class="font-bold text-green-400" id="user-winrate">0%</div>
+                <div class="flex items-center gap-4 md:gap-6">
+                    <!-- Skor -->
+                    <div class="hidden md:flex flex-col items-end mr-2">
+                        <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Total Poin On-Chain</div>
+                        <div class="font-black text-xl text-yellow-400 drop-shadow-[0_0_8px_rgba(255,200,0,0.5)] flex items-center gap-2">
+                            <i class="fas fa-coins text-sm"></i> <span id="display-pts">0</span>
                         </div>
                     </div>
                     
-                    <!-- Pilihan Bahasa -->
-                    <select id="lang-selector" onchange="changeLanguage()" class="bg-black/80 border border-red-500/50 text-white rounded-lg p-2 text-sm focus:outline-none focus:border-red-400 font-bold cursor-pointer">
-                        <option value="id">🇮🇩 ID</option>
-                        <option value="en">🇬🇧 EN</option>
-                        <option value="ar">🇸🇦 AR</option>
-                    </select>
-                    
-                    <!-- Lonceng Notifikasi -->
-                    <div class="relative">
-                        <button onclick="toggleElement('notif-dropdown')" class="relative p-2 text-gray-300 hover:text-white hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] transition">
-                            <i class="fas fa-bell text-xl"></i>
-                            <span id="notif-badge" class="absolute top-0 right-0 w-4 h-4 bg-red-600 rounded-full text-[10px] flex items-center justify-center font-bold border border-black animate-pulse">1</span>
-                        </button>
-                        <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-72 glass rounded-2xl shadow-2xl border border-red-500/50 overflow-hidden z-50">
-                            <div class="p-3 border-b border-red-500/30 flex justify-between items-center bg-black/80">
-                                <span class="font-bold text-sm">Pemberitahuan</span>
-                                <button onclick="clearNotifs()" class="text-xs text-red-400 hover:text-red-300 font-bold">Tandai Dibaca</button>
-                            </div>
-                            <div class="max-h-64 overflow-y-auto" id="notif-list">
-                                <div class="p-3 border-b border-white/5 hover:bg-white/10 cursor-pointer">
-                                    <div class="text-sm font-semibold text-green-400 flex items-center gap-2"><i class="fas fa-check-circle"></i> Selamat Datang!</div>
-                                    <div class="text-xs text-gray-400 mt-1">Akses akun berhasil. Mulai buat prediksi on-chain pertamamu hari ini.</div>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Profil -->
+                    <div class="flex items-center gap-3 bg-black/40 py-1.5 px-1.5 pr-4 rounded-full border border-white/10 shadow-inner">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-red-500 to-red-800 flex items-center justify-center text-white font-black text-lg border-2 border-black" id="display-initial">U</div>
+                        <span class="font-bold text-sm text-gray-200 max-w-[100px] truncate" id="display-username">User</span>
                     </div>
-
-                    <!-- Tombol Profil Akun -->
-                    <button onclick="showModal('profile-modal')" class="flex items-center gap-2 bg-black/40 hover:bg-white/10 p-1.5 pr-4 rounded-full border border-red-500/30 transition">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-red-600 to-red-400 flex items-center justify-center text-white font-bold shadow-lg" id="profile-initial">A</div>
-                        <span class="hidden sm:block font-bold text-sm truncate max-w-[100px]" id="profile-name">User</span>
-                    </button>
                 </div>
             </header>
 
-            <!-- Area Konten Berubah-ubah (Dinamic Tabs) -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-6 pb-24" id="content-area">
+            <!-- KONTEN DINAMIS -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 relative scroll-smooth" id="main-scroll">
                 
-                <!-- TAB 1: PASAR AKTIF -->
-                <div id="tab-pasar" class="tab-content block space-y-6">
-                    <!-- Banner Selamat Datang -->
-                    <div class="glass rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between relative overflow-hidden bg-gradient-to-r from-red-900/60 to-black/80 border border-red-500/40">
-                        <div class="z-10 text-center md:text-left">
-                            <h2 class="text-2xl md:text-4xl font-extrabold mb-2 text-glow">Siap Tebak, <span id="welcome-name" class="text-red-400 truncate inline-block max-w-[200px] align-bottom">Bosku</span>?</h2>
-                            <p class="text-gray-300 text-sm md:text-base">Kalahkan analis lain. Analisis data on-chain, buat prediksi akurat, dan raih posisi teratas di papan peringkat global.</p>
+                <!-- TAB 1: MARKET -->
+                <div id="view-market" class="tab-view block space-y-8 max-w-7xl mx-auto">
+                    <!-- Welcome Hero -->
+                    <div class="glass p-8 rounded-[2rem] flex flex-col md:flex-row items-center justify-between border border-red-500/30 relative overflow-hidden bg-gradient-to-br from-red-900/40 to-black/60 shadow-2xl">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-yellow-500 to-red-600"></div>
+                        <div class="z-10">
+                            <h2 class="text-3xl md:text-5xl font-black mb-3">Halo, <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-yellow-300" id="hero-name">Analis</span>!</h2>
+                            <p class="text-gray-300 max-w-xl text-sm md:text-base leading-relaxed">Pasar olahraga global sedang berfluktuasi tinggi. Gunakan analisamu, simulasikan tebakan on-chain, dan kumpulkan poin prediksi untuk menaikkan peringkatmu di Nusantara Predict.</p>
                         </div>
-                        <img src="10.png" class="w-32 h-32 md:w-40 md:h-40 z-10 mt-4 md:mt-0 drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] mascot-float" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
-                        <div class="absolute -right-10 -bottom-20 w-64 h-64 bg-red-600/30 rounded-full blur-[60px]"></div>
+                        <div class="mt-6 md:mt-0 relative z-10">
+                            <div class="w-32 h-32 md:w-48 md:h-48 bg-gradient-to-tr from-red-600/20 to-transparent rounded-full flex items-center justify-center absolute -top-4 -right-4 blur-xl"></div>
+                            <img src="10.png" class="w-28 h-28 md:w-40 md:h-40 mascot-float relative z-10" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
+                        </div>
                     </div>
 
-                    <!-- Tombol Filter -->
-                    <div class="flex flex-wrap gap-3 mb-2">
-                        <button class="filter-btn active px-5 py-2 rounded-full glass bg-red-600 shadow-[0_0_10px_rgba(255,0,0,0.5)] border border-red-400 font-bold transition" onclick="filterMatches('Semua', this)">Semua</button>
-                        <button class="filter-btn px-5 py-2 rounded-full glass hover:bg-white/10 font-bold transition border border-transparent hover:border-white/20" onclick="filterMatches('Sepak Bola', this)">Sepak Bola</button>
-                        <button class="filter-btn px-5 py-2 rounded-full glass hover:bg-white/10 font-bold transition border border-transparent hover:border-white/20" onclick="filterMatches('Basket', this)">Basket</button>
-                        <button class="filter-btn px-5 py-2 rounded-full glass hover:bg-white/10 font-bold transition border border-transparent hover:border-white/20" onclick="filterMatches('Badminton', this)">Badminton</button>
-                        <button class="filter-btn px-5 py-2 rounded-full glass hover:bg-white/10 font-bold transition border border-transparent hover:border-white/20" onclick="filterMatches('E-Sports', this)">E-Sports</button>
+                    <!-- Market Filters -->
+                    <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                        <button class="filter-btn active-filter px-6 py-2.5 rounded-full font-bold text-sm border-2 border-red-500 bg-red-600 text-white shadow-[0_0_15px_rgba(255,0,0,0.4)] whitespace-nowrap transition" onclick="filterMarket('Semua', this)">🔥 Semua Event</button>
+                        <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('Sepak Bola', this)">⚽ Sepak Bola</button>
+                        <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('Basket', this)">🏀 Basket</button>
+                        <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('E-Sports', this)">🎮 E-Sports</button>
                     </div>
 
-                    <!-- Grid Pertandingan -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="match-grid">
-                        <!-- Otomatis diisi oleh JavaScript -->
+                    <!-- Market Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="matches-container">
+                        <!-- Dimasukkan lewat JS -->
                     </div>
                 </div>
 
-                <!-- TAB 2: JURNAL SAYA -->
-                <div id="tab-jurnal" class="tab-content hidden">
-                    <div class="glass p-6 rounded-3xl border border-red-500/30">
-                        <h3 class="text-xl font-bold mb-4 border-b border-red-500/30 pb-3 flex items-center gap-2"><i class="fas fa-book-open text-red-500"></i> Riwayat Jurnal Prediksi</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm whitespace-nowrap">
-                                <thead class="text-red-300 bg-red-900/30">
+                <!-- TAB 2: JURNAL -->
+                <div id="view-journal" class="tab-view hidden max-w-7xl mx-auto space-y-6">
+                    <div class="glass rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+                        <div class="bg-gradient-to-r from-red-900/50 to-black p-6 border-b border-red-500/30 flex items-center gap-4">
+                            <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center text-white text-xl shadow-lg"><i class="fas fa-book-medical"></i></div>
+                            <div>
+                                <h3 class="text-2xl font-black">Jurnal Keputusan</h3>
+                                <p class="text-sm text-gray-400">Rekap riwayat prediksi yang sudah Anda kunci.</p>
+                            </div>
+                        </div>
+                        <div class="p-0 overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-black/60 text-gray-400 text-xs uppercase tracking-wider font-bold">
                                     <tr>
-                                        <th class="p-4 rounded-tl-xl font-bold">Event / Pertandingan</th>
-                                        <th class="p-4 font-bold">Pilihan Anda</th>
-                                        <th class="p-4 font-bold">Keyakinan</th>
-                                        <th class="p-4 font-bold">Status</th>
-                                        <th class="p-4 rounded-tr-xl font-bold">Waktu Disimpan</th>
+                                        <th class="p-5">Pertandingan</th>
+                                        <th class="p-5">Tebakan Anda</th>
+                                        <th class="p-5 text-center">Keyakinan</th>
+                                        <th class="p-5">Status</th>
+                                        <th class="p-5 text-right">Waktu (WIB)</th>
                                     </tr>
                                 </thead>
-                                <tbody id="journal-list" class="divide-y divide-white/10">
-                                    <!-- Otomatis diisi JS berdasarkan LocalStorage -->
+                                <tbody id="table-journal" class="divide-y divide-white/5 text-sm font-medium">
+                                    <!-- Diisi lewat JS -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 3: KOMUNITAS -->
-                <div id="tab-komunitas" class="tab-content hidden space-y-6">
-                    <div class="glass p-5 rounded-3xl border border-red-500/30 bg-black/60">
-                        <textarea id="community-input" class="w-full bg-black/50 border border-red-500/30 rounded-xl p-4 text-white focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 resize-none transition" rows="3" placeholder="Apa analisamu tentang pertandingan hari ini? Bagikan ke publik..."></textarea>
-                        <div class="flex justify-between items-center mt-3">
-                            <button onclick="showToast('Fitur upload gambar segera hadir!')" class="text-gray-400 hover:text-white px-4 py-2 rounded-lg hover:bg-white/10 transition"><i class="fas fa-image text-lg"></i> Lampirkan Data</button>
-                            <button onclick="postCommunity()" class="bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 px-8 py-2.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,0,0,0.4)] transition">Kirim Postingan</button>
+                <!-- TAB 3: FORUM -->
+                <div id="view-forum" class="tab-view hidden max-w-4xl mx-auto space-y-6">
+                    <div class="glass p-6 rounded-3xl border border-red-500/20 bg-black/60 shadow-2xl">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-red-500 to-red-800 flex items-center justify-center font-black border border-white/20 shrink-0" id="forum-initial">U</div>
+                            <div class="flex-1 space-y-3">
+                                <textarea id="forum-input" class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white placeholder-gray-500 focus:outline-none focus:border-red-500 focus:bg-black/80 transition resize-none" rows="3" placeholder="Bagikan analisamu ke komunitas..."></textarea>
+                                <div class="flex justify-end">
+                                    <button onclick="submitForumPost()" class="bg-red-600 hover:bg-red-500 text-white px-8 py-2.5 rounded-xl font-bold shadow-[0_0_15px_rgba(255,0,0,0.3)] transition transform active:scale-95">Kirim</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="space-y-4" id="community-feed">
-                        <!-- Feed Komunitas Otomatis -->
+                    <div class="space-y-4" id="forum-feed">
+                        <!-- Diisi JS -->
                     </div>
                 </div>
 
-                <!-- TAB 4: KREDIBILITAS -->
-                <div id="tab-kredibilitas" class="tab-content hidden">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Kartu Rank -->
-                        <div class="glass p-8 rounded-3xl text-center flex flex-col items-center border border-red-500/50 bg-gradient-to-b from-black/80 to-red-900/40 relative overflow-hidden">
-                            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-                            <img src="10.png" class="w-32 h-32 mb-4 drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] z-10" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
-                            <h3 class="text-3xl font-extrabold text-glow text-white z-10">Rank: <span class="text-red-500">Master Analis</span></h3>
-                            <p class="text-gray-300 text-sm mt-2 z-10">Akurasi prediksi Anda mengalahkan 85% pengguna lain.</p>
+                <!-- TAB 4: LEADERBOARD -->
+                <div id="view-leaderboard" class="tab-view hidden max-w-5xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Profil Stats -->
+                        <div class="md:col-span-1 glass p-6 rounded-3xl border border-red-500/30 text-center flex flex-col items-center bg-gradient-to-b from-black to-red-950/40">
+                            <img src="10.png" class="w-24 h-24 mb-4 drop-shadow-[0_0_20px_rgba(255,0,0,0.5)]" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
+                            <div class="text-sm font-bold text-red-400 uppercase tracking-widest mb-1">Peringkat Anda</div>
+                            <h3 class="text-3xl font-black text-white mb-6">#42</h3>
                             
-                            <div class="w-full bg-black/60 rounded-full h-5 mt-8 border border-white/20 z-10 p-0.5">
-                                <div class="bg-gradient-to-r from-red-700 via-red-500 to-yellow-400 h-full rounded-full shadow-[0_0_15px_rgba(255,0,0,0.8)] relative" style="width: 82%">
-                                    <div class="absolute right-2 top-0 text-[10px] font-bold">82%</div>
+                            <div class="w-full space-y-4">
+                                <div class="bg-black/50 p-4 rounded-xl border border-white/10 text-left flex justify-between items-center">
+                                    <span class="text-gray-400 text-xs uppercase font-bold">Total Prediksi</span>
+                                    <span class="font-black text-lg text-white" id="stat-total">0</span>
                                 </div>
-                            </div>
-                            <div class="flex justify-between w-full text-sm mt-3 text-gray-300 font-bold z-10">
-                                <span>Level 42</span>
-                                <span>Exp: 8,200 / 10,000</span>
+                                <div class="bg-black/50 p-4 rounded-xl border border-white/10 text-left flex justify-between items-center">
+                                    <span class="text-gray-400 text-xs uppercase font-bold">Akurasi (WR)</span>
+                                    <span class="font-black text-lg text-green-400" id="stat-wr">0%</span>
+                                </div>
                             </div>
                         </div>
                         
-                        <!-- Papan Peringkat -->
-                        <div class="glass p-6 rounded-3xl border border-white/10">
-                            <h4 class="font-bold text-xl border-b border-red-500/30 pb-3 mb-4 flex items-center gap-2"><i class="fas fa-crown text-yellow-500"></i> Papan Peringkat Nasional</h4>
+                        <!-- Peringkat Global -->
+                        <div class="md:col-span-2 glass p-6 rounded-3xl border border-white/10">
+                            <h4 class="font-black text-xl mb-6 flex items-center gap-3"><i class="fas fa-globe-asia text-blue-400"></i> Top 3 Analis Global</h4>
                             <div class="space-y-3">
-                                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-yellow-300 to-yellow-600 text-black font-extrabold flex items-center justify-center rounded-xl shadow-lg">1</div>
-                                        <div>
-                                            <div class="font-bold text-white">Raja_Prediksi99</div>
-                                            <div class="text-xs text-gray-400">1,402 Prediksi Tepat</div>
-                                        </div>
+                                <div class="bg-gradient-to-r from-yellow-900/40 to-black p-4 rounded-2xl border border-yellow-500/30 flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-300 to-yellow-600 flex items-center justify-center font-black text-black text-xl shadow-lg">1</div>
+                                    <div class="flex-1">
+                                        <div class="font-bold text-lg text-white">Raja_Prediksi99</div>
+                                        <div class="text-xs text-yellow-200">1,402 Prediksi Akurat</div>
                                     </div>
-                                    <span class="text-green-400 font-extrabold text-lg">94% WR</span>
+                                    <div class="text-right">
+                                        <div class="text-xl font-black text-green-400">94%</div>
+                                        <div class="text-[10px] text-gray-400">Win Rate</div>
+                                    </div>
                                 </div>
-                                <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-gray-300 to-gray-500 text-black font-extrabold flex items-center justify-center rounded-xl shadow-lg">2</div>
-                                        <div>
-                                            <div class="font-bold text-white">SobatOnChain</div>
-                                            <div class="text-xs text-gray-400">950 Prediksi Tepat</div>
-                                        </div>
+                                <div class="bg-gradient-to-r from-gray-800/40 to-black p-4 rounded-2xl border border-gray-400/30 flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center font-black text-black text-xl shadow-lg">2</div>
+                                    <div class="flex-1">
+                                        <div class="font-bold text-lg text-white">SobatOnChain</div>
+                                        <div class="text-xs text-gray-300">950 Prediksi Akurat</div>
                                     </div>
-                                    <span class="text-green-400 font-extrabold text-lg">89% WR</span>
+                                    <div class="text-right">
+                                        <div class="text-xl font-black text-green-400">89%</div>
+                                        <div class="text-[10px] text-gray-400">Win Rate</div>
+                                    </div>
                                 </div>
-                                <div class="flex items-center justify-between p-3 bg-red-900/50 rounded-xl border border-red-500 text-white transform scale-[1.02] shadow-[0_0_15px_rgba(255,0,0,0.3)] mt-6">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 bg-red-600 text-white font-extrabold flex items-center justify-center rounded-xl">42</div>
-                                        <div class="overflow-hidden">
-                                            <div class="font-bold text-white truncate max-w-[120px]" id="leaderboard-name">Anda</div>
-                                            <div class="text-xs text-red-200">Terus tingkatkan analisamu!</div>
-                                        </div>
+                                <div class="bg-gradient-to-r from-orange-900/40 to-black p-4 rounded-2xl border border-orange-500/30 flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center font-black text-black text-xl shadow-lg">3</div>
+                                    <div class="flex-1">
+                                        <div class="font-bold text-lg text-white">CryptoNusa</div>
+                                        <div class="text-xs text-orange-200">820 Prediksi Akurat</div>
                                     </div>
-                                    <span class="text-green-400 font-extrabold text-lg" id="leaderboard-wr">0% WR</span>
+                                    <div class="text-right">
+                                        <div class="text-xl font-black text-green-400">86%</div>
+                                        <div class="text-[10px] text-gray-400">Win Rate</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -321,506 +321,488 @@
         </main>
     </div>
 
+    <!-- MODAL PREDIKSI -->
+    <div id="modal-predict" class="fixed inset-0 z-[200] hidden flex items-center justify-center bg-black/90 backdrop-blur-sm transition-opacity duration-300 opacity-0 px-4">
+        <div class="glass p-8 rounded-3xl w-full max-w-lg border border-red-500/50 shadow-[0_0_50px_rgba(255,0,0,0.2)] transform scale-95 transition-transform duration-300" id="modal-predict-box">
+            <div class="flex justify-between items-start mb-8 border-b border-white/10 pb-4">
+                <div>
+                    <span class="text-xs font-bold bg-red-900/60 text-red-300 px-3 py-1 rounded-lg border border-red-500/30 mb-2 inline-block">Buat Prediksi</span>
+                    <h3 class="text-2xl font-black text-white leading-tight" id="mp-title">Loading...</h3>
+                </div>
+                <button onclick="closeModal('modal-predict')" class="w-10 h-10 bg-white/5 hover:bg-red-600 text-gray-400 hover:text-white rounded-full flex items-center justify-center transition border border-white/10"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Siapa yang akan menang?</label>
+                    <select id="mp-selection" class="w-full bg-black/80 border-2 border-red-500/50 rounded-xl p-4 text-white text-lg font-bold focus:outline-none focus:border-red-400 cursor-pointer appearance-none">
+                        <!-- Options via JS -->
+                    </select>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between items-end mb-3">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest">Tingkat Keyakinan</label>
+                        <span id="mp-conf-display" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-400">75%</span>
+                    </div>
+                    <input type="range" id="mp-confidence" min="10" max="100" step="1" value="75" class="w-full h-3 bg-black rounded-lg appearance-none cursor-pointer accent-red-600 border border-white/20" oninput="document.getElementById('mp-conf-display').innerText = this.value + '%'">
+                </div>
+                
+                <button onclick="savePredictionToDB()" class="w-full mt-4 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white text-lg font-black py-4 rounded-xl shadow-[0_0_20px_rgba(255,0,0,0.5)] transition transform hover:-translate-y-1">Simpan ke Jurnal & Dapatkan Poin</button>
+            </div>
+        </div>
+    </div>
+
     <!-- AI CHAT MENGAPUNG (SARI) -->
-    <div class="fixed bottom-20 md:bottom-8 right-6 z-50 flex flex-col items-end">
-        <!-- Kotak Chat -->
-        <div id="chat-box" class="hidden w-full max-w-[340px] glass rounded-3xl shadow-2xl overflow-hidden border border-red-500/50 flex-col h-[450px] mb-4 transform transition-all duration-300 origin-bottom-right">
-            <div class="bg-gradient-to-r from-red-800 to-black p-4 flex justify-between items-center border-b border-red-500/30">
+    <div class="fixed bottom-24 md:bottom-8 right-6 z-[90] flex flex-col items-end">
+        <div id="ai-chat-window" class="hidden w-full max-w-[340px] glass rounded-3xl shadow-2xl overflow-hidden border border-red-500/50 flex-col h-[450px] mb-4 transform transition-all duration-300 origin-bottom-right scale-95 opacity-0">
+            <div class="bg-gradient-to-r from-red-900 to-black p-4 flex justify-between items-center border-b border-red-500/30">
                 <div class="flex items-center gap-3">
-                    <img src="2.png" class="w-12 h-12 rounded-full border-2 border-red-400 bg-black/50 shadow-[0_0_10px_rgba(255,0,0,0.5)]" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">
+                    <img src="2.png" class="w-10 h-10 rounded-full border-2 border-red-400 bg-black shadow-lg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">
                     <div>
-                        <div class="font-bold text-white text-md">Sari AI</div>
-                        <div class="text-xs text-green-400 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse"></span> Asisten Aktif</div>
+                        <div class="font-bold text-white text-sm">Sari AI</div>
+                        <div class="text-[10px] text-green-400 font-bold tracking-wider uppercase"><span class="w-2 h-2 rounded-full bg-green-500 inline-block align-middle mr-1 animate-pulse"></span> Online</div>
                     </div>
                 </div>
-                <button onclick="toggleElement('chat-box')" class="text-white/50 hover:text-white bg-white/10 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+                <button onclick="toggleAIChat()" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white bg-white/5 hover:bg-red-600 rounded-full transition"><i class="fas fa-times"></i></button>
             </div>
             
-            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-black/80 scroll-smooth">
-                <div class="flex gap-3 max-w-[85%]">
-                    <img src="2.png" class="w-8 h-8 mt-1 border border-red-500/50 rounded-full bg-black shrink-0" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">
-                    <div class="bg-red-900/60 border border-red-500/30 text-white text-sm p-3 rounded-2xl rounded-tl-none shadow-md leading-relaxed">
-                        Halo Bosku! Aku Sari. Butuh bocoran data on-chain atau mau ngobrol soal prediksi hari ini? 📈
+            <div id="ai-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-black/70 scroll-smooth">
+                <div class="flex gap-3 max-w-[90%]">
+                    <img src="2.png" class="w-8 h-8 border border-red-500/50 rounded-full bg-black shrink-0" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">
+                    <div class="bg-red-900/60 border border-red-500/30 text-white text-sm p-3 rounded-2xl rounded-tl-none shadow-md">
+                        Halo Bosku! Aku Sari. Butuh bocoran pergerakan uang on-chain hari ini? Ketik aja! 📈
                     </div>
                 </div>
             </div>
             
-            <div class="p-3 bg-black/90 border-t border-red-500/30 flex gap-2">
-                <input type="text" id="chat-input" placeholder="Tanya sesuatu ke Sari..." class="flex-1 bg-white/5 border border-white/20 rounded-full px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 focus:bg-white/10 transition" onkeypress="if(event.key === 'Enter') sendChatMessage()">
-                <button onclick="sendChatMessage()" class="w-11 h-11 bg-gradient-to-br from-red-500 to-red-700 rounded-full flex items-center justify-center text-white shadow-[0_0_10px_rgba(255,0,0,0.5)] hover:scale-110 transition shrink-0"><i class="fas fa-paper-plane"></i></button>
+            <div class="p-3 bg-black border-t border-red-500/30 flex gap-2">
+                <input type="text" id="ai-input" placeholder="Tanya Sari..." class="flex-1 bg-white/10 border border-white/10 rounded-full px-4 text-sm text-white focus:outline-none focus:border-red-500 transition" onkeypress="if(event.key === 'Enter') sendToAI()">
+                <button onclick="sendToAI()" class="w-10 h-10 bg-red-600 hover:bg-red-500 rounded-full flex items-center justify-center text-white shrink-0 shadow-lg transition"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
 
-        <!-- Tombol Pemicu Chat -->
-        <button onclick="toggleElement('chat-box')" class="relative transform transition hover:scale-110 active:scale-95 drop-shadow-[0_0_20px_rgba(255,0,0,0.6)]">
-            <img src="1.png" alt="Chat with Sari" class="w-20 h-20 md:w-24 md:h-24 mascot-float" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
-            <span class="absolute top-2 right-2 w-4 h-4 bg-green-500 border-2 border-black rounded-full animate-bounce"></span>
+        <button onclick="toggleAIChat()" class="relative transform transition hover:scale-110 active:scale-95 drop-shadow-[0_0_20px_rgba(255,0,0,0.6)]">
+            <img src="1.png" alt="Chat AI" class="w-16 h-16 md:w-20 md:h-20 mascot-float" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
+            <span class="absolute top-0 right-0 w-4 h-4 bg-green-500 border-2 border-black rounded-full animate-pulse"></span>
         </button>
     </div>
 
-    <!-- MODAL: BUAT PREDIKSI -->
-    <div id="predict-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/80 backdrop-blur-md px-4">
-        <div class="glass p-6 rounded-3xl w-full max-w-md transform scale-95 transition-transform duration-300 border border-red-500/50 shadow-[0_0_40px_rgba(255,0,0,0.3)]">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-glow text-white pr-4" id="modal-match-title">Loading...</h3>
-                <button onclick="closeModal('predict-modal')" class="text-gray-400 hover:text-white bg-white/10 w-8 h-8 rounded-full flex items-center justify-center shrink-0"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-sm font-bold text-red-300 mb-2 uppercase tracking-wider">Tentukan Pemenang</label>
-                    <select id="predict-selection" class="w-full bg-black/60 border border-red-500/30 rounded-xl p-4 text-white focus:outline-none focus:border-red-500 text-lg font-bold cursor-pointer">
-                        <!-- Otomatis diisi JS -->
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-red-300 mb-2 uppercase tracking-wider flex justify-between">
-                        Tingkat Keyakinan <span id="conf-value" class="text-white font-extrabold text-lg">70%</span>
-                    </label>
-                    <input type="range" id="predict-confidence" min="10" max="100" step="5" value="70" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-500" oninput="document.getElementById('conf-value').innerText = this.value + '%'">
-                </div>
-                <button onclick="savePrediction()" class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-extrabold py-4 rounded-xl shadow-[0_0_20px_rgba(255,0,0,0.6)] hover:scale-[1.02] transition">Kunci Prediksi ke Jurnal</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: PENGATURAN PROFIL -->
-    <div id="profile-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/80 backdrop-blur-md px-4">
-        <div class="glass p-8 rounded-3xl w-full max-w-sm border border-red-500/50 shadow-2xl">
-            <h3 class="text-2xl font-bold mb-6 text-center text-glow">Pengaturan Profil</h3>
-            <div class="text-center mb-6">
-                <div class="w-24 h-24 bg-gradient-to-br from-red-500 to-red-800 rounded-full mx-auto flex items-center justify-center text-4xl font-extrabold mb-3 shadow-[0_0_15px_rgba(255,0,0,0.5)] border-2 border-red-400" id="modal-profile-initial">A</div>
-                <h4 class="font-bold text-xl text-white truncate px-2" id="modal-profile-name">Username</h4>
-                <p class="text-green-400 text-sm font-bold mt-1">Status: Aktif Terverifikasi</p>
-            </div>
-            <div class="space-y-3">
-                <button onclick="clearData()" class="w-full bg-red-900/50 border border-red-500 text-red-300 font-bold py-3 rounded-xl hover:bg-red-600 hover:text-white transition shadow-lg flex items-center justify-center gap-2">
-                    <i class="fas fa-trash-alt"></i> Reset Data Akun
-                </button>
-                <button onclick="closeModal('profile-modal')" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl transition border border-white/10">Kembali</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT: MESIN PENGGERAK APLIKASI -->
+    <!-- JAVASCRIPT UTAMA -->
     <script>
-        // --- 1. DATA MASTER ---
-        // CATATAN: Pilihan Pilpres (id:3 sebelumnya) telah dihapus dengan sempurna sesuai permintaan.
-        const defaultMatches = [
-            { id: 1, title: 'Timnas Indonesia vs Arab Saudi', category: 'Sepak Bola', odds1: '3.00', odds2: '1.50', teams: ['Indonesia Menang', 'Seri', 'Arab Saudi Menang'] },
-            { id: 2, title: 'Arsenal vs Manchester City', category: 'Sepak Bola', odds1: '2.60', odds2: '2.40', teams: ['Arsenal Menang', 'Seri', 'Man City Menang'] },
-            { id: 3, title: 'Persija vs Persib Bandung', category: 'Sepak Bola', odds1: '2.10', odds2: '2.80', teams: ['Persija Menang', 'Seri', 'Persib Menang'] },
-            { id: 4, title: 'Real Madrid vs Barcelona', category: 'Sepak Bola', odds1: '2.20', odds2: '2.50', teams: ['Madrid Menang', 'Seri', 'Barcelona Menang'] },
-            { id: 5, title: 'LA Lakers vs Golden State Warriors', category: 'Basket', odds1: '1.90', odds2: '1.85', teams: ['Lakers Menang', 'Warriors Menang'] },
-            { id: 6, title: 'Jonatan Christie vs Viktor Axelsen', category: 'Badminton', odds1: '2.75', odds2: '1.45', teams: ['Jonatan Menang', 'Viktor Menang'] },
-            { id: 7, title: 'ONIC Esports vs AP Bren', category: 'E-Sports', odds1: '1.85', odds2: '1.95', teams: ['ONIC Menang', 'AP Bren Menang'] },
-            { id: 8, title: 'T1 vs Gen.G', category: 'E-Sports', odds1: '1.70', odds2: '2.10', teams: ['T1 Menang', 'Gen.G Menang'] }
-        ];
-        
-        let currentUser = null;
-        let predictions = [];
-        let communityFeed = [
-            { user: 'Sari AI', text: 'Analisis sentimen harian selesai. Pasar Olahraga sedang volatil. Gunakan insting terbaikmu! 🇮🇩', time: '1 jam lalu', isAI: true },
-            { user: 'Garuda_ID', text: 'Yakin Timnas bakal kasih kejutan besok malam. Odds On-Chain terlalu meremehkan.', time: '2 jam lalu' }
+        // ----------------------------------------------------
+        // 1. DATA MASTER PERTANDINGAN
+        // ----------------------------------------------------
+        const DB_MATCHES = [
+            { id: 1, title: 'Timnas Indonesia vs Arab Saudi', category: 'Sepak Bola', o1: '2.80', o2: '1.60', teams: ['Indonesia Menang', 'Seri', 'Arab Saudi Menang'] },
+            { id: 2, title: 'Arsenal vs Manchester City', category: 'Sepak Bola', o1: '2.60', o2: '2.40', teams: ['Arsenal Menang', 'Seri', 'Man City Menang'] },
+            { id: 3, title: 'Persija Jakarta vs Persib Bandung', category: 'Sepak Bola', o1: '2.10', o2: '2.80', teams: ['Persija Menang', 'Seri', 'Persib Menang'] },
+            { id: 4, title: 'LA Lakers vs G.S. Warriors', category: 'Basket', o1: '1.90', o2: '1.85', teams: ['Lakers Menang', 'Warriors Menang'] },
+            { id: 5, title: 'RRQ Hoshi vs ONIC Esports', category: 'E-Sports', o1: '1.75', o2: '2.05', teams: ['RRQ Menang', 'ONIC Menang'] }
         ];
 
-        // --- 2. SISTEM OTENTIKASI & INISIALISASI ---
+        let SESSION_USER = null;
+        let USER_JOURNAL = [];
+        let FORUM_POSTS = [
+            { user: 'Sari AI', text: 'Analisis harian: Sentimen untuk Timnas Indonesia sedang tinggi di bursa on-chain. Waspada odds trap!', time: '1 jam lalu', ai: true },
+            { user: 'Garuda_ID', text: 'Optimis Indonesia bisa curi poin penuh malam ini. Let's go!', time: '2 jam lalu', ai: false }
+        ];
+
+        // ----------------------------------------------------
+        // 2. SISTEM OTENTIKASI KOKOH (NO BUGS)
+        // ----------------------------------------------------
         window.onload = () => {
-            checkAuth();
+            initApp();
         };
 
-        function checkAuth() {
-            currentUser = localStorage.getItem('nusa_user');
-            if (currentUser) {
-                document.getElementById('login-screen').classList.add('opacity-0', 'pointer-events-none');
-                setTimeout(() => {
-                    document.getElementById('login-screen').classList.add('hidden');
-                    document.getElementById('app-screen').classList.remove('hidden');
-                    setTimeout(() => document.getElementById('app-screen').classList.remove('opacity-0'), 50);
-                    loadApp();
-                }, 500);
+        function initApp() {
+            SESSION_USER = localStorage.getItem('nusa_active_user');
+            if(SESSION_USER) {
+                // Sembunyikan Auth, Tampilkan App
+                document.getElementById('auth-screen').classList.add('force-hide');
+                const app = document.getElementById('app-screen');
+                app.classList.remove('hidden');
+                setTimeout(() => app.classList.remove('opacity-0'), 50);
+                
+                loadDashboardData();
             } else {
-                document.getElementById('login-screen').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                // Tampilkan Auth, Sembunyikan App
+                document.getElementById('auth-screen').classList.remove('force-hide');
                 document.getElementById('app-screen').classList.add('hidden', 'opacity-0');
             }
         }
 
-        // --- Fungsi Toggle Login/Register ---
-        // --- Fungsi Toggle Login/Register ---
-        function toggleAuth(mode) {
-            const slider = document.getElementById('auth-tab-slider');
-            const tabLogin = document.getElementById('tab-login');
-            const tabRegister = document.getElementById('tab-register');
+        // Toggling UI Login / Daftar
+        function switchAuth(mode) {
+            const slider = document.getElementById('tab-slider');
+            const btnLogin = document.getElementById('btn-tab-login');
+            const btnReg = document.getElementById('btn-tab-register');
+            const formLogin = document.getElementById('form-login');
+            const formReg = document.getElementById('form-register');
+            const subtitle = document.getElementById('auth-subtitle');
 
-            if(mode === 'register') {
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('register-form').style.display = 'block';
-                document.getElementById('auth-subtitle').innerText = "Daftar akun baru untuk mulai bermain";
-                
+            if (mode === 'register') {
+                // Geser visual ke kanan (Biru)
                 slider.style.transform = 'translateX(100%)';
-                slider.classList.remove('bg-red-600');
-                slider.classList.add('bg-blue-600');
+                slider.classList.remove('from-red-600', 'to-red-800');
+                slider.classList.add('from-blue-600', 'to-blue-800');
+
+                // Warna teks tombol
+                btnLogin.classList.remove('text-white');
+                btnLogin.classList.add('text-gray-400');
+                btnReg.classList.remove('text-gray-400');
+                btnReg.classList.add('text-white');
+
+                // Toggle Form pakai Force Class CSS
+                formLogin.classList.remove('force-show');
+                formLogin.classList.add('force-hide');
                 
-                tabLogin.classList.remove('text-white');
-                tabLogin.classList.add('text-gray-400');
-                tabRegister.classList.remove('text-gray-400');
-                tabRegister.classList.add('text-white');
+                formReg.classList.remove('force-hide');
+                formReg.classList.add('force-show');
+                
+                subtitle.innerText = "Daftar akun baru untuk akses";
             } else {
-                document.getElementById('register-form').style.display = 'none';
-                document.getElementById('login-form').style.display = 'block';
-                document.getElementById('auth-subtitle').innerText = "Masuk untuk memulai prediksi On-Chain";
-                
+                // Geser visual ke kiri (Merah)
                 slider.style.transform = 'translateX(0)';
-                slider.classList.remove('bg-blue-600');
-                slider.classList.add('bg-red-600');
+                slider.classList.remove('from-blue-600', 'to-blue-800');
+                slider.classList.add('from-red-600', 'to-red-800');
+
+                // Warna teks tombol
+                btnReg.classList.remove('text-white');
+                btnReg.classList.add('text-gray-400');
+                btnLogin.classList.remove('text-gray-400');
+                btnLogin.classList.add('text-white');
+
+                // Toggle Form pakai Force Class CSS
+                formReg.classList.remove('force-show');
+                formReg.classList.add('force-hide');
                 
-                tabRegister.classList.remove('text-white');
-                tabRegister.classList.add('text-gray-400');
-                tabLogin.classList.remove('text-gray-400');
-                tabLogin.classList.add('text-white');
+                formLogin.classList.remove('force-hide');
+                formLogin.classList.add('force-show');
+
+                subtitle.innerText = "Pintu masuk ke prediksi On-Chain";
             }
         }
 
-        // --- Database User Lokal ---
-        function getUsersDB() {
-            return JSON.parse(localStorage.getItem('nusa_users_db') || '{}');
-        }
-
-        // --- Event Listener Login ---
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        // Proses Login
+        document.getElementById('form-login').addEventListener('submit', (e) => {
             e.preventDefault();
-            const user = document.getElementById('username').value.trim();
-            const pass = document.getElementById('password').value;
+            const u = document.getElementById('login-username').value.trim();
+            const p = document.getElementById('login-password').value;
             
-            const db = getUsersDB();
-            
-            // Verifikasi akun
-            if(db[user] && db[user].password === pass) {
-                localStorage.setItem('nusa_user', user); 
-                if(!localStorage.getItem('nusa_predictions')) {
-                    localStorage.setItem('nusa_predictions', JSON.stringify([])); 
-                }
-                showToast('✅ Login Berhasil! Selamat Datang, ' + user);
-                checkAuth();
+            const db = JSON.parse(localStorage.getItem('nusa_db') || '{}');
+            if(db[u] && db[u] === p) {
+                localStorage.setItem('nusa_active_user', u);
+                showToast('✅ Berhasil Masuk! Selamat Datang, ' + u);
+                initApp();
             } else {
-                // Tampilkan pesan error jika salah
-                showToast('❌ Nama pengguna atau kata sandi salah! Atau Anda belum mendaftar.');
+                showToast('❌ Akun tidak ditemukan atau kata sandi salah.');
             }
         });
 
-        // --- Event Listener Registrasi ---
-        document.getElementById('register-form').addEventListener('submit', (e) => {
+        // Proses Daftar
+        document.getElementById('form-register').addEventListener('submit', (e) => {
             e.preventDefault();
-            const user = document.getElementById('reg-username').value.trim();
-            const pass = document.getElementById('reg-password').value;
+            const u = document.getElementById('reg-username').value.trim();
+            const p = document.getElementById('reg-password').value;
             
-            const db = getUsersDB();
-            
-            // Cek jika username sudah ada
-            if(db[user]) {
-                showToast('⚠️ Nama pengguna sudah terdaftar! Pilih yang lain.');
+            const db = JSON.parse(localStorage.getItem('nusa_db') || '{}');
+            if(db[u]) {
+                showToast('⚠️ Nama pengguna sudah dipakai! Pilih yang lain.');
             } else {
-                // Simpan akun baru
-                db[user] = { password: pass };
-                localStorage.setItem('nusa_users_db', JSON.stringify(db));
-                
-                // Otomatis login setelah pendaftaran berhasil
-                localStorage.setItem('nusa_user', user); 
-                if(!localStorage.getItem('nusa_predictions')) {
-                    localStorage.setItem('nusa_predictions', JSON.stringify([])); 
-                }
-                showToast('🎉 Pendaftaran Berhasil! Selamat Datang, ' + user);
-                checkAuth();
+                db[u] = p;
+                localStorage.setItem('nusa_db', JSON.stringify(db));
+                localStorage.setItem('nusa_active_user', u);
+                showToast('🎉 Akun Dibuat! Halo, ' + u);
+                initApp();
             }
         });
 
-        function logout() {
-            if(confirm('Apakah Anda yakin ingin keluar dari akun?')) {
-                localStorage.removeItem('nusa_user');
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-                checkAuth(); 
+        function executeLogout() {
+            if(confirm("Yakin ingin keluar?")) {
+                localStorage.removeItem('nusa_active_user');
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                initApp();
             }
         }
 
-        // --- 3. MUAT DATA APLIKASI (DASHBOARD) ---
-        function loadApp() {
-            document.getElementById('profile-name').innerText = currentUser;
-            document.getElementById('welcome-name').innerText = currentUser;
-            document.getElementById('leaderboard-name').innerText = currentUser;
-            document.getElementById('modal-profile-name').innerText = currentUser;
-            
-            const initial = currentUser.charAt(0).toUpperCase();
-            document.getElementById('profile-initial').innerText = initial;
-            document.getElementById('modal-profile-initial').innerText = initial;
+        function resetAccountData() {
+            if(confirm("PERINGATAN: Semua poin dan jurnal prediksi Anda akan terhapus. Lanjut?")) {
+                localStorage.removeItem(`journal_${SESSION_USER}`);
+                USER_JOURNAL = [];
+                renderJournal();
+                updateUserStats();
+                showToast("♻️ Riwayat akun berhasil di-reset.");
+            }
+        }
 
-            predictions = JSON.parse(localStorage.getItem('nusa_predictions') || '[]');
+        // ----------------------------------------------------
+        // 3. DASHBOARD & UI ENGINE
+        // ----------------------------------------------------
+        function loadDashboardData() {
+            // Update teks dengan nama user
+            document.getElementById('display-username').innerText = SESSION_USER;
+            document.getElementById('hero-name').innerText = SESSION_USER;
+            document.getElementById('display-initial').innerText = SESSION_USER.charAt(0).toUpperCase();
+            document.getElementById('forum-initial').innerText = SESSION_USER.charAt(0).toUpperCase();
+
+            // Load data jurnal milik user ini
+            USER_JOURNAL = JSON.parse(localStorage.getItem(`journal_${SESSION_USER}`) || '[]');
             
-            renderMatches('Semua');
+            renderMarket('Semua');
             renderJournal();
-            renderCommunity();
-            updateStats();
+            renderForum();
+            updateUserStats();
         }
 
-        // --- 4. KONTROL MENU & UI ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
+        function changeTab(tabName) {
+            // Hide all
+            document.querySelectorAll('.tab-view').forEach(t => t.classList.add('hidden'));
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
             
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('active', 'text-white', 'bg-red-600', 'shadow-[0_0_10px_rgba(255,0,0,0.5)]', 'border-red-400');
-                el.classList.add('text-gray-400');
+            // Reset buttons
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.className = "nav-item flex items-center justify-center lg:justify-start gap-3 w-full p-3.5 rounded-xl transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/10 font-bold";
             });
-            const activeBtn = document.getElementById('nav-' + tabId);
-            activeBtn.classList.remove('text-gray-400');
-            activeBtn.classList.add('active', 'text-white', 'bg-red-600', 'shadow-[0_0_10px_rgba(255,0,0,0.5)]', 'border-red-400');
-
-            const titles = { 'pasar': 'Pasar Aktif', 'jurnal': 'Jurnal Saya', 'komunitas': 'Forum Komunitas', 'kredibilitas': 'Kredibilitas Profil' };
-            document.getElementById('header-title').innerText = titles[tabId];
-        }
-
-        function toggleElement(id) {
-            const el = document.getElementById(id);
-            if(el.classList.contains('hidden')) {
-                el.classList.remove('hidden');
-                el.classList.add('flex');
-            } else {
-                el.classList.add('hidden');
-                el.classList.remove('flex');
-            }
-        }
-
-        // --- 5. LOGIKA PASAR & PREDIKSI ---
-        function filterMatches(category, btnElement) {
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active', 'bg-red-600', 'shadow-[0_0_10px_rgba(255,0,0,0.5)]', 'border-red-400');
-                btn.classList.add('hover:bg-white/10', 'border-transparent');
-            });
-            btnElement.classList.remove('hover:bg-white/10', 'border-transparent');
-            btnElement.classList.add('active', 'bg-red-600', 'shadow-[0_0_10px_rgba(255,0,0,0.5)]', 'border-red-400');
-            renderMatches(category);
-        }
-
-        function renderMatches(category) {
-            const grid = document.getElementById('match-grid');
-            grid.innerHTML = '';
-            const filtered = category === 'Semua' ? defaultMatches : defaultMatches.filter(m => m.category === category);
             
-            filtered.forEach(match => {
-                grid.innerHTML += `
-                    <div class="glass p-5 rounded-3xl hover:shadow-[0_0_30px_rgba(255,0,0,0.4)] transition transform hover:-translate-y-2 border border-white/5 flex flex-col h-full">
-                        <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-3">
-                            <span class="text-xs font-bold px-3 py-1.5 rounded-lg bg-red-900/50 text-red-200 border border-red-500/30">${match.category}</span>
-                            <span class="text-xs text-green-400 font-bold bg-green-900/30 px-2 py-1 rounded border border-green-500/30"><i class="fas fa-link"></i> On-chain</span>
+            // Active button
+            const active = document.getElementById(`nav-${tabName}`);
+            active.className = "nav-item flex items-center justify-center lg:justify-start gap-3 w-full p-3.5 rounded-xl transition-all duration-300 text-white bg-gradient-to-r from-red-600 to-red-800 shadow-[0_0_15px_rgba(255,0,0,0.5)] font-bold";
+            
+            // Header title
+            const dict = { market: "Pasar Olahraga Aktif", journal: "Buku Jurnal Anda", forum: "Diskusi & Analisa", leaderboard: "Peringkat Nasional" };
+            document.getElementById('page-title').innerText = dict[tabName];
+        }
+
+        // ----------------------------------------------------
+        // 4. PASAR & PREDIKSI
+        // ----------------------------------------------------
+        function filterMarket(cat, btnElem) {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.className = "filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition";
+            });
+            btnElem.className = "filter-btn active-filter px-6 py-2.5 rounded-full font-bold text-sm border-2 border-red-500 bg-red-600 text-white shadow-[0_0_15px_rgba(255,0,0,0.4)] whitespace-nowrap transition";
+            renderMarket(cat);
+        }
+
+        function renderMarket(cat) {
+            const container = document.getElementById('matches-container');
+            container.innerHTML = '';
+            const data = (cat === 'Semua') ? DB_MATCHES : DB_MATCHES.filter(m => m.category === cat);
+            
+            data.forEach(m => {
+                container.innerHTML += `
+                    <div class="glass p-6 rounded-3xl border border-white/5 hover:border-red-500/50 transition duration-300 flex flex-col group h-full">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[10px] font-black tracking-widest uppercase bg-red-900/40 text-red-300 px-3 py-1 rounded border border-red-500/20">${m.category}</span>
+                            <span class="text-xs text-green-400 font-bold bg-green-900/30 px-2 py-1 rounded border border-green-500/30">Live Data</span>
                         </div>
-                        <h4 class="font-extrabold text-xl mb-5 text-white tracking-wide flex-1">${match.title}</h4>
-                        <div class="flex justify-between items-center bg-black/60 p-3 rounded-xl border border-white/10 mb-5 shadow-inner mt-auto">
+                        <h4 class="font-black text-xl mb-6 text-white group-hover:text-red-300 transition leading-tight flex-1">${m.title}</h4>
+                        
+                        <div class="flex justify-between bg-black/60 rounded-2xl p-4 border border-white/10 mb-6 shadow-inner mt-auto">
                             <div class="text-center w-1/2 border-r border-white/10">
-                                <div class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Bookmaker</div>
-                                <div class="font-black text-red-400 text-lg">${match.odds1}</div>
+                                <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Bookmaker</div>
+                                <div class="font-black text-red-400 text-xl">${m.o1}</div>
                             </div>
                             <div class="text-center w-1/2">
-                                <div class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Polymarket</div>
-                                <div class="font-black text-blue-400 text-lg">${match.odds2}</div>
+                                <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">On-Chain</div>
+                                <div class="font-black text-blue-400 text-xl">${m.o2}</div>
                             </div>
                         </div>
-                        <button onclick="openPredictModal(${match.id})" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white py-3 rounded-xl font-bold shadow-lg transition transform active:scale-95 mt-auto">Tebak & Simulasi Hasil</button>
+                        
+                        <button onclick="openModalPredict(${m.id})" class="w-full bg-white/5 hover:bg-red-600 text-white py-3.5 rounded-xl font-bold transition border border-white/10 hover:border-transparent mt-auto active:scale-95 uppercase tracking-wide text-sm">
+                            Tentukan Pilihan
+                        </button>
                     </div>
                 `;
             });
         }
 
-        let currentMatchData = null;
-        function openPredictModal(matchId) {
-            // Perbaikan passing data via ID untuk menghindari masalah karakter kutip pada parameter onclick
-            currentMatchData = defaultMatches.find(m => m.id === matchId);
-            if(!currentMatchData) return;
+        let ACTIVE_MATCH = null;
+        function openModalPredict(id) {
+            ACTIVE_MATCH = DB_MATCHES.find(x => x.id === id);
+            if(!ACTIVE_MATCH) return;
             
-            document.getElementById('modal-match-title').innerText = currentMatchData.title;
-            const select = document.getElementById('predict-selection');
-            select.innerHTML = '';
-            currentMatchData.teams.forEach(team => {
-                select.innerHTML += `<option value="${team}">${team}</option>`;
+            document.getElementById('mp-title').innerText = ACTIVE_MATCH.title;
+            const sel = document.getElementById('mp-selection');
+            sel.innerHTML = '';
+            ACTIVE_MATCH.teams.forEach(t => {
+                sel.innerHTML += `<option value="${t}">${t}</option>`;
             });
-            showModal('predict-modal');
+            
+            const modal = document.getElementById('modal-predict');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                document.getElementById('modal-predict-box').classList.remove('scale-95');
+            }, 10);
         }
 
-        function savePrediction() {
-            if(!currentMatchData) return;
-            const selection = document.getElementById('predict-selection').value;
-            const confidence = document.getElementById('predict-confidence').value;
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            const box = modal.querySelector('div');
+            box.classList.add('scale-95');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function savePredictionToDB() {
+            if(!ACTIVE_MATCH) return;
+            const sel = document.getElementById('mp-selection').value;
+            const conf = document.getElementById('mp-confidence').value;
+            const timeStr = new Date().toLocaleString('id-ID', {day: 'numeric', month: 'short', hour:'2-digit', minute:'2-digit'});
             
-            // Format waktu lebih sempurna (Tanggal + Jam)
-            const timeStr = new Date().toLocaleString('id-ID', {day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit'});
-            
-            const newPred = {
-                title: currentMatchData.title,
-                selection: selection,
-                confidence: confidence,
+            USER_JOURNAL.unshift({
+                title: ACTIVE_MATCH.title,
+                pick: sel,
+                conf: conf,
                 time: timeStr
-            };
+            });
             
-            predictions.unshift(newPred);
-            localStorage.setItem('nusa_predictions', JSON.stringify(predictions)); 
+            localStorage.setItem(`journal_${SESSION_USER}`, JSON.stringify(USER_JOURNAL));
             
-            closeModal('predict-modal');
-            showToast('✅ Prediksi Berhasil Disimpan ke Jurnal!');
+            closeModal('modal-predict');
+            showToast('✅ Mantap! Prediksimu masuk ke jurnal.');
             renderJournal();
-            updateStats();
+            updateUserStats();
         }
 
         function renderJournal() {
-            const list = document.getElementById('journal-list');
-            list.innerHTML = '';
-            if(predictions.length === 0) {
-                list.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-gray-400 font-bold">Jurnal masih kosong. Yuk buat prediksi!</td></tr>';
+            const tbody = document.getElementById('table-journal');
+            tbody.innerHTML = '';
+            if(USER_JOURNAL.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-500 font-bold">Belum ada riwayat prediksi.</td></tr>';
                 return;
             }
-            predictions.forEach(p => {
-                list.innerHTML += `
-                    <tr class="hover:bg-white/5 transition group">
-                        <td class="p-4 font-bold text-white group-hover:text-red-300 transition whitespace-normal min-w-[200px]">${p.title}</td>
-                        <td class="p-4 text-red-400 font-semibold">${p.selection}</td>
-                        <td class="p-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-24 h-2.5 bg-black rounded-full overflow-hidden border border-white/10"><div class="bg-gradient-to-r from-red-500 to-yellow-400 h-full" style="width: ${p.confidence}%"></div></div>
-                                <span class="text-xs font-bold text-gray-300">${p.confidence}%</span>
+            
+            USER_JOURNAL.forEach(j => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition">
+                        <td class="p-5 font-bold text-white max-w-[200px] truncate">${j.title}</td>
+                        <td class="p-5 text-red-400 font-black">${j.pick}</td>
+                        <td class="p-5">
+                            <div class="flex items-center justify-center gap-2">
+                                <div class="w-16 h-2 bg-black rounded-full overflow-hidden border border-white/20">
+                                    <div class="bg-gradient-to-r from-red-500 to-yellow-400 h-full" style="width: ${j.conf}%"></div>
+                                </div>
+                                <span class="text-xs font-bold text-gray-300">${j.conf}%</span>
                             </div>
                         </td>
-                        <td class="p-4"><span class="bg-blue-900/50 text-blue-300 border border-blue-500/50 px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg">Menunggu Hasil</span></td>
-                        <td class="p-4 text-gray-400 text-xs font-semibold">${p.time}</td>
+                        <td class="p-5"><span class="bg-blue-900/40 text-blue-300 border border-blue-500/30 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider">Menunggu</span></td>
+                        <td class="p-5 text-right text-gray-400 text-xs font-bold">${j.time}</td>
                     </tr>
                 `;
             });
         }
 
-        function updateStats() {
-            const basePts = 0;
-            const totalPreds = predictions.length;
-            document.getElementById('user-pts').innerText = (basePts + (totalPreds * 30)).toLocaleString(); 
-            
-            let wr = "0%";
-            if(totalPreds > 0) wr = Math.min(100, 60 + (totalPreds * 2)) + "%"; 
-            document.getElementById('user-winrate').innerText = wr;
-            document.getElementById('leaderboard-wr').innerText = wr;
+        function updateUserStats() {
+            const total = USER_JOURNAL.length;
+            const pts = total * 50;
+            document.getElementById('display-pts').innerText = pts.toLocaleString();
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-wr').innerText = total > 0 ? (60 + Math.min(total*2, 35)) + "%" : "0%";
         }
 
-        // --- 6. LOGIKA KOMUNITAS & CHAT AI ---
-        function renderCommunity() {
-            const feed = document.getElementById('community-feed');
+        // ----------------------------------------------------
+        // 5. FORUM & AI CHAT
+        // ----------------------------------------------------
+        function renderForum() {
+            const feed = document.getElementById('forum-feed');
             feed.innerHTML = '';
-            communityFeed.forEach(post => {
-                const avatar = post.isAI ? 
-                    '<img src="2.png" class="w-12 h-12 rounded-full border-2 border-red-500 bg-black shadow-lg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">' : 
-                    `<div class="w-12 h-12 rounded-full bg-gradient-to-tr from-gray-600 to-gray-800 border-2 border-gray-400 flex items-center justify-center font-extrabold text-lg shadow-lg shrink-0">${post.user.charAt(0).toUpperCase()}</div>`;
+            FORUM_POSTS.forEach(p => {
+                const avatar = p.ai 
+                    ? `<img src="2.png" class="w-12 h-12 rounded-full border-2 border-red-500 bg-black shadow-lg shrink-0" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">`
+                    : `<div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 border-2 border-gray-400 flex items-center justify-center font-black text-xl shadow-lg shrink-0 text-white">${p.user.charAt(0).toUpperCase()}</div>`;
                 
                 feed.innerHTML += `
-                    <div class="glass p-5 rounded-3xl border border-white/5 hover:border-white/10 transition">
+                    <div class="glass p-5 rounded-2xl border border-white/5">
                         <div class="flex items-center gap-4 mb-3">
                             ${avatar}
                             <div>
-                                <div class="font-bold text-white flex items-center gap-2">${post.user} ${post.isAI ? '<i class="fas fa-check-circle text-blue-400 text-sm" title="Verified AI"></i>' : ''}</div>
-                                <div class="text-[10px] text-gray-400 uppercase tracking-widest">${post.time}</div>
+                                <div class="font-bold text-white flex items-center gap-2">${p.user} ${p.ai ? '<i class="fas fa-certificate text-blue-400 text-xs"></i>' : ''}</div>
+                                <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">${p.time}</div>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-200 leading-relaxed">${post.text}</p>
+                        <p class="text-sm text-gray-200 leading-relaxed">${p.text}</p>
                     </div>
                 `;
             });
         }
 
-        function postCommunity() {
-            const text = document.getElementById('community-input').value.trim();
-            if(!text) return;
-            communityFeed.unshift({ user: currentUser, text: text, time: 'Baru saja' });
-            document.getElementById('community-input').value = '';
-            renderCommunity();
-            showToast('Postingan berhasil dipublikasikan!');
+        function submitForumPost() {
+            const input = document.getElementById('forum-input');
+            const txt = input.value.trim();
+            if(!txt) return;
+            FORUM_POSTS.unshift({ user: SESSION_USER, text: txt, time: 'Baru saja', ai: false });
+            input.value = '';
+            renderForum();
+            showToast('Postingan dikirim!');
         }
 
-        function sendChatMessage() {
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            if(!text) return;
+        // AI Chat Engine
+        function toggleAIChat() {
+            const win = document.getElementById('ai-chat-window');
+            if(win.classList.contains('hidden')) {
+                win.classList.remove('hidden');
+                setTimeout(() => {
+                    win.classList.remove('scale-95', 'opacity-0');
+                }, 10);
+            } else {
+                win.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => win.classList.add('hidden'), 300);
+            }
+        }
+
+        function sendToAI() {
+            const inp = document.getElementById('ai-input');
+            const txt = inp.value.trim();
+            if(!txt) return;
             
-            const chatBox = document.getElementById('chat-messages');
-            chatBox.innerHTML += `
+            const box = document.getElementById('ai-messages');
+            box.innerHTML += `
                 <div class="flex justify-end gap-3 max-w-[100%]">
                     <div class="bg-white/10 border border-white/20 text-white text-sm p-3 rounded-2xl rounded-tr-none shadow-md">
-                        ${text}
+                        ${txt}
                     </div>
                 </div>
             `;
-            input.value = '';
-            
-            // Perbaikan smooth scroll chat
-            chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+            inp.value = '';
+            box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
 
             setTimeout(() => {
-                const responses = [
-                    "Siap Bosku! Analisanya tajam sekali. 🚀",
-                    "Sari perhatikan odds on-chain sedang bergerak liar, hati-hati ambil posisi ya!",
-                    "Catat! Semoga prediksimu yang ini tembus dan cuan! 🇮🇩",
-                    "Kredibilitasmu makin naik nih kalau tebakan ini benar. Semangat!",
-                    "Tentu! Sari akan bantu pantau data pertandingannya."
+                const replies = [
+                    "Wah, analisa yang berani Bosku! Terus pantau data on-chain ya.",
+                    "Sari cek pergerakan dompet besar sedang mengarah ke sana juga nih.",
+                    "Catat! Jangan lupa eksekusi di jurnal prediksimu.",
+                    "Siap bantu! Beritahu Sari kalau butuh perbandingan odds."
                 ];
-                const reply = responses[Math.floor(Math.random() * responses.length)];
-                
-                chatBox.innerHTML += `
-                    <div class="flex gap-3 max-w-[85%] mt-2">
-                        <img src="2.png" class="w-8 h-8 mt-1 border border-red-500/50 rounded-full bg-black shrink-0" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">
-                        <div class="bg-red-900/60 border border-red-500/30 text-white text-sm p-3 rounded-2xl rounded-tl-none shadow-md leading-relaxed">
-                            ${reply}
+                const res = replies[Math.floor(Math.random() * replies.length)];
+                box.innerHTML += `
+                    <div class="flex gap-3 max-w-[90%] mt-2">
+                        <img src="2.png" class="w-8 h-8 border border-red-500/50 rounded-full bg-black shrink-0" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8649/8649603.png'">
+                        <div class="bg-red-900/60 border border-red-500/30 text-white text-sm p-3 rounded-2xl rounded-tl-none shadow-md">
+                            ${res}
                         </div>
                     </div>
                 `;
-                chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+                box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
             }, 1000);
         }
 
-        // --- 7. UTILITAS (MODAL, TOAST, BAHASA) ---
-        function showModal(id) {
-            const modal = document.getElementById(id);
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.firstElementChild.classList.remove('scale-95'), 10);
-        }
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            modal.firstElementChild.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-        function clearNotifs() {
-            document.getElementById('notif-badge').classList.add('hidden');
-            document.getElementById('notif-list').innerHTML = '<div class="p-6 text-center text-sm font-bold text-gray-500">Tidak ada pemberitahuan.</div>';
-        }
+        // UTILS
         function showToast(msg) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = 'bg-black/90 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,0,0,0.5)] transform transition-all translate-y-[-20px] opacity-0 text-sm font-bold flex items-center gap-3 border border-red-500';
-            toast.innerHTML = `<i class="fas fa-bell text-red-500 shrink-0"></i> <span>${msg}</span>`;
+            toast.className = 'bg-black/90 text-white px-6 py-3.5 rounded-2xl shadow-[0_0_20px_rgba(255,0,0,0.6)] transform transition-all translate-y-[-20px] opacity-0 text-sm font-bold flex items-center gap-3 border border-red-500';
+            toast.innerHTML = `<span>${msg}</span>`;
             container.appendChild(toast);
             
-            setTimeout(() => { toast.classList.remove('translate-y-[-20px]', 'opacity-0'); }, 10);
+            setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
             setTimeout(() => { 
                 toast.classList.add('opacity-0', 'translate-y-[-20px]'); 
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
-        }
-        function clearData() {
-            if(confirm('PERINGATAN: Semua riwayat prediksi dan poin akan dihapus permanen. Lanjutkan?')) {
-                localStorage.removeItem('nusa_predictions');
-                predictions = [];
-                renderJournal();
-                updateStats();
-                closeModal('profile-modal');
-                showToast('Data akun berhasil disetel ulang (Reset).');
-            }
-        }
-        function changeLanguage() {
-            const lang = document.getElementById('lang-selector').value;
-            const isRtl = (lang === 'ar');
-            document.body.classList.toggle('rtl', isRtl);
-            document.body.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
-            showToast(`Sistem dialihkan ke bahasa: ${lang.toUpperCase()}`);
         }
     </script>
 </body>
