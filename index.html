@@ -54,8 +54,9 @@
             <!-- Maskot Selamat Datang -->
             <img src="10.png" alt="Welcome Mascot" class="w-40 h-40 mx-auto mb-2 mascot-float drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
             <h1 class="text-3xl font-extrabold mb-1 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-white text-glow">Nusantara Predict</h1>
-            <p class="text-gray-400 mb-8 text-sm">Masuk untuk memulai prediksi On-Chain</p>
+            <p class="text-gray-400 mb-8 text-sm" id="auth-subtitle">Masuk untuk memulai prediksi On-Chain</p>
             
+            <!-- Form Login -->
             <form id="login-form" class="space-y-4">
                 <div class="relative">
                     <i class="fas fa-user absolute left-4 top-4 text-red-500"></i>
@@ -66,6 +67,21 @@
                     <input type="password" id="password" required placeholder="Kata Sandi" class="w-full bg-black/50 border border-red-500/30 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition">
                 </div>
                 <button type="submit" class="w-full mt-4 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(255,0,0,0.5)] transition transform hover:scale-105 active:scale-95">Masuk Aplikasi</button>
+                <p class="text-sm text-gray-400 mt-4">Belum punya akun? <a href="#" onclick="toggleAuth('register')" class="text-red-400 hover:text-white font-bold transition">Daftar di sini</a></p>
+            </form>
+
+            <!-- Form Register (Hidden by default) -->
+            <form id="register-form" class="space-y-4 hidden">
+                <div class="relative">
+                    <i class="fas fa-user-plus absolute left-4 top-4 text-blue-500"></i>
+                    <input type="text" id="reg-username" required placeholder="Buat Nama Pengguna" class="w-full bg-black/50 border border-blue-500/30 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                </div>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-4 top-4 text-blue-500"></i>
+                    <input type="password" id="reg-password" required placeholder="Buat Kata Sandi" class="w-full bg-black/50 border border-blue-500/30 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                </div>
+                <button type="submit" class="w-full mt-4 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(0,100,255,0.5)] transition transform hover:scale-105 active:scale-95">Daftar Akun Baru</button>
+                <p class="text-sm text-gray-400 mt-4">Sudah punya akun? <a href="#" onclick="toggleAuth('login')" class="text-red-400 hover:text-white font-bold transition">Masuk di sini</a></p>
             </form>
         </div>
     </div>
@@ -423,15 +439,68 @@
             }
         }
 
+        // --- Fungsi Toggle Login/Register ---
+        function toggleAuth(mode) {
+            if(mode === 'register') {
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.remove('hidden');
+                document.getElementById('auth-subtitle').innerText = "Daftar akun baru untuk mulai bermain";
+            } else {
+                document.getElementById('register-form').classList.add('hidden');
+                document.getElementById('login-form').classList.remove('hidden');
+                document.getElementById('auth-subtitle').innerText = "Masuk untuk memulai prediksi On-Chain";
+            }
+        }
+
+        // --- Database User Lokal ---
+        function getUsersDB() {
+            return JSON.parse(localStorage.getItem('nusa_users_db') || '{}');
+        }
+
+        // --- Event Listener Login ---
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const user = document.getElementById('username').value.trim();
-            if(user) {
+            const pass = document.getElementById('password').value;
+            
+            const db = getUsersDB();
+            
+            // Verifikasi akun
+            if(db[user] && db[user].password === pass) {
                 localStorage.setItem('nusa_user', user); 
                 if(!localStorage.getItem('nusa_predictions')) {
                     localStorage.setItem('nusa_predictions', JSON.stringify([])); 
                 }
-                showToast('Login Berhasil! Selamat Datang, ' + user);
+                showToast('✅ Login Berhasil! Selamat Datang, ' + user);
+                checkAuth();
+            } else {
+                // Tampilkan pesan error jika salah
+                showToast('❌ Nama pengguna atau kata sandi salah! Atau Anda belum mendaftar.');
+            }
+        });
+
+        // --- Event Listener Registrasi ---
+        document.getElementById('register-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('reg-username').value.trim();
+            const pass = document.getElementById('reg-password').value;
+            
+            const db = getUsersDB();
+            
+            // Cek jika username sudah ada
+            if(db[user]) {
+                showToast('⚠️ Nama pengguna sudah terdaftar! Pilih yang lain.');
+            } else {
+                // Simpan akun baru
+                db[user] = { password: pass };
+                localStorage.setItem('nusa_users_db', JSON.stringify(db));
+                
+                // Otomatis login setelah pendaftaran berhasil
+                localStorage.setItem('nusa_user', user); 
+                if(!localStorage.getItem('nusa_predictions')) {
+                    localStorage.setItem('nusa_predictions', JSON.stringify([])); 
+                }
+                showToast('🎉 Pendaftaran Berhasil! Selamat Datang, ' + user);
                 checkAuth();
             }
         });
