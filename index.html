@@ -381,7 +381,30 @@
     </div>
 
     <!-- JAVASCRIPT UTAMA -->
+    
+    <!-- Firebase Realtime Database (Compat v10) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script>
+        // =========================================================================
+        // KONFIGURASI FIREBASE BOSKU (WAJIB DIISI AGAR FITUR GLOBAL AKTIF)
+        // =========================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAIchaO9fpnnPgwv9ihrdHcwb6cugQV74A",
+              authDomain: "nusapredict.firebaseapp.com",
+              projectId: "nusapredict",
+              storageBucket: "nusapredict.firebasestorage.app",
+              messagingSenderId: "1024013297231",
+              appId: "1:1024013297231:web:fe9d152de3b9ef02632c3a",
+              measurementId: "G-S9Q3L25Z57"
+        };
+
+        // Inisialisasi Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
         // ----------------------------------------------------
         // 1. DATA MASTER PERTANDINGAN
         // ----------------------------------------------------
@@ -395,22 +418,27 @@
 
         let SESSION_USER = null;
         let USER_JOURNAL = [];
-        let FORUM_POSTS = JSON.parse(localStorage.getItem('nusa_forum')) || [
-            { user: 'Sari AI', text: 'Analisis harian: Sentimen untuk Timnas Indonesia sedang tinggi di bursa on-chain. Waspada odds trap!', time: '1 jam lalu', ai: true },
-            { user: 'Garuda_ID', text: "Optimis Indonesia bisa curi poin penuh malam ini. Mari kita buktikan!", time: '2 jam lalu', ai: false }
-        ];
+        let FORUM_POSTS = [];
+        let forumListener = null;
+        let journalListener = null;
 
         // ----------------------------------------------------
-        // 2. SISTEM OTENTIKASI KOKOH (NO BUGS)
+        // 2. SISTEM OTENTIKASI (TERHUBUNG KE CLOUD)
         // ----------------------------------------------------
         window.onload = () => {
             initApp();
+            
+            // Peringatan UI jika Config masih kosong
+            if(firebaseConfig.apiKey === "ISI_API_KEY_ANDA_DISINI") {
+                setTimeout(() => {
+                    showToast("⚠️ API Key Firebase belum diisi di dalam kode HTML!");
+                }, 1000);
+            }
         };
 
         function initApp() {
             SESSION_USER = localStorage.getItem('nusa_active_user');
             if(SESSION_USER) {
-                // Sembunyikan Auth, Tampilkan App
                 document.getElementById('auth-screen').classList.add('force-hide');
                 const app = document.getElementById('app-screen');
                 app.classList.remove('hidden');
@@ -418,13 +446,11 @@
                 
                 loadDashboardData();
             } else {
-                // Tampilkan Auth, Sembunyikan App
                 document.getElementById('auth-screen').classList.remove('force-hide');
                 document.getElementById('app-screen').classList.add('hidden', 'opacity-0');
             }
         }
 
-        // Toggling UI Login / Daftar
         function switchAuth(mode) {
             const btnLogin = document.getElementById('btn-tab-login');
             const btnReg = document.getElementById('btn-tab-register');
@@ -438,10 +464,8 @@
 
                 formLogin.classList.remove('force-show');
                 formLogin.classList.add('force-hide');
-                
                 formReg.classList.remove('force-hide');
                 formReg.classList.add('force-show');
-                
                 subtitle.innerText = "Daftar akun baru untuk akses";
             } else {
                 btnLogin.className = "flex-1 py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-800 text-white font-black tracking-widest shadow-[0_0_15px_rgba(255,0,0,0.4)] transition border border-red-500/50 cursor-pointer";
@@ -449,46 +473,52 @@
 
                 formReg.classList.remove('force-show');
                 formReg.classList.add('force-hide');
-                
                 formLogin.classList.remove('force-hide');
                 formLogin.classList.add('force-show');
-
                 subtitle.innerText = "Pintu masuk ke prediksi On-Chain";
             }
         }
 
-        // Proses Login
         document.getElementById('form-login').addEventListener('submit', (e) => {
             e.preventDefault();
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value;
             
-            const db = JSON.parse(localStorage.getItem('nusa_db') || '{}');
-            if(db[u] && db[u] === p) {
-                localStorage.setItem('nusa_active_user', u);
-                showToast('✅ Berhasil Masuk! Selamat Datang, ' + u);
-                initApp();
-            } else {
-                showToast('❌ Akun tidak ditemukan atau kata sandi salah.');
-            }
+            showToast("⏳ Sinkronisasi ke Cloud...");
+            
+            db.ref('users/' + u).once('value').then((snapshot) => {
+                if(snapshot.exists() && snapshot.val() === p) {
+                    localStorage.setItem('nusa_active_user', u);
+                    showToast('✅ Login Berhasil! Halo, ' + u);
+                    initApp();
+                } else {
+                    showToast('❌ Username tidak ditemukan atau Password salah.');
+                }
+            }).catch(err => {
+                showToast('⚠️ Gagal menghubungi Firebase! Cek Config.');
+            });
         });
 
-        // Proses Daftar
         document.getElementById('form-register').addEventListener('submit', (e) => {
             e.preventDefault();
             const u = document.getElementById('reg-username').value.trim();
             const p = document.getElementById('reg-password').value;
             
-            const db = JSON.parse(localStorage.getItem('nusa_db') || '{}');
-            if(db[u]) {
-                showToast('⚠️ Nama pengguna sudah dipakai! Pilih yang lain.');
-            } else {
-                db[u] = p;
-                localStorage.setItem('nusa_db', JSON.stringify(db));
-                localStorage.setItem('nusa_active_user', u);
-                showToast('🎉 Akun Dibuat! Halo, ' + u);
-                initApp();
-            }
+            showToast("⏳ Mendaftarkan di server pusat...");
+            
+            db.ref('users/' + u).once('value').then((snapshot) => {
+                if(snapshot.exists()) {
+                    showToast('⚠️ Username sudah dipakai pengguna lain!');
+                } else {
+                    db.ref('users/' + u).set(p).then(() => {
+                        localStorage.setItem('nusa_active_user', u);
+                        showToast('🎉 Akun Global Dibuat!');
+                        initApp();
+                    });
+                }
+            }).catch(err => {
+                showToast('⚠️ Gagal terhubung ke Firebase Database.');
+            });
         });
 
         function executeLogout() {
@@ -496,17 +526,20 @@
                 localStorage.removeItem('nusa_active_user');
                 document.getElementById('login-username').value = '';
                 document.getElementById('login-password').value = '';
+                
+                // Matikan Listener Real-time agar tidak bocor
+                if(journalListener) db.ref('journals/' + SESSION_USER).off('value', journalListener);
+                if(forumListener) db.ref('forum').off('value', forumListener);
+                
                 initApp();
             }
         }
 
         function resetAccountData() {
-            if(confirm("PERINGATAN: Semua poin dan jurnal prediksi Anda akan terhapus. Lanjut?")) {
-                localStorage.removeItem(`journal_${SESSION_USER}`);
-                USER_JOURNAL = [];
-                renderJournal();
-                updateUserStats();
-                showToast("♻️ Riwayat akun berhasil di-reset.");
+            if(confirm("PERINGATAN: Poin & jurnal prediksi Anda akan dihapus permanen dari SERVER. Lanjut?")) {
+                db.ref('journals/' + SESSION_USER).remove().then(() => {
+                    showToast("♻️ Riwayat berhasil dihapus dari cloud.");
+                });
             }
         }
 
@@ -514,36 +547,50 @@
         // 3. DASHBOARD & UI ENGINE
         // ----------------------------------------------------
         function loadDashboardData() {
-            // Update teks dengan nama user
             document.getElementById('display-username').innerText = SESSION_USER;
             document.getElementById('hero-name').innerText = SESSION_USER;
             document.getElementById('display-initial').innerText = SESSION_USER.charAt(0).toUpperCase();
             document.getElementById('forum-initial').innerText = SESSION_USER.charAt(0).toUpperCase();
 
-            // Load data jurnal milik user ini
-            USER_JOURNAL = JSON.parse(localStorage.getItem(`journal_${SESSION_USER}`) || '[]');
-            
             renderMarket('Semua');
-            renderJournal();
-            renderForum();
-            updateUserStats();
+            
+            // ==========================================
+            // REAL-TIME LISTENER: JURNAL PRIBADI
+            // ==========================================
+            if(journalListener) db.ref('journals/' + SESSION_USER).off('value', journalListener);
+            journalListener = db.ref('journals/' + SESSION_USER).on('value', (snapshot) => {
+                USER_JOURNAL = snapshot.val() || [];
+                renderJournal();
+                updateUserStats();
+            });
+
+            // ==========================================
+            // REAL-TIME LISTENER: FORUM GLOBAL
+            // ==========================================
+            if(forumListener) db.ref('forum').off('value', forumListener);
+            forumListener = db.ref('forum').on('value', (snapshot) => {
+                if(snapshot.exists()) {
+                    FORUM_POSTS = snapshot.val();
+                } else {
+                    FORUM_POSTS = [
+                        { user: 'Sari AI', text: 'Koneksi Firebase berhasil! Silakan mulai diskusi di sini.', time: 'Sistem', ai: true }
+                    ];
+                }
+                renderForum();
+            });
         }
 
         function changeTab(tabName) {
-            // Hide all
             document.querySelectorAll('.tab-view').forEach(t => t.classList.add('hidden'));
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
             
-            // Reset buttons
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.className = "nav-item flex items-center justify-center lg:justify-start gap-3 w-full p-3.5 rounded-xl transition-all duration-300 text-gray-400 hover:text-white hover:bg-white/10 font-bold";
             });
             
-            // Active button
             const active = document.getElementById(`nav-${tabName}`);
             active.className = "nav-item flex items-center justify-center lg:justify-start gap-3 w-full p-3.5 rounded-xl transition-all duration-300 text-white bg-gradient-to-r from-red-600 to-red-800 shadow-[0_0_15px_rgba(255,0,0,0.5)] font-bold";
             
-            // Header title
             const dict = { market: "Pasar Olahraga Aktif", journal: "Buku Jurnal Anda", forum: "Diskusi & Analisa", leaderboard: "Peringkat Nasional" };
             document.getElementById('page-title').innerText = dict[tabName];
         }
@@ -626,6 +673,7 @@
             const conf = document.getElementById('mp-confidence').value;
             const timeStr = new Date().toLocaleString('id-ID', {day: 'numeric', month: 'short', hour:'2-digit', minute:'2-digit'});
             
+            if(!USER_JOURNAL) USER_JOURNAL = [];
             USER_JOURNAL.unshift({
                 title: ACTIVE_MATCH.title,
                 pick: sel,
@@ -633,12 +681,13 @@
                 time: timeStr
             });
             
-            localStorage.setItem(`journal_${SESSION_USER}`, JSON.stringify(USER_JOURNAL));
-            
-            closeModal('modal-predict');
-            showToast('✅ Mantap! Prediksimu masuk ke jurnal.');
-            renderJournal();
-            updateUserStats();
+            // Push Real-time ke Cloud
+            db.ref('journals/' + SESSION_USER).set(USER_JOURNAL).then(() => {
+                closeModal('modal-predict');
+                showToast('✅ Sinkronisasi sukses! Tersimpan di Cloud.');
+            }).catch(err => {
+                showToast('⚠️ Gagal terhubung ke server Firebase.');
+            });
         }
 
         function renderJournal() {
@@ -662,7 +711,7 @@
                                 <span class="text-xs font-bold text-gray-300">${j.conf}%</span>
                             </div>
                         </td>
-                        <td class="p-5"><span class="bg-blue-900/40 text-blue-300 border border-blue-500/30 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider">Menunggu</span></td>
+                        <td class="p-5"><span class="bg-blue-900/40 text-blue-300 border border-blue-500/30 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider"><i class="fas fa-cloud text-blue-400 mr-1"></i> Tersinkron</span></td>
                         <td class="p-5 text-right text-gray-400 text-xs font-bold">${j.time}</td>
                     </tr>
                 `;
@@ -708,20 +757,23 @@
             const txt = input.value.trim();
             if(!txt) return;
             
-            // Format waktu rapi
             const timeStr = new Date().toLocaleString('id-ID', {day: 'numeric', month: 'short', hour:'2-digit', minute:'2-digit'});
             
+            if(!FORUM_POSTS) FORUM_POSTS = [];
             FORUM_POSTS.unshift({ user: SESSION_USER, text: txt, time: timeStr, ai: false });
             
-            // Simpan permanen ke Local Storage
-            localStorage.setItem('nusa_forum', JSON.stringify(FORUM_POSTS));
+            if(FORUM_POSTS.length > 50) FORUM_POSTS.pop(); // Batasi max 50 post
             
-            input.value = '';
-            renderForum();
-            showToast('✅ Postingan tersimpan permanen!');
+            // Push Real-time ke Cloud
+            db.ref('forum').set(FORUM_POSTS).then(() => {
+                input.value = '';
+                showToast('✅ Terkirim ke semua pengguna via Cloud!');
+            }).catch(err => {
+                showToast('⚠️ Gagal mengirim pesan ke server.');
+            });
         }
 
-        // AI Chat Engine
+        // AI Chat Engine (Lokal)
         function toggleAIChat() {
             const win = document.getElementById('ai-chat-window');
             if(win.classList.contains('hidden')) {
@@ -771,11 +823,10 @@
             }, 1000);
         }
 
-        // UTILS
         function showToast(msg) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = 'bg-black/90 text-white px-6 py-3.5 rounded-2xl shadow-[0_0_20px_rgba(255,0,0,0.6)] transform transition-all translate-y-[-20px] opacity-0 text-sm font-bold flex items-center gap-3 border border-red-500';
+            toast.className = 'bg-black/90 text-white px-6 py-3.5 rounded-2xl shadow-[0_0_20px_rgba(255,0,0,0.6)] transform transition-all translate-y-[-20px] opacity-0 text-sm font-bold flex items-center gap-3 border border-red-500 z-[9999] relative';
             toast.innerHTML = `<span>${msg}</span>`;
             container.appendChild(toast);
             
