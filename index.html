@@ -402,8 +402,32 @@
         </button>
     </div>
 
+    
     <!-- JAVASCRIPT UTAMA -->
+    <!-- Firebase Realtime Database (Compat v10) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+    
     <script>
+        // =========================================================================
+        // KONFIGURASI FIREBASE KAKAK (WAJIB DIISI AGAR FITUR GLOBAL AKTIF)
+        // =========================================================================
+        const firebaseConfig = {
+             apiKey: "AIzaSyAIchaO9fpnnPgwv9ihrdHcwb6cugQV74A",
+              authDomain: "nusapredict.firebaseapp.com",
+              projectId: "nusapredict",
+              storageBucket: "nusapredict.firebasestorage.app",
+              messagingSenderId: "1024013297231",
+              appId: "1:1024013297231:web:dd0389a9139722ec632c3a",
+              measurementId: "G-46R05FDNYB"
+        };
+
+        // Inisialisasi Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
         // ----------------------------------------------------
         // I18N (SISTEM 2 BAHASA)
         // ----------------------------------------------------
@@ -459,16 +483,17 @@
                 cat_football: "Sepak Bola",
                 cat_basket: "Basket",
                 cat_esport: "E-Sports",
-                status_wait: "Menunggu",
+                status_wait: "Tersinkron",
                 toast_login_ok: "✅ Berhasil Masuk! Selamat Datang, Kak ",
                 toast_login_err: "❌ Akun tidak ditemukan atau kata sandi salah.",
                 toast_reg_err: "⚠️ Nama pengguna sudah dipakai! Pilih yang lain ya Kak.",
                 toast_reg_ok: "🎉 Akun Dibuat! Halo Kak ",
-                toast_reset: "♻️ Riwayat akun berhasil di-reset.",
-                toast_pred_ok: "✅ Mantap Kak! Prediksinya udah masuk jurnal.",
-                toast_post_ok: "✅ Postingan tersimpan permanen ya Kak!",
+                toast_reset: "♻️ Riwayat akun berhasil dihapus dari Cloud.",
+                toast_pred_ok: "✅ Mantap Kak! Prediksinya udah masuk jurnal Cloud.",
+                toast_post_ok: "✅ Postingan terkirim ke semua pengguna global!",
+                toast_fb_err: "⚠️ Gagal terhubung ke server! Cek API Key Firebase Kakak ya.",
                 confirm_logout: "Kakak yakin ingin keluar?",
-                confirm_reset: "PERINGATAN: Semua poin dan jurnal Kakak akan terhapus. Lanjut?"
+                confirm_reset: "PERINGATAN: Semua poin dan jurnal Kakak akan terhapus permanen dari SERVER. Lanjut?"
             },
             en: {
                 app_title: "Nusantara Predict",
@@ -521,16 +546,17 @@
                 cat_football: "Football",
                 cat_basket: "Basketball",
                 cat_esport: "E-Sports",
-                status_wait: "Waiting",
+                status_wait: "Synced",
                 toast_login_ok: "✅ Login Success! Welcome, ",
                 toast_login_err: "❌ Account not found or wrong password.",
                 toast_reg_err: "⚠️ Username already taken! Choose another.",
                 toast_reg_ok: "🎉 Account Created! Hello ",
-                toast_reset: "♻️ Account history successfully reset.",
-                toast_pred_ok: "✅ Awesome! Prediction saved to journal.",
-                toast_post_ok: "✅ Post saved permanently!",
+                toast_reset: "♻️ Account history successfully deleted from Cloud.",
+                toast_pred_ok: "✅ Awesome! Prediction saved to Cloud journal.",
+                toast_post_ok: "✅ Post sent to all global users!",
+                toast_fb_err: "⚠️ Failed to connect to server! Please check your Firebase API Key.",
                 confirm_logout: "Are you sure you want to log out?",
-                confirm_reset: "WARNING: All your points and journals will be deleted. Continue?"
+                confirm_reset: "WARNING: All your points and journals will be permanently deleted from the SERVER. Continue?"
             }
         };
 
@@ -553,18 +579,13 @@
                 }
             });
             
-            // Update Toggle texts
             document.getElementById('lang-txt-auth').innerText = lang === 'id' ? 'ID / EN' : 'EN / ID';
             document.getElementById('lang-txt-app').innerText = lang.toUpperCase();
-            
-            // Update AI Default Text
             document.getElementById('ai-greet-txt').innerText = t('ai_greet');
 
-            // Re-render UI components if user is logged in
             if(SESSION_USER) {
                 renderMarket(window.activeCategory || 'Semua');
                 renderJournal();
-                // Titles fix based on tab
                 const actDict = { 
                     market: t("header_market"), 
                     journal: t("jour_title"), 
@@ -596,21 +617,25 @@
 
         let SESSION_USER = null;
         let USER_JOURNAL = [];
+        let FORUM_POSTS = [];
         window.activeCategory = 'Semua';
-
-        let defaultForumId = [
-            { user: 'Sari AI 🌸', text: 'Analisis harian: Sentimen untuk Timnas Indonesia sedang tinggi di bursa on-chain. Hati-hati jebakan odds ya, Kak! 🥰', time: '1 jam lalu', ai: true },
-            { user: 'Garuda_ID', text: "Optimis Indonesia bisa curi poin penuh malam ini. Mari kita buktikan!", time: '2 jam lalu', ai: false }
-        ];
         
-        let FORUM_POSTS = JSON.parse(localStorage.getItem('nusa_forum')) || defaultForumId;
+        let forumListener = null;
+        let journalListener = null;
 
         // ----------------------------------------------------
-        // SISTEM OTENTIKASI 
+        // SISTEM OTENTIKASI & FIREBASE SYNC
         // ----------------------------------------------------
         window.onload = () => {
             setLang('id');
             initApp();
+            
+            // Peringatan jika Firebase Config masih kosong
+            if(firebaseConfig.apiKey === "ISI_API_KEY_ANDA_DISINI") {
+                setTimeout(() => {
+                    showToast("⚠️ Psst Kak! API Key Firebase belum diisi di kode HTML lho. Nanti datanya nggak bisa nyambung global ✨");
+                }, 2000);
+            }
         };
 
         function initApp() {
@@ -658,14 +683,19 @@
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value;
             
-            const db = JSON.parse(localStorage.getItem('nusa_db') || '{}');
-            if(db[u] && db[u] === p) {
-                localStorage.setItem('nusa_active_user', u);
-                showToast(t("toast_login_ok") + u);
-                initApp();
-            } else {
-                showToast(t("toast_login_err"));
-            }
+            showToast("⏳ Sebentar ya Kak, Sari cek ke server dulu...");
+            
+            db.ref('users/' + u).once('value').then((snapshot) => {
+                if(snapshot.exists() && snapshot.val() === p) {
+                    localStorage.setItem('nusa_active_user', u);
+                    showToast(t("toast_login_ok") + u + " ✨");
+                    initApp();
+                } else {
+                    showToast(t("toast_login_err"));
+                }
+            }).catch(err => {
+                showToast(t("toast_fb_err"));
+            });
         });
 
         document.getElementById('form-register').addEventListener('submit', (e) => {
@@ -673,16 +703,21 @@
             const u = document.getElementById('reg-username').value.trim();
             const p = document.getElementById('reg-password').value;
             
-            const db = JSON.parse(localStorage.getItem('nusa_db') || '{}');
-            if(db[u]) {
-                showToast(t("toast_reg_err"));
-            } else {
-                db[u] = p;
-                localStorage.setItem('nusa_db', JSON.stringify(db));
-                localStorage.setItem('nusa_active_user', u);
-                showToast(t("toast_reg_ok") + u);
-                initApp();
-            }
+            showToast("⏳ Sedang mendaftarkan Kakak di sistem global...");
+            
+            db.ref('users/' + u).once('value').then((snapshot) => {
+                if(snapshot.exists()) {
+                    showToast(t("toast_reg_err"));
+                } else {
+                    db.ref('users/' + u).set(p).then(() => {
+                        localStorage.setItem('nusa_active_user', u);
+                        showToast(t("toast_reg_ok") + u + " 🥰");
+                        initApp();
+                    });
+                }
+            }).catch(err => {
+                showToast(t("toast_fb_err"));
+            });
         });
 
         function executeLogout() {
@@ -690,22 +725,24 @@
                 localStorage.removeItem('nusa_active_user');
                 document.getElementById('login-username').value = '';
                 document.getElementById('login-password').value = '';
+                
+                if(journalListener) db.ref('journals/' + SESSION_USER).off('value', journalListener);
+                if(forumListener) db.ref('forum').off('value', forumListener);
+                
                 initApp();
             }
         }
 
         function resetAccountData() {
             if(confirm(t("confirm_reset"))) {
-                localStorage.removeItem(`journal_${SESSION_USER}`);
-                USER_JOURNAL = [];
-                renderJournal();
-                updateUserStats();
-                showToast(t("toast_reset"));
+                db.ref('journals/' + SESSION_USER).remove().then(() => {
+                    showToast(t("toast_reset"));
+                }).catch(err => showToast(t("toast_fb_err")));
             }
         }
 
         // ----------------------------------------------------
-        // DASHBOARD & UI
+        // DASHBOARD & CLOUD LISTENER
         // ----------------------------------------------------
         function loadDashboardData() {
             document.getElementById('display-username').innerText = SESSION_USER;
@@ -713,12 +750,28 @@
             document.getElementById('display-initial').innerText = SESSION_USER.charAt(0).toUpperCase();
             document.getElementById('forum-initial').innerText = SESSION_USER.charAt(0).toUpperCase();
 
-            USER_JOURNAL = JSON.parse(localStorage.getItem(`journal_${SESSION_USER}`) || '[]');
+            renderMarket(window.activeCategory || 'Semua');
             
-            renderMarket('Semua');
-            renderJournal();
-            renderForum();
-            updateUserStats();
+            // Jurnal Real-time dari Cloud
+            if(journalListener) db.ref('journals/' + SESSION_USER).off('value', journalListener);
+            journalListener = db.ref('journals/' + SESSION_USER).on('value', (snapshot) => {
+                USER_JOURNAL = snapshot.val() || [];
+                renderJournal();
+                updateUserStats();
+            });
+
+            // Forum Real-time dari Cloud (Bisa dilihat Semua Orang)
+            if(forumListener) db.ref('forum').off('value', forumListener);
+            forumListener = db.ref('forum').on('value', (snapshot) => {
+                if(snapshot.exists()) {
+                    FORUM_POSTS = snapshot.val();
+                } else {
+                    FORUM_POSTS = [
+                        { user: 'Sari AI 🌸', text: 'Selamat datang di Forum Global Kak! Diskusi yang tertulis di sini akan masuk ke server dan bisa dibaca oleh semua analis di seluruh dunia lho ✨', time: 'Sistem', ai: true }
+                    ];
+                }
+                renderForum();
+            });
         }
 
         function changeTab(tabName) {
@@ -754,15 +807,12 @@
                 const catName = t(m.catKey);
                 container.innerHTML += `
                     <div class="glass p-6 rounded-3xl border border-white/5 hover:border-red-500/50 transition duration-300 flex flex-col group h-full relative overflow-hidden">
-                        <!-- BG Hiasan mascot pudar -->
                         <img src="4.png" class="absolute -bottom-10 -right-10 w-40 h-40 opacity-10 pointer-events-none">
-                        
                         <div class="flex justify-between items-center mb-4 relative z-10">
                             <span class="text-[10px] font-black tracking-widest uppercase bg-red-900/40 text-red-300 px-3 py-1 rounded border border-red-500/20">${catName}</span>
                             <span class="text-xs text-green-400 font-bold bg-green-900/30 px-2 py-1 rounded border border-green-500/30">Live Data</span>
                         </div>
                         <h4 class="font-black text-xl mb-6 text-white group-hover:text-red-300 transition leading-tight flex-1 relative z-10">${m.title}</h4>
-                        
                         <div class="flex justify-between bg-black/60 rounded-2xl p-4 border border-white/10 mb-6 shadow-inner mt-auto relative z-10">
                             <div class="text-center w-1/2 border-r border-white/10">
                                 <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">${t("card_bookie")}</div>
@@ -773,7 +823,6 @@
                                 <div class="font-black text-blue-400 text-xl">${m.o2}</div>
                             </div>
                         </div>
-                        
                         <button onclick="openModalPredict(${m.id})" class="w-full bg-white/5 hover:bg-red-600 text-white py-3.5 rounded-xl font-bold transition border border-white/10 hover:border-transparent mt-auto active:scale-95 uppercase tracking-wide text-sm relative z-10">
                             ${t("card_btn")}
                         </button>
@@ -791,11 +840,8 @@
             const sel = document.getElementById('mp-selection');
             sel.innerHTML = '';
             ACTIVE_MATCH.teams.forEach(te => {
-                // translate team if 'Menang' or 'Seri' for EN
                 let tmStr = te;
-                if(currentLang === 'en') {
-                    tmStr = tmStr.replace('Menang', 'Win').replace('Seri', 'Draw');
-                }
+                if(currentLang === 'en') tmStr = tmStr.replace('Menang', 'Win').replace('Seri', 'Draw');
                 sel.innerHTML += `<option value="${tmStr}">${tmStr}</option>`;
             });
             
@@ -821,19 +867,16 @@
             const conf = document.getElementById('mp-confidence').value;
             const timeStr = new Date().toLocaleString(currentLang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', hour:'2-digit', minute:'2-digit'});
             
-            USER_JOURNAL.unshift({
-                title: ACTIVE_MATCH.title,
-                pick: sel,
-                conf: conf,
-                time: timeStr
+            if(!USER_JOURNAL) USER_JOURNAL = [];
+            USER_JOURNAL.unshift({ title: ACTIVE_MATCH.title, pick: sel, conf: conf, time: timeStr });
+            
+            // Push Real-time ke Cloud Firebase
+            db.ref('journals/' + SESSION_USER).set(USER_JOURNAL).then(() => {
+                closeModal('modal-predict');
+                showToast(t("toast_pred_ok"));
+            }).catch(err => {
+                showToast(t("toast_fb_err"));
             });
-            
-            localStorage.setItem(`journal_${SESSION_USER}`, JSON.stringify(USER_JOURNAL));
-            
-            closeModal('modal-predict');
-            showToast(t("toast_pred_ok"));
-            renderJournal();
-            updateUserStats();
         }
 
         function renderJournal() {
@@ -857,7 +900,7 @@
                                 <span class="text-xs font-bold text-gray-300">${j.conf}%</span>
                             </div>
                         </td>
-                        <td class="p-5"><span class="bg-blue-900/40 text-blue-300 border border-blue-500/30 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider">${t("status_wait")}</span></td>
+                        <td class="p-5"><span class="bg-blue-900/40 text-blue-300 border border-blue-500/30 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider"><i class="fas fa-cloud text-blue-400 mr-1"></i> ${t("status_wait")}</span></td>
                         <td class="p-5 text-right text-gray-400 text-xs font-bold">${j.time}</td>
                     </tr>
                 `;
@@ -879,7 +922,6 @@
             const feed = document.getElementById('forum-feed');
             feed.innerHTML = '';
             FORUM_POSTS.forEach(p => {
-                // Avatar AI pakai 2.png, user normal inisial
                 const avatar = p.ai 
                     ? `<img src="2.png" class="w-12 h-12 rounded-full border-2 border-red-500 bg-black/50 shadow-lg shrink-0 object-contain p-0.5">`
                     : `<div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 border-2 border-gray-400 flex items-center justify-center font-black text-xl shadow-lg shrink-0 text-white">${p.user.charAt(0).toUpperCase()}</div>`;
@@ -906,12 +948,17 @@
             
             const timeStr = new Date().toLocaleString(currentLang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', hour:'2-digit', minute:'2-digit'});
             
+            if(!FORUM_POSTS) FORUM_POSTS = [];
             FORUM_POSTS.unshift({ user: SESSION_USER, text: txt, time: timeStr, ai: false });
-            localStorage.setItem('nusa_forum', JSON.stringify(FORUM_POSTS));
+            if(FORUM_POSTS.length > 50) FORUM_POSTS.pop();
             
-            input.value = '';
-            renderForum();
-            showToast(t("toast_post_ok"));
+            // Tembak Real-time ke Firebase (Global)
+            db.ref('forum').set(FORUM_POSTS).then(() => {
+                input.value = '';
+                showToast(t("toast_post_ok"));
+            }).catch(err => {
+                showToast(t("toast_fb_err"));
+            });
         }
 
         // AI Chat Engine - Feminine Edition
@@ -963,7 +1010,6 @@
                 
                 box.innerHTML += `
                     <div class="flex gap-3 max-w-[90%] mt-2">
-                        <!-- AI Response Mascot Pose 9.png -->
                         <img src="9.png" class="w-8 h-8 border border-red-500/50 rounded-full bg-black/50 shrink-0 object-contain p-0.5">
                         <div class="bg-red-900/60 border border-red-500/30 text-white text-sm p-3 rounded-2xl rounded-tl-none shadow-md">
                             ${res}
@@ -978,7 +1024,7 @@
         function showToast(msg) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = 'bg-black/90 text-white px-6 py-3.5 rounded-2xl shadow-[0_0_20px_rgba(255,0,0,0.6)] transform transition-all translate-y-[-20px] opacity-0 text-sm font-bold flex items-center gap-3 border border-red-500';
+            toast.className = 'bg-black/90 text-white px-6 py-3.5 rounded-2xl shadow-[0_0_20px_rgba(255,0,0,0.6)] transform transition-all translate-y-[-20px] opacity-0 text-sm font-bold flex items-center gap-3 border border-red-500 z-[9999] relative';
             toast.innerHTML = `<span>${msg}</span>`;
             container.appendChild(toast);
             
