@@ -49,6 +49,8 @@
         .force-hide { display: none !important; }
         .force-show { display: block !important; }
     </style>
+    <!-- Ethers.js untuk Crypto Wallet -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative">
 
@@ -176,6 +178,11 @@
                         </div>
                     </div>
                     
+                    <!-- Connect Wallet Button -->
+                    <button id="btn-connect-wallet" onclick="connectWallet()" class="hidden md:flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-4 py-1.5 rounded-full text-xs font-bold border border-white/20 shadow-[0_0_10px_rgba(150,50,255,0.4)] transition transform hover:-translate-y-0.5">
+                        <i class="fab fa-ethereum"></i> <span id="wallet-text" data-i18n="btn_wallet">Connect Wallet</span>
+                    </button>
+
                     <!-- Profil -->
                     <div class="flex items-center gap-3 bg-black/40 py-1.5 px-1.5 pr-4 rounded-full border border-white/10 shadow-inner">
                         <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-red-500 to-red-800 flex items-center justify-center text-white font-black text-lg border-2 border-black" id="display-initial">U</div>
@@ -492,6 +499,10 @@
                 toast_pred_ok: "✅ Mantap Kak! Prediksinya udah masuk jurnal Cloud.",
                 toast_post_ok: "✅ Postingan terkirim ke semua pengguna global!",
                 toast_fb_err: "⚠️ Gagal terhubung ke server! Cek API Key Firebase Kakak ya.",
+                btn_wallet: "Sambung Dompet",
+                toast_wallet_ok: "🔗 Dompet Crypto berhasil tersambung, Kak!",
+                toast_wallet_err: "❌ Yah, MetaMask-nya belum terpasang atau ditolak nih Kak.",
+                toast_wallet_ext: "⚠️ Kakak perlu install ekstensi MetaMask dulu ya di browser!",
                 confirm_logout: "Kakak yakin ingin keluar?",
                 confirm_reset: "PERINGATAN: Semua poin dan jurnal Kakak akan terhapus permanen dari SERVER. Lanjut?"
             },
@@ -555,6 +566,10 @@
                 toast_pred_ok: "✅ Awesome! Prediction saved to Cloud journal.",
                 toast_post_ok: "✅ Post sent to all global users!",
                 toast_fb_err: "⚠️ Failed to connect to server! Please check your Firebase API Key.",
+                btn_wallet: "Connect Wallet",
+                toast_wallet_ok: "🔗 Crypto Wallet successfully connected, Kak!",
+                toast_wallet_err: "❌ Oops, MetaMask is not installed or connection rejected.",
+                toast_wallet_ext: "⚠️ You need to install the MetaMask browser extension first!",
                 confirm_logout: "Are you sure you want to log out?",
                 confirm_reset: "WARNING: All your points and journals will be permanently deleted from the SERVER. Continue?"
             }
@@ -1034,6 +1049,70 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
-    </script>
+    
+        // ----------------------------------------------------
+        // WEB3 & CRYPTO WALLET (METAMASK)
+        // ----------------------------------------------------
+        let userWalletAddress = null;
+
+        async function connectWallet() {
+            const walletBtn = document.getElementById('wallet-text');
+            
+            // Cek apakah MetaMask / Web3 Provider tersedia di browser
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    showToast("⏳ Sedang menghubungkan dompet...");
+                    
+                    // Meminta akses akun ke MetaMask
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    
+                    if (accounts.length > 0) {
+                        userWalletAddress = accounts[0];
+                        
+                        // Mempersingkat tampilan address (misal: 0x1234...ABCD)
+                        const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
+                        
+                        walletBtn.innerText = shortAddress;
+                        document.getElementById('btn-connect-wallet').classList.remove('from-purple-600', 'to-blue-600');
+                        document.getElementById('btn-connect-wallet').classList.add('from-green-600', 'to-emerald-600');
+                        
+                        // Simpan info wallet ke Firebase milik user
+                        if (SESSION_USER) {
+                            db.ref('users_data/' + SESSION_USER + '/wallet').set(userWalletAddress);
+                        }
+                        
+                        showToast(t("toast_wallet_ok"));
+                    }
+                } catch (error) {
+                    console.error("Wallet connection failed:", error);
+                    showToast(t("toast_wallet_err"));
+                }
+            } else {
+                showToast(t("toast_wallet_ext"));
+                // Opsional: Buka tab baru ke halaman download MetaMask
+                // window.open('https://metamask.io/download/', '_blank');
+            }
+        }
+
+        // Listener jika user mengganti akun langsung dari ekstensi MetaMask
+        if (typeof window.ethereum !== 'undefined') {
+            window.ethereum.on('accountsChanged', function (accounts) {
+                if (accounts.length > 0) {
+                    userWalletAddress = accounts[0];
+                    const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
+                    document.getElementById('wallet-text').innerText = shortAddress;
+                    if (SESSION_USER) {
+                        db.ref('users_data/' + SESSION_USER + '/wallet').set(userWalletAddress);
+                    }
+                } else {
+                    // User mendisconnect wallet dari MetaMask
+                    userWalletAddress = null;
+                    document.getElementById('wallet-text').innerText = t("btn_wallet");
+                    document.getElementById('btn-connect-wallet').classList.add('from-purple-600', 'to-blue-600');
+                    document.getElementById('btn-connect-wallet').classList.remove('from-green-600', 'to-emerald-600');
+                }
+            });
+        }
+</script>
 </body>
 </html>
