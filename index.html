@@ -395,7 +395,7 @@
 
         let SESSION_USER = null;
         let USER_JOURNAL = [];
-        let FORUM_POSTS = [
+        let FORUM_POSTS = JSON.parse(localStorage.getItem('nusa_forum')) || [
             { user: 'Sari AI', text: 'Analisis harian: Sentimen untuk Timnas Indonesia sedang tinggi di bursa on-chain. Waspada odds trap!', time: '1 jam lalu', ai: true },
             { user: 'Garuda_ID', text: "Optimis Indonesia bisa curi poin penuh malam ini. Mari kita buktikan!", time: '2 jam lalu', ai: false }
         ];
@@ -707,10 +707,18 @@
             const input = document.getElementById('forum-input');
             const txt = input.value.trim();
             if(!txt) return;
-            FORUM_POSTS.unshift({ user: SESSION_USER, text: txt, time: 'Baru saja', ai: false });
+            
+            // Format waktu rapi
+            const timeStr = new Date().toLocaleString('id-ID', {day: 'numeric', month: 'short', hour:'2-digit', minute:'2-digit'});
+            
+            FORUM_POSTS.unshift({ user: SESSION_USER, text: txt, time: timeStr, ai: false });
+            
+            // Simpan permanen ke Local Storage
+            localStorage.setItem('nusa_forum', JSON.stringify(FORUM_POSTS));
+            
             input.value = '';
             renderForum();
-            showToast('Postingan dikirim!');
+            showToast('✅ Postingan tersimpan permanen!');
         }
 
         // AI Chat Engine
