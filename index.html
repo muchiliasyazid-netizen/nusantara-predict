@@ -63,18 +63,10 @@
             <h1 class="text-3xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-white text-glow relative z-10">Nusantara Predict</h1>
             <p id="auth-subtitle" class="text-gray-400 mb-6 text-sm relative z-10">Pintu masuk ke prediksi On-Chain</p>
             
-            <!-- TAB NAVIGASI YANG 100% AMAN DARI BUG KLIK -->
-            <div class="flex bg-black/60 p-1.5 rounded-xl mb-6 border border-white/10 relative z-20 shadow-inner">
-                <!-- Slider Latar (Menggunakan pointer-events-none agar tidak menghalangi klik) -->
-                <div id="tab-slider" class="absolute top-1.5 left-1.5 w-[calc(50%-6px)] bottom-1.5 bg-gradient-to-r from-red-600 to-red-800 rounded-lg transition-all duration-300 shadow-md pointer-events-none z-0"></div>
-                
-                <!-- Tombol (z-10 membuatnya berada di atas slider) -->
-                <button type="button" id="btn-tab-login" onclick="switchAuth('login')" class="flex-1 py-2.5 text-white font-bold text-sm tracking-wide relative z-10 transition-colors cursor-pointer">
-                    MASUK
-                </button>
-                <button type="button" id="btn-tab-register" onclick="switchAuth('register')" class="flex-1 py-2.5 text-gray-400 font-bold text-sm tracking-wide relative z-10 transition-colors cursor-pointer hover:text-gray-200">
-                    DAFTAR
-                </button>
+            <!-- TAB NAVIGASI KLASIK (DIJAMIN BISA DI KLIK 100%) -->
+            <div class="flex gap-3 mb-6 relative z-50">
+                <button type="button" id="btn-tab-login" onclick="switchAuth('login')" class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-800 text-white font-black tracking-widest shadow-[0_0_15px_rgba(255,0,0,0.4)] transition border border-red-500/50 cursor-pointer">MASUK</button>
+                <button type="button" id="btn-tab-register" onclick="switchAuth('register')" class="flex-1 py-3.5 rounded-xl bg-black/80 text-gray-400 font-bold hover:bg-black hover:text-white transition border border-white/10 cursor-pointer shadow-inner">DAFTAR</button>
             </div>
             
             <!-- FORM LOGIN -->
@@ -434,7 +426,6 @@
 
         // Toggling UI Login / Daftar
         function switchAuth(mode) {
-            const slider = document.getElementById('tab-slider');
             const btnLogin = document.getElementById('btn-tab-login');
             const btnReg = document.getElementById('btn-tab-register');
             const formLogin = document.getElementById('form-login');
@@ -442,18 +433,9 @@
             const subtitle = document.getElementById('auth-subtitle');
 
             if (mode === 'register') {
-                // Geser visual ke kanan (Biru)
-                slider.style.transform = 'translateX(100%)';
-                slider.classList.remove('from-red-600', 'to-red-800');
-                slider.classList.add('from-blue-600', 'to-blue-800');
+                btnLogin.className = "flex-1 py-3.5 rounded-xl bg-black/80 text-gray-400 font-bold hover:bg-black hover:text-white transition border border-white/10 cursor-pointer shadow-inner";
+                btnReg.className = "flex-1 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-800 text-white font-black tracking-widest shadow-[0_0_15px_rgba(0,100,255,0.4)] transition border border-blue-500/50 cursor-pointer";
 
-                // Warna teks tombol
-                btnLogin.classList.remove('text-white');
-                btnLogin.classList.add('text-gray-400');
-                btnReg.classList.remove('text-gray-400');
-                btnReg.classList.add('text-white');
-
-                // Toggle Form pakai Force Class CSS
                 formLogin.classList.remove('force-show');
                 formLogin.classList.add('force-hide');
                 
@@ -462,18 +444,9 @@
                 
                 subtitle.innerText = "Daftar akun baru untuk akses";
             } else {
-                // Geser visual ke kiri (Merah)
-                slider.style.transform = 'translateX(0)';
-                slider.classList.remove('from-blue-600', 'to-blue-800');
-                slider.classList.add('from-red-600', 'to-red-800');
+                btnLogin.className = "flex-1 py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-800 text-white font-black tracking-widest shadow-[0_0_15px_rgba(255,0,0,0.4)] transition border border-red-500/50 cursor-pointer";
+                btnReg.className = "flex-1 py-3.5 rounded-xl bg-black/80 text-gray-400 font-bold hover:bg-black hover:text-white transition border border-white/10 cursor-pointer shadow-inner";
 
-                // Warna teks tombol
-                btnReg.classList.remove('text-white');
-                btnReg.classList.add('text-gray-400');
-                btnLogin.classList.remove('text-gray-400');
-                btnLogin.classList.add('text-white');
-
-                // Toggle Form pakai Force Class CSS
                 formReg.classList.remove('force-show');
                 formReg.classList.add('force-hide');
                 
