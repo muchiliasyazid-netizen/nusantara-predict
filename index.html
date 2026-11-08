@@ -382,8 +382,7 @@
         }
         const db = firebase.database();
 
-        // ========== API KEY GEMINI ==========
-        // ========== API KEY GEMINI (DI-SPLIT AGAR AMAN DARI GITHUB SCANNER) ==========
+        // ========== API KEY & MODEL GEMINI ==========
         const part1 = "AQ.Ab8RN6KUPKG3";
         const part2 = "E3uIVJzEVlSPIKX";
         const part3 = "0tgqGqHT7ZxR-dn";
@@ -1004,11 +1003,11 @@
             }, 50);
         }
 
-        // ========== FUNGSI AI SARI (FORMAT BARU) ==========
+        // ========== FUNGSI AI SARI (MENGGUNAKAN GEMINI 3.5 FLASH-LITE) ==========
         async function generateSariSpace(message) {
             const userName = SESSION_USER || "Kakak";
             
-            let favCat = "Belum ada", favTeam = "Belum ada", winRateStr = "0%", totalPred = USER_JOURNAL ? USER_JOURNAL.length : 0;
+            let favCat = "Belum ada", favTeam = "Belum ada", totalPred = USER_JOURNAL ? USER_JOURNAL.length : 0;
             if (USER_JOURNAL && USER_JOURNAL.length > 0) {
                 let catCounts = { 'Sepak Bola': 0, 'Basket': 0, 'E-Sports': 0 };
                 let teamCounts = {};
@@ -1019,19 +1018,19 @@
                 });
                 favCat = Object.keys(catCounts).reduce((a, b) => catCounts[a] > catCounts[b] ? a : b);
                 favTeam = Object.keys(teamCounts).reduce((a, b) => teamCounts[a] > teamCounts[b] ? a : b);
-                winRateStr = (60 + Math.min(USER_JOURNAL.length * 2, 35)) + "%";
             }
 
             const sysPrompt = `Kamu adalah "Sari", asisten AI virtual berwujud gadis manis, ceria, interaktif, dan expert dalam dunia Web3, blockchain, serta prediksi on-chain pasar olahraga. 
 Karaktermu: Logis berbasis data statistik namun bicaranya hangat, kadang sedikit manja/genit, tapi berpendirian teguh.
 Gunakan bahasa Indonesia sehari-hari ala anak muda. Panggil pengguna dengan nama "${userName}".
 Fakta tentangmu: Tim favoritmu RRQ Hoshi (E-Sports) dan LA Lakers (Basket).
-Fakta pengguna: Total Prediksi: ${totalPred}, Kategori favorit: ${favCat}, Tim jagoan: ${favTeam}, Win Rate: ${winRateStr}.
+Fakta pengguna: Total Prediksi: ${totalPred}, Kategori favorit: ${favCat}, Tim jagoan: ${favTeam}.
 Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu panjang.`;
 
             try {
+                // Menggunakan model gemini-3.5-flash-lite agar respon stabil, cepat, dan up-to-date
                 const response = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
                     {
                         method: "POST",
                         headers: { 
@@ -1052,7 +1051,6 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
                 
                 if (!response.ok) {
                     console.error("Gemini Error:", responseData);
-                    
                     if (response.status === 401 || response.status === 403 || response.status === 400) {
                         return "Aduh Kak, API Key Gemini-nya sepertinya tidak valid atau ada yang salah dengan request-nya. Coba cek lagi kodenya ya 🥺";
                     }
@@ -1075,11 +1073,9 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
 
             } catch (error) {
                 console.error("🚨 Otak On-Chain Sari Error:", error.message);
-                
                 if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
                     return "Server Gemini sedang sibuk atau koneksi internet Kakak bermasalah. Coba refresh halaman ya 🥺";
                 }
-                
                 return `Sistem On-Chain RL sedang gangguan Kak. *(Error: ${error.message})* 🥺`;
             }
         }
@@ -1154,6 +1150,6 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
                 }
             });
         }
-</script>
+    </script>
 </body>
 </html>
