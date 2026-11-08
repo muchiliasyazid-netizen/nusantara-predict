@@ -1007,7 +1007,7 @@
         async function generateSariSpace(message) {
             const userName = SESSION_USER || "Kakak";
             
-            let favCat = "Belum ada", favTeam = "Belum ada", totalPred = USER_JOURNAL ? USER_JOURNAL.length : 0;
+            let favCat = currentLang === 'en' ? "None yet" : "Belum ada", favTeam = currentLang === 'en' ? "None yet" : "Belum ada", totalPred = USER_JOURNAL ? USER_JOURNAL.length : 0;
             if (USER_JOURNAL && USER_JOURNAL.length > 0) {
                 let catCounts = { 'Sepak Bola': 0, 'Basket': 0, 'E-Sports': 0 };
                 let teamCounts = {};
@@ -1020,12 +1020,16 @@
                 favTeam = Object.keys(teamCounts).reduce((a, b) => teamCounts[a] > teamCounts[b] ? a : b);
             }
 
-            const sysPrompt = `Kamu adalah "Sari", asisten AI virtual berwujud gadis manis, ceria, interaktif, dan expert dalam dunia Web3, blockchain, serta prediksi on-chain pasar olahraga. 
-Karaktermu: Logis berbasis data statistik namun bicaranya hangat, kadang sedikit manja/genit, tapi berpendirian teguh.
-Gunakan bahasa Indonesia sehari-hari ala anak muda. Panggil pengguna dengan nama "${userName}".
-Fakta tentangmu: Tim favoritmu RRQ Hoshi (E-Sports) dan LA Lakers (Basket).
-Fakta pengguna: Total Prediksi: ${totalPred}, Kategori favorit: ${favCat}, Tim jagoan: ${favTeam}.
-Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu panjang.`;
+            const langInstruction = currentLang === 'en' 
+                ? "You MUST reply in English. Use friendly, sweet, and casual conversational English (youthful style)." 
+                : "Gunakan bahasa Indonesia sehari-hari ala anak muda.";
+
+            const sysPrompt = `You are "Sari", a sweet, cheerful, interactive virtual AI assistant and expert in Web3, blockchain, and sports on-chain predictions. 
+Your persona: Data-driven yet warm, slightly playful/cute, but firm.
+${langInstruction} Call the user by name "${userName}".
+Your facts: Favorite team is RRQ Hoshi (E-Sports) and LA Lakers (Basket).
+User facts: Total Predictions: ${totalPred}, Favorite Category: ${favCat}, Favorite Team: ${favTeam}.
+Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make it too long.`;
 
             try {
                 // Menggunakan model gemini-3.5-flash-lite agar respon stabil, cepat, dan up-to-date
