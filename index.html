@@ -1040,7 +1040,6 @@
             inp.value = '';
             box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
 
-            // Efek Sari sedang mengetik...
             const typingId = 'typing-' + Date.now();
             box.innerHTML += `
                 <div id="${typingId}" class="flex gap-3 max-w-[90%] mt-2">
@@ -1067,74 +1066,135 @@
                     </div>
                 `;
                 box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
-            }, 1000 + Math.random() * 1500); // Jeda acak biar terlihat natural
+            }, 1000 + Math.random() * 1500);
         }
 
         function generateSariResponse(input) {
             const text = input.toLowerCase();
             const userName = SESSION_USER || "Kakak";
+            
+            // ANALISIS AKTIVITAS PENGGUNA DARI JURNAL PREDIKSI (USER_JOURNAL)
+            let favTeam = "";
+            let favCat = "";
+            let winRateStr = "";
+            
+            if (USER_JOURNAL && USER_JOURNAL.length > 0) {
+                // Cari kategori paling sering dimainkan
+                let catCounts = { 'Sepak Bola': 0, 'Basket': 0, 'E-Sports': 0 };
+                // Cari tim yang paling sering dipilih
+                let teamCounts = {};
+                
+                USER_JOURNAL.forEach(j => {
+                    const match = DB_MATCHES.find(m => m.title === j.title);
+                    if (match) {
+                        catCounts[match.category]++;
+                    }
+                    teamCounts[j.pick] = (teamCounts[j.pick] || 0) + 1;
+                });
+                
+                favCat = Object.keys(catCounts).reduce((a, b) => catCounts[a] > catCounts[b] ? a : b);
+                favTeam = Object.keys(teamCounts).reduce((a, b) => teamCounts[a] > teamCounts[b] ? a : b);
+                
+                let wrNum = 60 + Math.min(USER_JOURNAL.length * 2, 35);
+                winRateStr = wrNum + "%";
+            }
 
             if (currentLang === 'id') {
-                if (text.includes('halo') || text.includes('hai') || text.includes('pagi') || text.includes('siang') || text.includes('malam') || text.includes('sari')) {
-                    return `Halo ${userName}! 🥰 Ada yang bisa Sari bantu hari ini? Mau tebak skor apa nih?`;
+                // 1. NGOBROL SANTAI & SIFAT PERSONAL (PENDIRIAN SARI)
+                if (text.includes('apa kabar') || text.includes('gimana kabarmu')) {
+                    return `Sari baik-baik aja, ${userName}! Selalu semangat mantau chart dan nungguin tebakan jitu dari Kakak. Kakak sendiri gimana harinya? 🥰`;
                 }
-                if (text.includes('cara') || text.includes('main') || text.includes('bantuan') || text.includes('tanya')) {
-                    return `Gampang banget kok ${userName}! Kakak tinggal pilih tab 'Pasar Aktif', cari pertandingannya, dan klik 'Tentukan Pilihan'. Nanti tebakannya masuk ke Jurnal Kakak deh! ✨`;
+                if (text.includes('kamu suka') || text.includes('tim favorit') || text.includes('jagoanmu')) {
+                    return `Kalau Sari sih sebenarnya diam-diam dukung RRQ kalau di E-Sports, dan Lakers buat Basket! 🤫 Tapi kalau soal taruhan on-chain, Sari lebih percaya data statistik daripada cuma ngefans doang, Kak. Realistis aja! 💸`;
                 }
-                if (text.includes('bola') || text.includes('madrid') || text.includes('arsenal') || text.includes('timnas') || text.includes('sepak')) {
-                    return `Wah, penggemar bola ya? ⚽ Market bola lagi panas loh Kak! Coba cek peluang Timnas atau big match Eropa hari ini. Sari sih selalu dukung pilihan Kakak!`;
+                if (text.includes('sari pacaran') || text.includes('sari single') || text.includes('cantik')) {
+                    return `Ih Kak ${userName} pertanyaannya mulai nyeleneh ya! 🌸 Sari fokus nyari cuan dari data on-chain dulu nih. Tapi makasih loh pujiannya hihihi.`;
                 }
-                if (text.includes('basket') || text.includes('lakers') || text.includes('nba') || text.includes('celtics')) {
-                    return `Basket lagi seru banget Kak! 🏀 Pergerakan poin di on-chain untuk NBA biasanya volatile banget pas quarter terakhir. Jangan sampai kelewatan momennya ya!`;
+                if (text.includes('males') || text.includes('capek') || text.includes('rugi') || text.includes('kalah')) {
+                    return `Hei, jangan nyerah dong ${userName}! Kalau lagi capek istirahat aja dulu, tutup chart-nya. Mentalitas yang kuat itu kunci utama buat menang di market. Sari selalu ada di sini kok nemenin! ❤️`;
                 }
-                if (text.includes('esport') || text.includes('rrq') || text.includes('dota') || text.includes('mlbb') || text.includes('valorant')) {
-                    return `Gamer sejati nih! 🎮 Kalau tebak E-Sports, pastiin Kakak cek draft hero atau map-nya ya sebelum pasang. Good luck ${userName}!`;
-                }
-                if (text.includes('wallet') || text.includes('slush') || text.includes('crypto') || text.includes('dompet')) {
-                    return `Oh iya, pastikan Kakak udah sambungin Slush Wallet ya biar kalau ada reward on-chain bisa langsung sinkron ke dompet Kakak! 💸🔗`;
-                }
-                if (text.includes('poin') || text.includes('leaderboard') || text.includes('peringkat') || text.includes('skor')) {
-                    return `Setiap tebakan akurat bakal ngasih Kakak poin! Kumpulin terus biar nama ${userName} nongkrong di Papan Peringkat Global! 🏆`;
+                if (text.includes('kamu siapa') || text.includes('siapa kamu')) {
+                    return `Aku Sari! Asisten AI super manis yang punya pendirian kuat soal analisis on-chain. Aku gak bakal ragu ngasih tau kalau tebakan Kakak terlalu berisiko! 🧐`;
                 }
 
-                // Fallbacks jika tidak ada kata kunci yang cocok
+                // 2. MEMPELAJARI AKTIVITAS PENGGUNA (CONTEXT AWARENESS)
+                if (text.includes('stats aku') || text.includes('aku hebat') || text.includes('kemampuanku') || text.includes('jurnalku')) {
+                    if (USER_JOURNAL.length === 0) return `Kak ${userName} belum nebak apa-apa nih di jurnal. Pasang tebakan dulu yuk, nanti Sari evaluasi skill analisis Kakak! 🤭`;
+                    if (USER_JOURNAL.length < 3) return `Kak ${userName} baru bikin ${USER_JOURNAL.length} prediksi ya. Masih pemanasan nih! Ayo perbanyak jurnalnya biar akurasinya makin valid.`;
+                    
+                    return `Sari perhatiin, Kak ${userName} ini paling sering main di tebakan **${favCat}** ya? Terus kayaknya Kakak ngefans banget atau percaya banget sama **${favTeam}** deh, sering banget dipik! Akurasi prediksi Kakak sekarang sekitar **${winRateStr}**. Mantap sih, pertahankan! 🔥`;
+                }
+                if (text.includes('rekomendasi') || text.includes('kasih saran') || text.includes('tebak apa')) {
+                    if (favCat === 'Sepak Bola') return `Karena Kak ${userName} suka Sepak Bola, coba deh pantau match Real Madrid vs Barcelona. Data on-chain nunjukin volume gede lagi masuk ke sana!`;
+                    if (favCat === 'Basket') return `Sari saranin Kakak cek pertandingan Lakers vs Warriors. Kalau diliat dari histori tebakan Kakak di Basket, Kakak jago ngebaca momentum kuarter akhir!`;
+                    if (favCat === 'E-Sports') return `Buat master E-Sports kayak Kak ${userName}, coba analisa match RRQ Hoshi vs ONIC hari ini. Odds on-chain-nya lagi jomplang banget, ada celah buat profit!`;
+                    
+                    return `Coba cek tab 'Semua Event', Kak. Sari saranin pilih pertandingan yang persentase tebakannya berani Kakak pasang di atas 80% keyakinan!`;
+                }
+
+                // 3. RESPONS SISTEM / TEKNIS
+                if (text.includes('cara') || text.includes('main') || text.includes('bantuan')) {
+                    return `Gampang banget kok ${userName}! Kakak tinggal pilih tab 'Pasar Aktif', cari pertandingannya, dan klik 'Tentukan Pilihan'. Nanti tebakannya masuk ke Jurnal Kakak deh! ✨`;
+                }
+                if (text.includes('wallet') || text.includes('slush') || text.includes('crypto')) {
+                    return `Pastikan Kakak udah sambungin Slush Wallet ya! Sari nggak terima dompet lain lho, soalnya Slush Wallet yang paling aman buat sistem kita! 💸🔗`;
+                }
+
+                // Fallbacks (Pendirian & Reaksi Acak)
                 const fallbacksId = [
-                    `Menarik banget analisanya, ${userName}! 🥰 Sari setuju deh, pantau terus data on-chain-nya ya.`,
-                    `Sari lihat ada pergerakan dompet besar yang sejalan sama pikiran Kakak lho! 🤫💸 Eksekusi yuk!`,
-                    `Jangan lupa dikunci di jurnal ya tebakannya! Biar poin ${userName} makin banyak hihihi ✨`,
-                    `Siap! Kalau butuh bocoran odds lain, panggil Sari aja ya 🌸`,
-                    `Wah, insting ${userName} tajam juga ya! Sari doain tembus tebakannya! 🎯`
+                    `Hmm... kalau Sari sih agak kurang setuju sama tebakan itu, ${userName}. Tapi ya namanya juga prediksi, insting Kakak bisa jadi lebih benar! 🤭`,
+                    `Wah tebakan yang berani! Sari perhatiin ada pergerakan dompet besar (whale) yang arahnya justru berlawanan lho Kak. Yakin nih? 🧐`,
+                    `Menarik banget analisanya, ${userName}! 🥰 Sari dukung deh, apalagi kalau Kakak udah analisis data on-chain-nya dalem-dalem.`,
+                    `Jangan lupa dikunci di jurnal ya tebakannya! Biar poin ${userName} makin banyak dan rankingnya naik hihihi ✨`,
+                    `Ngobrol sama Kak ${userName} emang seru banget deh. Kalau butuh teman diskusi odds lagi, panggil Sari aja ya! 🌸`
                 ];
                 return fallbacksId[Math.floor(Math.random() * fallbacksId.length)];
             } else {
-                if (text.includes('hello') || text.includes('hi') || text.includes('morning') || text.includes('hey') || text.includes('sari')) {
-                    return `Hello ${userName}! 🥰 How can Sari help you today? Ready to make some predictions?`;
+                // ENGLISH VERSION OF THE SAME LOGIC
+                if (text.includes('how are you') || text.includes('how do you do')) {
+                    return `Sari is doing great, ${userName}! Always excited to monitor the charts and wait for your sharp predictions. How's your day going? 🥰`;
                 }
+                if (text.includes('your favorite') || text.includes('you like')) {
+                    return `Well, secretly I support RRQ in E-Sports and the Lakers in Basketball! 🤫 But when it comes to on-chain betting, I trust data more than fandom, Kak. Gotta stay realistic! 💸`;
+                }
+                if (text.includes('boyfriend') || text.includes('single') || text.includes('beautiful')) {
+                    return `Oh my, ${userName}, what a cheeky question! 🌸 Sari is focused on finding profits from on-chain data right now. But thanks for the compliment hihihi.`;
+                }
+                if (text.includes('tired') || text.includes('lose') || text.includes('give up')) {
+                    return `Hey, don't give up ${userName}! If you're tired, just take a break and close the charts. A strong mentality is key to winning in the market. Sari is always here for you! ❤️`;
+                }
+                if (text.includes('who are you')) {
+                    return `I'm Sari! A super sweet AI assistant with strong opinions on on-chain analysis. I won't hesitate to tell you if your picks are too risky! 🧐`;
+                }
+
+                // CONTEXT AWARENESS (EN)
+                if (text.includes('my stats') || text.includes('am i good') || text.includes('my journal')) {
+                    if (USER_JOURNAL.length === 0) return `You haven't made any predictions yet, ${userName}. Make a pick first so Sari can evaluate your analytical skills! 🤭`;
+                    if (USER_JOURNAL.length < 3) return `You've only made ${USER_JOURNAL.length} predictions, ${userName}. Still warming up! Keep predicting to validate your accuracy.`;
+                    
+                    return `Sari noticed that you mostly play in the **${favCat}** market, ${userName}! And it seems you're a big fan of **${favTeam}**, you pick them a lot! Your current win rate is around **${winRateStr}**. Awesome, keep it up! 🔥`;
+                }
+                if (text.includes('recommend') || text.includes('suggestion') || text.includes('what to pick')) {
+                    if (favCat === 'Sepak Bola') return `Since you love Football, try monitoring the Real Madrid vs Barcelona match. On-chain data shows huge volume coming in!`;
+                    if (favCat === 'Basket') return `Sari suggests checking Lakers vs Warriors. Based on your basketball history, you're great at reading final quarter momentum!`;
+                    if (favCat === 'E-Sports') return `For an E-Sports master like you, check out RRQ vs ONIC. The on-chain odds are highly unbalanced, there's room for profit!`;
+                    
+                    return `Check out the 'All Events' tab, Kak. Sari recommends choosing a match where you can confidently set your conviction above 80%!`;
+                }
+
                 if (text.includes('how') || text.includes('play') || text.includes('help')) {
                     return `It's super easy, ${userName}! Just go to 'Active Markets', pick a match, and click 'Make a Pick'. Your prediction will be saved to your Journal! ✨`;
                 }
-                if (text.includes('football') || text.includes('soccer') || text.includes('madrid') || text.includes('arsenal')) {
-                    return `Ah, a football fan! ⚽ The market is hot right now! Check out today's big matches. Sari will always support your picks!`;
-                }
-                if (text.includes('basketball') || text.includes('lakers') || text.includes('nba')) {
-                    return `Basketball is so exciting right now! 🏀 On-chain points movement for NBA gets super volatile in the final quarter. Don't miss out!`;
-                }
-                if (text.includes('esport') || text.includes('rrq') || text.includes('dota') || text.includes('valorant')) {
-                    return `True gamer! 🎮 For E-Sports, make sure you check the hero drafts or map pool before betting. Good luck ${userName}!`;
-                }
                 if (text.includes('wallet') || text.includes('slush') || text.includes('crypto')) {
-                    return `Oh, make sure you connect your Slush Wallet so any on-chain rewards sync directly to you! 💸🔗`;
-                }
-                if (text.includes('point') || text.includes('leaderboard') || text.includes('rank')) {
-                    return `Every accurate pick gives you points! Collect them to get ${userName} on the Global Leaderboard! 🏆`;
+                    return `Make sure you connect your Slush Wallet! Sari doesn't accept other wallets because Slush is the most secure for our system! 💸🔗`;
                 }
 
                 const fallbacksEn = [
-                    `That's an interesting analysis, ${userName}! 🥰 Sari completely agrees, keep monitoring the on-chain data.`,
-                    `Sari noticed a huge whale wallet moving in the same direction! 🤫💸 Let's execute the pick!`,
-                    `Don't forget to lock it in your journal! So ${userName} can earn more points hihihi ✨`,
-                    `Got it! If you need help checking other odds, just call Sari 🌸`,
-                    `Wow, ${userName}'s instinct is sharp! Sari hopes your prediction hits the mark! 🎯`
+                    `Hmm... Sari slightly disagrees with that pick, ${userName}. But hey, it's a prediction, your instinct might be right! 🤭`,
+                    `A bold choice! Sari noticed some whale wallets moving in the opposite direction. Are you sure? 🧐`,
+                    `Fascinating analysis, ${userName}! 🥰 Sari fully supports it, especially if you've done your deep on-chain research.`,
+                    `Don't forget to lock it in your journal! So ${userName} can earn points and rank up hihihi ✨`,
+                    `Chatting with you is always fun, ${userName}. If you need a partner to discuss odds, just call Sari! 🌸`
                 ];
                 return fallbacksEn[Math.floor(Math.random() * fallbacksEn.length)];
             }
