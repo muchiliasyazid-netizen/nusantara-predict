@@ -455,7 +455,7 @@
                 btn_wallet: "Sambung Dompet",
                 toast_wallet_ok: "🔗 Dompet Crypto berhasil tersambung, Kak!",
                 toast_wallet_err: "❌ Yah, Slush Wallet-nya belum terpasang atau ditolak nih Kak.",
-                toast_wallet_ext: "⚠️ Kakak perlu install ekstensi Slush Wallet dulu ya di browser!",
+                toast_wallet_ext: "⚠️ Ekstensi dompet belum terpasang di browser ini!",
                 confirm_logout: "Kakak yakin ingin keluar?",
                 confirm_reset: "PERINGATAN: Semua poin dan jurnal Kakak akan terhapus permanen dari SERVER. Lanjut?"
             },
@@ -522,7 +522,7 @@
                 btn_wallet: "Connect Wallet",
                 toast_wallet_ok: "🔗 Crypto Wallet successfully connected, Kak!",
                 toast_wallet_err: "❌ Oops, Slush Wallet is not installed or connection rejected.",
-                toast_wallet_ext: "⚠️ You need to install the Slush Wallet browser extension first!",
+                toast_wallet_ext: "⚠️ You need to install a wallet extension first!",
                 confirm_logout: "Are you sure you want to log out?",
                 confirm_reset: "WARNING: All your points and journals will be permanently deleted from the SERVER. Continue?"
             }
@@ -575,7 +575,7 @@
         const DB_MATCHES = [
             { id: 1, title: 'Timnas Indonesia vs Arab Saudi', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.80', o2: '1.60', teams: ['Indonesia Menang', 'Seri', 'Arab Saudi Menang'] },
             { id: 2, title: 'Arsenal vs Manchester City', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.60', o2: '2.40', teams: ['Arsenal Menang', 'Seri', 'Man City Menang'] },
-            { id: 3, title: 'Persija Jakarta vs Persib Jakarta', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.10', o2: '2.80', teams: ['Persija Menang', 'Seri', 'Persib Menang'] },
+            { id: 3, title: 'Persija Jakarta vs Persib Bandung', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.10', o2: '2.80', teams: ['Persija Menang', 'Seri', 'Persib Menang'] },
             { id: 6, title: 'Real Madrid vs Barcelona', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.85', o2: '2.10', teams: ['Real Madrid Menang', 'Seri', 'Barcelona Menang'] },
             { id: 7, title: 'Manchester United vs Liverpool', category: 'Sepak Bola', catKey: 'cat_football', o1: '3.10', o2: '1.75', teams: ['Man United Menang', 'Seri', 'Liverpool Menang'] },
             { id: 8, title: 'Bayern Munich vs B. Dortmund', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.40', o2: '3.50', teams: ['Bayern Menang', 'Seri', 'Dortmund Menang'] },
@@ -1002,7 +1002,6 @@
             }, 50);
         }
 
-        // ========== FUNGSI AI SARI (MENGGUNAKAN GEMINI 3.5 FLASH-LITE) ==========
         async function generateSariSpace(message) {
             const userName = SESSION_USER || "Kakak";
             
@@ -1081,52 +1080,56 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
                 return `Sistem On-Chain RL sedang gangguan Kak. *(Error: ${error.message})* 🥺`;
             }
         }
-
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'bg-black/90 text-white px-6 py-3.5 rounded-2xl shadow-[0_0_20px_rgba(255,0,0,0.6)] transform transition-all translate-y-[-20px] opacity-0 text-sm font-bold flex items-center gap-3 border border-red-500 z-[9999] relative';
-            toast.innerHTML = `<span>${msg}</span>`;
-            container.appendChild(toast);
-            
-            setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
-            setTimeout(() => { 
-                toast.classList.add('opacity-0', 'translate-y-[-20px]'); 
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
     
         let userWalletAddress = null;
 
+        // FUNGSI DIAGNOSTIK KONEKSI WALLET
         async function connectWallet() {
             const walletBtn = document.getElementById('wallet-text');
             
-            // Slush Wallet berjalan di jaringan SUI
-            // Kita cari object 'slush' atau 'suiWallet' di browser
-            let provider = window.slush || window.suiWallet;
-            
-            if (provider) {
-                try {
-                    showToast("⏳ Sedang menghubungkan Slush Wallet...");
-                    
-                    let accounts = [];
-                    
-                    // Meminta izin koneksi ke dompet SUI
-                    if (typeof provider.requestPermissions === 'function') {
-                        await provider.requestPermissions();
-                    } else if (typeof provider.connect === 'function') {
-                        await provider.connect();
-                    }
+            // 1. Pengecekan URL Lokal (Penyebab utama wallet diblokir)
+            if (window.location.protocol === 'file:') {
+                alert("⚠️ ERROR: Kakak membuka file HTML secara lokal (file:///). Ekstensi wallet otomatis memblokir file lokal demi keamanan. Silakan jalankan menggunakan 'Live Server' (http://127.0.0.1...).");
+                return;
+            }
 
-                    // Mengambil data akun wallet-nya
+            // 2. Deteksi Objek Ekstensi di Browser
+            let provider = null;
+            let providerName = "";
+
+            if (window.slush) { provider = window.slush; providerName = "Slush (window.slush)"; }
+            else if (window.suiWallet) { provider = window.suiWallet; providerName = "SUI (window.suiWallet)"; }
+            else if (window.ethereum) { provider = window.ethereum; providerName = "Ethereum/EVM (window.ethereum)"; }
+
+            if (!provider) {
+                alert("❌ Gagal: Tidak ada dompet kripto yang terdeteksi di browser ini! Pastikan ekstensi Slush Wallet sudah di-pin, aktif, dan diizinkan (site access) membaca halaman web ini.");
+                showToast(t("toast_wallet_ext"));
+                return;
+            }
+
+            try {
+                alert(`✅ Sistem dompet terdeteksi sebagai: ${providerName}. Sedang meminta izin koneksi...`);
+                let accounts = [];
+
+                // 3. Eksekusi koneksi berdasarkan tipe provider
+                if (providerName.includes("Ethereum")) {
+                    accounts = await provider.request({ method: 'eth_requestAccounts' });
+                } else {
+                    if (typeof provider.requestPermissions === 'function') await provider.requestPermissions();
+                    else if (typeof provider.connect === 'function') await provider.connect();
+
                     if (typeof provider.getAccounts === 'function') {
                         accounts = await provider.getAccounts();
+                    } else if (typeof provider.request === 'function') {
+                        accounts = await provider.request({ method: 'sui_accounts' });
                     }
+                }
+
+                // 4. Proses data akun yang didapat
+                if (accounts && accounts.length > 0) {
+                    userWalletAddress = typeof accounts[0] === 'string' ? accounts[0] : accounts[0].address;
                     
-                    // Format response Sui biasanya berupa array string atau object
-                    if (accounts && accounts.length > 0) {
-                        userWalletAddress = typeof accounts[0] === 'string' ? accounts[0] : accounts[0].address;
-                        
+                    if (userWalletAddress) {
                         const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
                         
                         walletBtn.innerText = shortAddress;
@@ -1137,27 +1140,27 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
                             db.ref('users_data/' + SESSION_USER + '/wallet').set(userWalletAddress);
                         }
                         
-                        showToast(t("toast_wallet_ok"));
-                    } else {
-                        showToast("❌ Tidak ada alamat wallet yang dipilih.");
+                        showToast("✅ Berhasil terhubung: " + shortAddress);
                     }
-                } catch (error) {
-                    console.error("Wallet connection failed:", error);
-                    showToast("❌ Koneksi ditolak oleh Slush Wallet.");
+                } else {
+                    alert("❌ Berhasil terhubung ke ekstensi, tapi tidak ada alamat dompet (Address) yang dikembalikan.");
                 }
-            } else {
-                showToast(t("toast_wallet_ext"));
+            } catch (error) {
+                console.error("Wallet Error:", error);
+                alert("❌ Koneksi dibatalkan atau gagal! Error Sistem: " + error.message);
             }
         }
 
-        // Listener jika pengguna mengganti akun di dalam extension Slush Wallet
-        const activeSlushProvider = window.slush || window.suiWallet;
-        if (activeSlushProvider && typeof activeSlushProvider.on === 'function') {
-            activeSlushProvider.on('accountsChanged', function (accounts) {
+        // Listener jika pengguna mengganti akun di dalam extension Wallet
+        const activeProvider = window.slush || window.suiWallet || window.ethereum;
+        if (activeProvider && typeof activeProvider.on === 'function') {
+            activeProvider.on('accountsChanged', function (accounts) {
                 if (accounts && accounts.length > 0) {
                     userWalletAddress = typeof accounts[0] === 'string' ? accounts[0] : accounts[0].address;
                     const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
                     document.getElementById('wallet-text').innerText = shortAddress;
+                    document.getElementById('btn-connect-wallet').classList.remove('from-purple-600', 'to-blue-600');
+                    document.getElementById('btn-connect-wallet').classList.add('from-green-600', 'to-emerald-600');
                     if (SESSION_USER) {
                         db.ref('users_data/' + SESSION_USER + '/wallet').set(userWalletAddress);
                     }
