@@ -320,7 +320,7 @@
                                     </div>
                                 </div>
                                 <div class="bg-gradient-to-r from-orange-900/40 to-black p-4 rounded-2xl border border-orange-500/30 flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center font-black text-black text-xl shadow-lg">3</div>
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center font-black text-xl shadow-lg">3</div>
                                     <div class="flex-1">
                                         <div class="font-bold text-lg text-white">CryptoNusa</div>
                                         <div class="text-xs text-orange-200">820 Prediksi Akurat</div>
@@ -1066,7 +1066,7 @@
 
             // Fetch Response dari Gemini API
             let res = "";
-            if (GEMINI_API_KEY === "ISI_API_KEY_GEMINI_ANDA_DISINI") {
+            if (GEMINI_API_KEY === "ISI_API_KEY_GEMINI_ANDA_DISINI" || !GEMINI_API_KEY) {
                 res = "Maaf Kak, API Key Gemini belum diisi nih. Sari jadi belum bisa mikir pintar pakai otak AI sungguhan 🥺 Masukkan API Key dulu ya di *source code*-nya!";
             } else {
                 res = await generateSariSpace(txt);
@@ -1118,65 +1118,85 @@ Karaktermu: Logis berbasis data statistik namun bicaranya hangat, kadang sedikit
 Gunakan bahasa Indonesia sehari-hari ala anak muda. Panggil pengguna dengan nama "${userName}".
 Fakta tentangmu: Tim favoritmu RRQ Hoshi (E-Sports) dan LA Lakers (Basket).
 Fakta pengguna: Total Prediksi: ${totalPred}, Kategori favorit: ${favCat}, Tim jagoan: ${favTeam}, Win Rate: ${winRateStr}.
-Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya.`;
+Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu panjang.`;
 
-            // Format riwayat pesan khusus untuk antarmuka Gradio Hugging Face
-            let gradioHistory = [];
-            for (let i = 0; i < aiChatHistory.length; i += 2) {
-                if (aiChatHistory[i] && aiChatHistory[i+1]) {
-                    gradioHistory.push([
-                        aiChatHistory[i].parts[0].text,   
-                        aiChatHistory[i+1].parts[0].text  
-                    ]);
-                }
+            // Siapkan history untuk Gemini
+            let contents = [];
+            
+            // Tambahkan system instruction sebagai pesan pertama
+            contents.push({
+                role: "user",
+                parts: [{ text: sysPrompt }]
+            });
+            contents.push({
+                role: "model",
+                parts: [{ text: "Siap Kak! Aku Sari, siap bantu analisis on-chain dan prediksi olahraga. Tanya aja ya 🌸" }]
+            });
+
+            // Tambahkan history chat sebelumnya
+            for (let i = 0; i < aiChatHistory.length; i++) {
+                contents.push(aiChatHistory[i]);
             }
 
-            aiChatHistory.push({ "role": "user", "parts": [{ "text": message }] });
+            // Tambahkan pesan user saat ini
+            contents.push({
+                role: "user",
+                parts: [{ text: message }]
+            });
 
             try {
-                const response = await fetch("https://solanaclawd-brave-new-world-on-chain-reinforcement-learning.hf.space/api/predict", {
-                    method: "POST",
-                    headers: { 
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        data: [
-                            message,       
-                            gradioHistory, 
-                            sysPrompt      
-                        ]
-                    })
-                });
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+                    {
+                        method: "POST",
+                        headers: { 
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            contents: contents,
+                            generationConfig: {
+                                temperature: 0.8,
+                                maxOutputTokens: 250,
+                                topP: 0.9
+                            }
+                        })
+                    }
+                );
 
                 const responseData = await response.json();
                 
-                if (!response.ok || responseData.error) {
-                    throw new Error(responseData.error || response.statusText);
+                if (!response.ok) {
+                    console.error("Gemini Error:", responseData);
+                    if (response.status === 401 || response.status === 403) {
+                        return "Aduh Kak, API Key Gemini-nya sepertinya tidak valid atau expired. Coba cek lagi di Google AI Studio ya 🥺";
+                    }
+                    if (response.status === 429) {
+                        return "Sabar ya Kak, limit API Gemini lagi penuh. Coba lagi beberapa saat lagi 🌸";
+                    }
+                    throw new Error(responseData.error?.message || response.statusText);
                 }
 
-                let replyText = responseData.data[0]; 
-                if (Array.isArray(replyText)) {
-                    replyText = replyText[replyText.length - 1][1];
+                let replyText = responseData.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf Kak, Sari lagi blank. Coba tanya lagi ya 🥺";
+
+                // Simpan ke history
+                aiChatHistory.push({ role: "user", parts: [{ text: message }] });
+                aiChatHistory.push({ role: "model", parts: [{ text: replyText }] });
+
+                // Batasi history biar tidak terlalu panjang
+                if (aiChatHistory.length > 12) {
+                    aiChatHistory = aiChatHistory.slice(-12);
                 }
-                
-                aiChatHistory.push({ "role": "model", "parts": [{ "text": replyText }] });
 
                 return replyText;
 
             } catch (error) {
                 console.error("🚨 Otak On-Chain Sari Error:", error.message);
                 
-                if(aiChatHistory.length > 0 && aiChatHistory[aiChatHistory.length - 1].role === "user") {
-                    aiChatHistory.pop();
+                if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+                    return "Server Gemini sedang sibuk atau koneksi internet Kakak bermasalah. Coba refresh halaman ya 🥺";
                 }
                 
-                if(error.message.includes("404")) {
-                    return "Aduh Kak, alamat API Space-nya tidak ditemukan (404). Coba ganti ujung URL fetch di kodenya dari `/api/predict` menjadi `/run/predict` ya! 🛠️";
-                } else if(error.message.includes("fetch")) {
-                    return "Server Hugging Face sedang tidur atau menolak koneksi dari browser (CORS Error). 🥺";
-                } else {
-                    return `Sistem On-Chain RL sedang gangguan Kak. *(Error: ${error.message})* 🥺`;
-                }
+                return `Sistem On-Chain RL sedang gangguan Kak. *(Error: ${error.message})* 🥺`;
             }
         }
 
@@ -1203,13 +1223,13 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya.`;
         async function connectWallet() {
             const walletBtn = document.getElementById('wallet-text');
             
-            // Pengecekan eksklusif HANYA untuk Slush Wallet
+            // Pengecekan eksklusif HANYA untuk Sush Wallet
             // Slush Wallet biasanya menyuntikkan window.slush atau menetapkan isSlushWallet pada window.ethereum
             const isSlushWallet = typeof window.slush !== 'undefined' || (typeof window.ethereum !== 'undefined' && window.ethereum.isSlushWallet);
             
             if (isSlushWallet) {
                 try {
-                    showToast("⏳ Sedang menghubungkan Slush Wallet...");
+                    showToast("⏳ Sedang menghubungkan Sush Wallet...");
                     
                     const provider = window.slush || window.ethereum;
                     const accounts = await provider.request({ method: 'eth_requestAccounts' });
@@ -1239,7 +1259,7 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya.`;
             }
         }
 
-        // Listener jika user mengganti akun langsung dari ekstensi Slush Wallet
+        // Listener jika user mengganti akun langsung dari ekstensi Sush Wallet
         const activeSlushProvider = window.slush || (typeof window.ethereum !== 'undefined' && window.ethereum.isSlushWallet ? window.ethereum : null);
         
         if (activeSlushProvider) {
