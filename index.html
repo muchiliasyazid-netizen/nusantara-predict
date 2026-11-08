@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nusantara Predict</title>
-    <!-- Favicon / Web Icon -->
     <link rel="icon" href="10.png" type="image/png">
     
-    <!-- Tailwind CSS (Framework Desain) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome (Ikon) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Desain Khusus & Animasi (Glassmorphism & Glow) */
         body { 
             background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000') center/cover fixed; 
             color: white; 
@@ -39,27 +35,21 @@
             50% { transform: translateY(-10px); } 
             100% { transform: translateY(0); } 
         }
-        /* Custom Scrollbar for Chat & App */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
         ::-webkit-scrollbar-thumb { background: rgba(255,0,0,0.5); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,0,0,0.8); }
-        
-        /* Utility classes for guaranteed hide/show */
         .force-hide { display: none !important; }
         .force-show { display: block !important; }
     </style>
-    <!-- Ethers.js untuk Crypto Wallet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative">
 
-    <!-- Toast Notifications -->
     <div id="toast-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 z-[9999] flex flex-col gap-2 w-full max-w-sm px-4 pointer-events-none"></div>
 
-    <!-- LAYAR OTENTIKASI (LOGIN & DAFTAR) -->
+    <!-- LAYAR OTENTIKASI -->
     <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl transition-opacity duration-500">
-        <!-- Tombol Bahasa Login -->
         <div class="absolute top-6 right-6 z-50">
             <button onclick="toggleLang()" id="lang-btn-auth" class="glass px-4 py-2 rounded-xl text-sm font-bold text-white border border-red-500/50 shadow-[0_0_10px_rgba(255,0,0,0.3)] flex items-center gap-2 hover:bg-red-600/30 transition">
                 <i class="fas fa-language"></i> <span id="lang-txt-auth">ID / EN</span>
@@ -67,22 +57,18 @@
         </div>
 
         <div class="glass p-8 rounded-3xl w-11/12 max-w-md text-center shadow-[0_0_50px_rgba(255,0,0,0.3)] border border-red-500/30 relative overflow-hidden">
-            <!-- Dekorasi Latar -->
             <div class="absolute -top-20 -right-20 w-40 h-40 bg-red-600 rounded-full blur-[80px] opacity-50 pointer-events-none"></div>
             <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-600 rounded-full blur-[80px] opacity-30 pointer-events-none"></div>
             
-            <!-- Pose 1 (Login Screen) -->
             <img src="1.png" alt="Mascot" class="w-32 h-32 mx-auto mb-4 mascot-float drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] relative z-10" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
             <h1 class="text-3xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-white text-glow relative z-10" data-i18n="app_title">Nusantara Predict</h1>
             <p id="auth-subtitle" class="text-gray-400 mb-6 text-sm relative z-10" data-i18n="auth_sub">Pintu masuk ke prediksi On-Chain</p>
             
-            <!-- TAB NAVIGASI KLASIK -->
             <div class="flex gap-3 mb-6 relative z-50">
                 <button type="button" id="btn-tab-login" onclick="switchAuth('login')" class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-red-800 text-white font-black tracking-widest shadow-[0_0_15px_rgba(255,0,0,0.4)] transition border border-red-500/50 cursor-pointer" data-i18n="tab_login">MASUK</button>
                 <button type="button" id="btn-tab-register" onclick="switchAuth('register')" class="flex-1 py-3.5 rounded-xl bg-black/80 text-gray-400 font-bold hover:bg-black hover:text-white transition border border-white/10 cursor-pointer shadow-inner" data-i18n="tab_reg">DAFTAR</button>
             </div>
             
-            <!-- FORM LOGIN -->
             <form id="form-login" class="space-y-4 force-show relative z-20">
                 <div class="relative">
                     <i class="fas fa-envelope absolute left-4 top-[18px] text-red-400"></i>
@@ -97,7 +83,6 @@
                 </button>
             </form>
 
-            <!-- FORM REGISTER -->
             <form id="form-register" class="space-y-4 force-hide relative z-20">
                 <div class="relative">
                     <i class="fas fa-user-plus absolute left-4 top-[18px] text-blue-400"></i>
@@ -114,13 +99,11 @@
         </div>
     </div>
 
-    <!-- LAYAR APLIKASI UTAMA (Disembunyikan saat belum login) -->
+    <!-- LAYAR APLIKASI UTAMA -->
     <div id="app-screen" class="hidden h-screen flex flex-col md:flex-row overflow-hidden opacity-0 transition-opacity duration-700 relative z-10">
         
-        <!-- SIDEBAR MENU -->
         <nav class="glass w-full md:w-20 lg:w-64 h-16 md:h-full flex-shrink-0 flex md:flex-col items-center justify-between md:justify-start py-4 px-2 md:px-0 fixed md:relative bottom-0 md:bottom-auto z-40 border-t md:border-t-0 md:border-r border-white/10">
             <div class="hidden md:block w-full text-center mb-8 mt-4">
-                <!-- Logo Sidebar Pakai 3.png -->
                 <div class="w-16 h-16 bg-gradient-to-br from-red-600/40 to-black rounded-2xl mx-auto flex items-center justify-center shadow-[0_0_20px_rgba(255,0,0,0.6)] border border-red-500/50 overflow-hidden p-1">
                     <img src="3.png" class="w-full h-full object-contain drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]">
                 </div>
@@ -158,19 +141,15 @@
             </div>
         </nav>
 
-        <!-- AREA KONTEN -->
         <main class="flex-1 flex flex-col h-full overflow-hidden pb-20 md:pb-0">
-            <!-- HEADER -->
             <header class="glass-panel px-6 py-4 flex justify-between items-center z-30 border-b border-white/10">
                 <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-red-200 tracking-wide" id="page-title" data-i18n="header_market">Pasar Olahraga Aktif</h2>
                 
                 <div class="flex items-center gap-4 md:gap-6">
-                    <!-- Language Toggle Web App -->
                     <button onclick="toggleLang()" id="lang-btn-app" class="glass px-3 py-1.5 rounded-lg text-xs font-bold text-white border border-white/20 shadow-[0_0_10px_rgba(255,0,0,0.2)] flex items-center gap-2 hover:bg-white/10 transition">
                         <i class="fas fa-globe"></i> <span id="lang-txt-app">ID</span>
                     </button>
 
-                    <!-- Skor -->
                     <div class="hidden md:flex flex-col items-end mr-2">
                         <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold" data-i18n="header_pts">Total Poin On-Chain</div>
                         <div class="font-black text-xl text-yellow-400 drop-shadow-[0_0_8px_rgba(255,200,0,0.5)] flex items-center gap-2">
@@ -178,12 +157,10 @@
                         </div>
                     </div>
                     
-                    <!-- Connect Wallet Button -->
                     <button id="btn-connect-wallet" onclick="connectWallet()" class="hidden md:flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-4 py-1.5 rounded-full text-xs font-bold border border-white/20 shadow-[0_0_10px_rgba(150,50,255,0.4)] transition transform hover:-translate-y-0.5">
                         <i class="fab fa-ethereum"></i> <span id="wallet-text" data-i18n="btn_wallet">Connect Wallet</span>
                     </button>
 
-                    <!-- Profil -->
                     <div class="flex items-center gap-3 bg-black/40 py-1.5 px-1.5 pr-4 rounded-full border border-white/10 shadow-inner">
                         <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-red-500 to-red-800 flex items-center justify-center text-white font-black text-lg border-2 border-black" id="display-initial">U</div>
                         <span class="font-bold text-sm text-gray-200 max-w-[100px] truncate" id="display-username">User</span>
@@ -191,12 +168,9 @@
                 </div>
             </header>
 
-            <!-- KONTEN DINAMIS -->
             <div class="flex-1 overflow-y-auto p-4 md:p-8 relative scroll-smooth" id="main-scroll">
                 
-                <!-- TAB 1: MARKET -->
                 <div id="view-market" class="tab-view block space-y-8 max-w-7xl mx-auto">
-                    <!-- Welcome Hero -->
                     <div class="glass p-8 rounded-[2rem] flex flex-col md:flex-row items-center justify-between border border-red-500/30 relative overflow-hidden bg-gradient-to-br from-red-900/40 to-black/60 shadow-2xl">
                         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-yellow-500 to-red-600"></div>
                         <div class="z-10">
@@ -205,12 +179,10 @@
                         </div>
                         <div class="mt-6 md:mt-0 relative z-10">
                             <div class="w-32 h-32 md:w-48 md:h-48 bg-gradient-to-tr from-red-600/20 to-transparent rounded-full flex items-center justify-center absolute -top-4 -right-4 blur-xl"></div>
-                            <!-- Hero Mascot Pose 5.png -->
                             <img src="5.png" class="w-28 h-28 md:w-40 md:h-40 mascot-float relative z-10" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2665/2665171.png'">
                         </div>
                     </div>
 
-                    <!-- Market Filters -->
                     <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                         <button class="filter-btn active-filter px-6 py-2.5 rounded-full font-bold text-sm border-2 border-red-500 bg-red-600 text-white shadow-[0_0_15px_rgba(255,0,0,0.4)] whitespace-nowrap transition" onclick="filterMarket('Semua', this)"><span data-i18n="filter_all">🔥 Semua Event</span></button>
                         <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('Sepak Bola', this)"><span data-i18n="filter_soc">⚽ Sepak Bola</span></button>
@@ -218,13 +190,9 @@
                         <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('E-Sports', this)"><span data-i18n="filter_es">🎮 E-Sports</span></button>
                     </div>
 
-                    <!-- Market Grid -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="matches-container">
-                        <!-- Dimasukkan lewat JS -->
-                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="matches-container"></div>
                 </div>
 
-                <!-- TAB 2: JURNAL -->
                 <div id="view-journal" class="tab-view hidden max-w-7xl mx-auto space-y-6">
                     <div class="glass rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
                         <div class="bg-gradient-to-r from-red-900/50 to-black p-6 border-b border-red-500/30 flex items-center gap-4">
@@ -245,15 +213,12 @@
                                         <th class="p-5 text-right" data-i18n="th_time">Waktu</th>
                                     </tr>
                                 </thead>
-                                <tbody id="table-journal" class="divide-y divide-white/5 text-sm font-medium">
-                                    <!-- Diisi lewat JS -->
-                                </tbody>
+                                <tbody id="table-journal" class="divide-y divide-white/5 text-sm font-medium"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 3: FORUM -->
                 <div id="view-forum" class="tab-view hidden max-w-4xl mx-auto space-y-6">
                     <div class="glass p-6 rounded-3xl border border-red-500/20 bg-black/60 shadow-2xl">
                         <div class="flex gap-4">
@@ -266,17 +231,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="space-y-4" id="forum-feed">
-                        <!-- Diisi JS -->
-                    </div>
+                    <div class="space-y-4" id="forum-feed"></div>
                 </div>
 
-                <!-- TAB 4: LEADERBOARD -->
                 <div id="view-leaderboard" class="tab-view hidden max-w-5xl mx-auto">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Profil Stats -->
                         <div class="md:col-span-1 glass p-6 rounded-3xl border border-red-500/30 text-center flex flex-col items-center bg-gradient-to-b from-black to-red-950/40">
-                            <!-- User Leaderboard Pose 8.png -->
                             <img src="8.png" class="w-24 h-24 mb-4 drop-shadow-[0_0_20px_rgba(255,0,0,0.5)]">
                             <div class="text-sm font-bold text-red-400 uppercase tracking-widest mb-1" data-i18n="ld_rank">Peringkat Anda</div>
                             <h3 class="text-3xl font-black text-white mb-6">#42</h3>
@@ -293,7 +253,6 @@
                             </div>
                         </div>
                         
-                        <!-- Peringkat Global -->
                         <div class="md:col-span-2 glass p-6 rounded-3xl border border-white/10">
                             <h4 class="font-black text-xl mb-6 flex items-center gap-3"><i class="fas fa-globe-asia text-blue-400"></i> <span data-i18n="ld_top">Top 3 Analis Global</span></h4>
                             <div class="space-y-3">
@@ -320,7 +279,7 @@
                                     </div>
                                 </div>
                                 <div class="bg-gradient-to-r from-orange-900/40 to-black p-4 rounded-2xl border border-orange-500/30 flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center font-black text-xl shadow-lg">3</div>
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center font-black text-black text-xl shadow-lg">3</div>
                                     <div class="flex-1">
                                         <div class="font-bold text-lg text-white">CryptoNusa</div>
                                         <div class="text-xs text-orange-200">820 Prediksi Akurat</div>
@@ -334,7 +293,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </main>
     </div>
@@ -353,9 +311,7 @@
             <div class="space-y-6">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3" data-i18n="mod_q">Siapa yang akan menang?</label>
-                    <select id="mp-selection" class="w-full bg-black/80 border-2 border-red-500/50 rounded-xl p-4 text-white text-lg font-bold focus:outline-none focus:border-red-400 cursor-pointer appearance-none">
-                        <!-- Options via JS -->
-                    </select>
+                    <select id="mp-selection" class="w-full bg-black/80 border-2 border-red-500/50 rounded-xl p-4 text-white text-lg font-bold focus:outline-none focus:border-red-400 cursor-pointer appearance-none"></select>
                 </div>
                 
                 <div>
@@ -371,12 +327,11 @@
         </div>
     </div>
 
-    <!-- AI CHAT MENGAPUNG (SARI) -->
+    <!-- AI CHAT SARI -->
     <div class="fixed bottom-24 md:bottom-8 right-6 z-[90] flex flex-col items-end">
         <div id="ai-chat-window" class="hidden w-full max-w-[340px] glass rounded-3xl shadow-2xl overflow-hidden border border-red-500/50 flex-col h-[450px] mb-4 transform transition-all duration-300 origin-bottom-right scale-95 opacity-0">
             <div class="bg-gradient-to-r from-red-900 to-black p-4 flex justify-between items-center border-b border-red-500/30">
                 <div class="flex items-center gap-3">
-                    <!-- Head Icon Mascot Chat 6.png -->
                     <img src="6.png" class="w-10 h-10 rounded-full border-2 border-red-400 bg-black/50 shadow-lg object-contain p-0.5">
                     <div>
                         <div class="font-bold text-white text-sm">Sari AI 🌸</div>
@@ -388,7 +343,6 @@
             
             <div id="ai-messages" class="flex-1 min-h-0 p-4 overflow-y-auto space-y-4 bg-black/70 scroll-smooth">
                 <div class="flex gap-3 max-w-[90%]">
-                    <!-- Message Mascot Pose 9.png -->
                     <img src="9.png" class="w-8 h-8 border border-red-500/50 rounded-full bg-black/50 shrink-0 object-contain p-0.5">
                     <div class="bg-red-900/60 border border-red-500/30 text-white text-sm p-3 rounded-2xl rounded-tl-none shadow-md" id="ai-greet-txt">
                         Halo Kakak! Aku Sari. Butuh bocoran pergerakan uang on-chain hari ini? Tanya aja ke Sari ya! 🌸
@@ -402,23 +356,17 @@
             </div>
         </div>
 
-        <!-- Floating Chat Icon Pose 7.png -->
         <button onclick="toggleAIChat()" class="relative transform transition hover:scale-110 active:scale-95 drop-shadow-[0_0_20px_rgba(255,0,0,0.6)]">
             <img src="7.png" alt="Chat AI" class="w-16 h-16 md:w-20 md:h-20 mascot-float object-contain">
             <span class="absolute top-0 right-0 w-4 h-4 bg-green-500 border-2 border-black rounded-full animate-pulse"></span>
         </button>
     </div>
 
-    
-    <!-- JAVASCRIPT UTAMA -->
-    <!-- Firebase Realtime Database (Compat v10) -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     
     <script>
-        // =========================================================================
-        // KONFIGURASI FIREBASE KAKAK (WAJIB DIISI AGAR FITUR GLOBAL AKTIF)
-        // =========================================================================
         const firebaseConfig = {
               apiKey: "AIzaSyDFm2nI0fNo6zkbM3mIA5hqY5l4ml-7U5Y",
               authDomain: "percobaan-1-b20ba.firebaseapp.com",
@@ -429,23 +377,17 @@
               measurementId: "G-0Y87JLV6XL"
         };
 
-        // Inisialisasi Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.database();
 
-        // =========================================================================
-        // KONFIGURASI GEMINI API (WAJIB DIISI AGAR SARI PINTAR)
-        // =========================================================================
+        // ========== API KEY GEMINI ==========
         const GEMINI_API_KEY = "AQ.Ab8RN6J068KyE7zTEhj85r4571uqtT_TKrprgndaNb1XwEG5kg";
         
         let aiChatHistory = [];
 
-
-        // ----------------------------------------------------
-        // I18N (SISTEM 2 BAHASA)
-        // ----------------------------------------------------
+        // I18N
         const i18n = {
             id: {
                 app_title: "Nusantara Predict",
@@ -627,11 +569,7 @@
             setLang(currentLang === 'id' ? 'en' : 'id');
         }
 
-        // ----------------------------------------------------
-        // DATA MASTER PERTANDINGAN
-        // ----------------------------------------------------
         const DB_MATCHES = [
-            // SEPAK BOLA
             { id: 1, title: 'Timnas Indonesia vs Arab Saudi', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.80', o2: '1.60', teams: ['Indonesia Menang', 'Seri', 'Arab Saudi Menang'] },
             { id: 2, title: 'Arsenal vs Manchester City', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.60', o2: '2.40', teams: ['Arsenal Menang', 'Seri', 'Man City Menang'] },
             { id: 3, title: 'Persija Jakarta vs Persib Bandung', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.10', o2: '2.80', teams: ['Persija Menang', 'Seri', 'Persib Menang'] },
@@ -644,8 +582,6 @@
             { id: 12, title: 'Chelsea vs Tottenham', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.40', o2: '2.30', teams: ['Chelsea Menang', 'Seri', 'Tottenham Menang'] },
             { id: 29, title: 'Persebaya vs Arema FC', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.15', o2: '2.35', teams: ['Persebaya Menang', 'Seri', 'Arema Menang'] },
             { id: 30, title: 'Atletico Madrid vs Sevilla', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.75', o2: '2.80', teams: ['Atletico Menang', 'Seri', 'Sevilla Menang'] },
-            
-            // BASKET
             { id: 4, title: 'LA Lakers vs G.S. Warriors', category: 'Basket', catKey: 'cat_basket', o1: '1.90', o2: '1.85', teams: ['Lakers Menang', 'Warriors Menang'] },
             { id: 13, title: 'Boston Celtics vs Miami Heat', category: 'Basket', catKey: 'cat_basket', o1: '1.60', o2: '2.40', teams: ['Celtics Menang', 'Heat Menang'] },
             { id: 14, title: 'Chicago Bulls vs NY Knicks', category: 'Basket', catKey: 'cat_basket', o1: '2.10', o2: '1.75', teams: ['Bulls Menang', 'Knicks Menang'] },
@@ -656,8 +592,6 @@
             { id: 19, title: 'Prawira Bandung vs Dewa United', category: 'Basket', catKey: 'cat_basket', o1: '2.30', o2: '1.65', teams: ['Prawira Menang', 'Dewa United Menang'] },
             { id: 31, title: 'Toronto Raptors vs Brooklyn Nets', category: 'Basket', catKey: 'cat_basket', o1: '2.50', o2: '1.55', teams: ['Raptors Menang', 'Nets Menang'] },
             { id: 32, title: 'Bima Perkasa vs PSS Sleman', category: 'Basket', catKey: 'cat_basket', o1: '1.95', o2: '1.85', teams: ['Bima Perkasa Menang', 'PSS Sleman Menang'] },
-            
-            // E-SPORTS
             { id: 5, title: 'RRQ Hoshi vs ONIC Esports', category: 'E-Sports', catKey: 'cat_esport', o1: '1.75', o2: '2.05', teams: ['RRQ Menang', 'ONIC Menang'] },
             { id: 20, title: 'EVOS Legends vs Alter Ego', category: 'E-Sports', catKey: 'cat_esport', o1: '1.90', o2: '1.85', teams: ['EVOS Menang', 'Alter Ego Menang'] },
             { id: 21, title: 'T1 vs Gen.G (LoL)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.65', o2: '2.20', teams: ['T1 Menang', 'Gen.G Menang'] },
@@ -680,19 +614,9 @@
         let forumListener = null;
         let journalListener = null;
 
-        // ----------------------------------------------------
-        // SISTEM OTENTIKASI & FIREBASE SYNC
-        // ----------------------------------------------------
         window.onload = () => {
             setLang('id');
             initApp();
-            
-            // Peringatan jika Firebase Config masih kosong
-            if(firebaseConfig.apiKey === "ISI_API_KEY_ANDA_DISINI") {
-                setTimeout(() => {
-                    showToast("⚠️ Psst Kak! API Key Firebase belum diisi di kode HTML lho. Nanti datanya nggak bisa nyambung global ✨");
-                }, 2000);
-            }
         };
 
         function initApp() {
@@ -798,9 +722,6 @@
             }
         }
 
-        // ----------------------------------------------------
-        // DASHBOARD & CLOUD LISTENER
-        // ----------------------------------------------------
         function loadDashboardData() {
             document.getElementById('display-username').innerText = SESSION_USER;
             document.getElementById('hero-name').innerText = SESSION_USER;
@@ -809,7 +730,6 @@
 
             renderMarket(window.activeCategory || 'Semua');
             
-            // Jurnal Real-time dari Cloud
             if(journalListener) db.ref('journals/' + SESSION_USER).off('value', journalListener);
             journalListener = db.ref('journals/' + SESSION_USER).on('value', (snapshot) => {
                 USER_JOURNAL = snapshot.val() || [];
@@ -817,7 +737,6 @@
                 updateUserStats();
             });
 
-            // Forum Real-time dari Cloud (Bisa dilihat Semua Orang)
             if(forumListener) db.ref('forum').off('value', forumListener);
             forumListener = db.ref('forum').on('value', (snapshot) => {
                 if(snapshot.exists()) {
@@ -927,7 +846,6 @@
             if(!USER_JOURNAL) USER_JOURNAL = [];
             USER_JOURNAL.unshift({ title: ACTIVE_MATCH.title, pick: sel, conf: conf, time: timeStr });
             
-            // Push Real-time ke Cloud Firebase
             db.ref('journals/' + SESSION_USER).set(USER_JOURNAL).then(() => {
                 closeModal('modal-predict');
                 showToast(t("toast_pred_ok"));
@@ -972,9 +890,6 @@
             document.getElementById('stat-wr').innerText = total > 0 ? (60 + Math.min(total*2, 35)) + "%" : "0%";
         }
 
-        // ----------------------------------------------------
-        // FORUM & AI CHAT
-        // ----------------------------------------------------
         function renderForum() {
             const feed = document.getElementById('forum-feed');
             feed.innerHTML = '';
@@ -1009,7 +924,6 @@
             FORUM_POSTS.unshift({ user: SESSION_USER, text: txt, time: timeStr, ai: false });
             if(FORUM_POSTS.length > 50) FORUM_POSTS.pop();
             
-            // Tembak Real-time ke Firebase (Global)
             db.ref('forum').set(FORUM_POSTS).then(() => {
                 input.value = '';
                 showToast(t("toast_post_ok"));
@@ -1018,7 +932,6 @@
             });
         }
 
-        // AI Chat Engine - Feminine Edition
         function toggleAIChat() {
             const win = document.getElementById('ai-chat-window');
             if(win.classList.contains('hidden')) {
@@ -1059,24 +972,15 @@
                     </div>
                 </div>
             `;
-            // Trigger layout recalculation before scrolling to ensure smooth scroll to bottom
             setTimeout(() => {
                 box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
             }, 50);
 
-            // Fetch Response dari Gemini API
-            let res = "";
-            if (GEMINI_API_KEY === "ISI_API_KEY_GEMINI_ANDA_DISINI" || !GEMINI_API_KEY) {
-                res = "Maaf Kak, API Key Gemini belum diisi nih. Sari jadi belum bisa mikir pintar pakai otak AI sungguhan 🥺 Masukkan API Key dulu ya di *source code*-nya!";
-            } else {
-                res = await generateSariSpace(txt);
-            }
+            let res = await generateSariSpace(txt);
 
-            // Hapus indikator mengetik
             const typingEl = document.getElementById(typingId);
             if(typingEl) typingEl.remove();
             
-            // Render Markdown Ringan (Bold, Italic, Newlines)
             const formattedRes = res
                 .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
                 .replace(/\*(.*?)\*/g, '<i>$1</i>')
@@ -1095,10 +999,10 @@
             }, 50);
         }
 
+        // ========== FUNGSI AI SARI (FORMAT BARU) ==========
         async function generateSariSpace(message) {
             const userName = SESSION_USER || "Kakak";
             
-            // Analisis data aktivitas tebakan on-chain Kakak
             let favCat = "Belum ada", favTeam = "Belum ada", winRateStr = "0%", totalPred = USER_JOURNAL ? USER_JOURNAL.length : 0;
             if (USER_JOURNAL && USER_JOURNAL.length > 0) {
                 let catCounts = { 'Sepak Bola': 0, 'Basket': 0, 'E-Sports': 0 };
@@ -1120,45 +1024,18 @@ Fakta tentangmu: Tim favoritmu RRQ Hoshi (E-Sports) dan LA Lakers (Basket).
 Fakta pengguna: Total Prediksi: ${totalPred}, Kategori favorit: ${favCat}, Tim jagoan: ${favTeam}, Win Rate: ${winRateStr}.
 Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu panjang.`;
 
-            // Siapkan history untuk Gemini
-            let contents = [];
-            
-            // Tambahkan system instruction sebagai pesan pertama
-            contents.push({
-                role: "user",
-                parts: [{ text: sysPrompt }]
-            });
-            contents.push({
-                role: "model",
-                parts: [{ text: "Siap Kak! Aku Sari, siap bantu analisis on-chain dan prediksi olahraga. Tanya aja ya 🌸" }]
-            });
-
-            // Tambahkan history chat sebelumnya
-            for (let i = 0; i < aiChatHistory.length; i++) {
-                contents.push(aiChatHistory[i]);
-            }
-
-            // Tambahkan pesan user saat ini
-            contents.push({
-                role: "user",
-                parts: [{ text: message }]
-            });
-
             try {
                 const response = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+                    "https://generativelanguage.googleapis.com/v1beta/interactions",
                     {
                         method: "POST",
                         headers: { 
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "x-goog-api-key": GEMINI_API_KEY
                         },
                         body: JSON.stringify({
-                            contents: contents,
-                            generationConfig: {
-                                temperature: 0.8,
-                                maxOutputTokens: 250,
-                                topP: 0.9
-                            }
+                            model: "gemini-2.0-flash",
+                            input: sysPrompt + "\n\nPertanyaan user: " + message
                         })
                     }
                 );
@@ -1167,6 +1044,7 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
                 
                 if (!response.ok) {
                     console.error("Gemini Error:", responseData);
+                    
                     if (response.status === 401 || response.status === 403) {
                         return "Aduh Kak, API Key Gemini-nya sepertinya tidak valid atau expired. Coba cek lagi di Google AI Studio ya 🥺";
                     }
@@ -1176,13 +1054,15 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
                     throw new Error(responseData.error?.message || response.statusText);
                 }
 
-                let replyText = responseData.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf Kak, Sari lagi blank. Coba tanya lagi ya 🥺";
+                let replyText = responseData.text 
+                    || responseData.output 
+                    || responseData.candidates?.[0]?.content?.parts?.[0]?.text 
+                    || responseData.response 
+                    || "Maaf Kak, Sari lagi blank. Coba tanya lagi ya 🥺";
 
-                // Simpan ke history
                 aiChatHistory.push({ role: "user", parts: [{ text: message }] });
                 aiChatHistory.push({ role: "model", parts: [{ text: replyText }] });
 
-                // Batasi history biar tidak terlalu panjang
                 if (aiChatHistory.length > 12) {
                     aiChatHistory = aiChatHistory.slice(-12);
                 }
@@ -1200,7 +1080,6 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
             }
         }
 
-        // UTILS
         function showToast(msg) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -1215,16 +1094,10 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
             }, 3000);
         }
     
-        // ----------------------------------------------------
-        // WEB3 & CRYPTO WALLET (HANYA SLUSH WALLET)
-        // ----------------------------------------------------
         let userWalletAddress = null;
 
         async function connectWallet() {
             const walletBtn = document.getElementById('wallet-text');
-            
-            // Pengecekan eksklusif HANYA untuk Sush Wallet
-            // Slush Wallet biasanya menyuntikkan window.slush atau menetapkan isSlushWallet pada window.ethereum
             const isSlushWallet = typeof window.slush !== 'undefined' || (typeof window.ethereum !== 'undefined' && window.ethereum.isSlushWallet);
             
             if (isSlushWallet) {
@@ -1254,12 +1127,10 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
                     showToast(t("toast_wallet_err"));
                 }
             } else {
-                // Tolak dompet lain dan beri peringatan
                 showToast(t("toast_wallet_ext"));
             }
         }
 
-        // Listener jika user mengganti akun langsung dari ekstensi Sush Wallet
         const activeSlushProvider = window.slush || (typeof window.ethereum !== 'undefined' && window.ethereum.isSlushWallet ? window.ethereum : null);
         
         if (activeSlushProvider) {
