@@ -1102,11 +1102,18 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
 
         async function connectWallet() {
             const walletBtn = document.getElementById('wallet-text');
-            const provider = window.slush || window.ethereum;
             
-            if (typeof provider !== 'undefined') {
+            // Mencari spesifik Slush Wallet, abaikan MetaMask
+            let provider = null;
+            if (typeof window.slush !== 'undefined') {
+                provider = window.slush;
+            } else if (typeof window.ethereum !== 'undefined' && window.ethereum.isSlushWallet) {
+                provider = window.ethereum;
+            }
+            
+            if (provider) {
                 try {
-                    showToast("⏳ Sedang menghubungkan Dompet Web3...");
+                    showToast("⏳ Sedang menghubungkan Slush Wallet...");
                     
                     const accounts = await provider.request({ method: 'eth_requestAccounts' });
                     
@@ -1134,7 +1141,7 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
             }
         }
 
-        const activeSlushProvider = window.slush || (typeof window.ethereum !== 'undefined' ? window.ethereum : null);
+        const activeSlushProvider = typeof window.slush !== 'undefined' ? window.slush : (typeof window.ethereum !== 'undefined' && window.ethereum.isSlushWallet ? window.ethereum : null);
         
         if (activeSlushProvider) {
             activeSlushProvider.on('accountsChanged', function (accounts) {
