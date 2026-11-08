@@ -950,10 +950,16 @@
             }
         }
 
+                let isAITyping = false;
+
         async function sendToAI() {
+            if (isAITyping) return;
+            
             const inp = document.getElementById('ai-input');
             const txt = inp.value.trim();
             if(!txt) return;
+            
+            isAITyping = true;
             
             const box = document.getElementById('ai-messages');
             box.innerHTML += `
@@ -964,7 +970,8 @@
                 </div>
             `;
             inp.value = '';
-            box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
+            
+            setTimeout(() => { box.scrollTop = box.scrollHeight; }, 10);
 
             const typingId = 'typing-' + Date.now();
             box.innerHTML += `
@@ -977,9 +984,8 @@
                     </div>
                 </div>
             `;
-            setTimeout(() => {
-                box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
-            }, 50);
+            
+            setTimeout(() => { box.scrollTop = box.scrollHeight; }, 10);
 
             let res = await generateSariSpace(txt);
 
@@ -989,7 +995,8 @@
             const formattedRes = res
                 .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
                 .replace(/\*(.*?)\*/g, '<i>$1</i>')
-                .replace(/\n/g, '<br>');
+                .replace(/
+/g, '<br>');
             
             box.innerHTML += `
                 <div class="flex gap-3 max-w-[90%] mt-2">
@@ -999,9 +1006,10 @@
                     </div>
                 </div>
             `;
-            setTimeout(() => {
-                box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
-            }, 50);
+            
+            setTimeout(() => { box.scrollTop = box.scrollHeight; }, 10);
+            
+            isAITyping = false;
         }
 
         // ========== FUNGSI AI SARI (FORMAT BARU) ==========
@@ -1022,20 +1030,25 @@
                 winRateStr = (60 + Math.min(USER_JOURNAL.length * 2, 35)) + "%";
             }
 
-            const sysPrompt = `Kamu adalah "Sari", asisten AI virtual berwujud gadis manis, ceria, interaktif, dan expert dalam dunia Web3, blockchain, serta prediksi on-chain pasar olahraga. 
-Karaktermu: Logis berbasis data statistik namun bicaranya hangat, kadang sedikit manja/genit, tapi berpendirian teguh.
-Gunakan bahasa Indonesia sehari-hari ala anak muda. Panggil pengguna dengan nama "${userName}".
-Fakta tentangmu: Tim favoritmu RRQ Hoshi (E-Sports) dan LA Lakers (Basket).
-Fakta pengguna: Total Prediksi: ${totalPred}, Kategori favorit: ${favCat}, Tim jagoan: ${favTeam}, Win Rate: ${winRateStr}.
-Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu panjang.`;
+            const sysPrompt = `[INSTRUKSI SISTEM: Kamu adalah "Sari", asisten AI virtual berwujud gadis manis, ceria, interaktif, dan expert dalam dunia Web3, blockchain, serta prediksi on-chain pasar olahraga. Logis berbasis data statistik namun bicaranya hangat, kadang sedikit manja/genit, tapi berpendirian teguh. Gunakan bahasa Indonesia gaul/sehari-hari ala anak muda. Panggil pengguna dengan nama "${userName}". Tim favoritmu RRQ Hoshi (E-Sports) dan LA Lakers (Basket). Fakta pengguna: Total Prediksi: ${totalPred}, Kategori favorit: ${favCat}, Tim jagoan: ${favTeam}, Win Rate: ${winRateStr}. Jawab maksimal 2-3 kalimat langsung ke intinya.]
 
-            // Salin riwayat percakapan yang sudah ada untuk dikirim sebagai konteks
+`;
+
             let chatContents = [...aiChatHistory];
             
-            // Tambahkan pesan user yang baru ke dalam antrian pengiriman
+            let finalUserMessage = message;
+            if (chatContents.length === 0) {
+                // Pesan pertama: Gabungkan instruksi sistem agar AI tahu identitasnya
+                finalUserMessage = sysPrompt + message;
+            } else {
+                // Pesan selanjutnya: Sisipkan update statistik kecil
+                finalUserMessage = `[Update Info User -> Prediksi: ${totalPred}, WR: ${winRateStr}]
+` + message;
+            }
+
             chatContents.push({
                 role: "user",
-                parts: [{ text: message }]
+                parts: [{ text: finalUserMessage }]
             });
 
             try {
@@ -1047,10 +1060,7 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            systemInstruction: {
-                                parts: [{ text: sysPrompt }]
-                            },
-                            contents: chatContents
+                            contents: chatContents // Langsung kirim contents, tanpa systemInstruction yang rawan bug di multi-turn
                         })
                     }
                 );
@@ -1060,13 +1070,12 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
                 if (!response.ok) {
                     console.error("Gemini Error:", responseData);
                     
-                    if (response.status === 400 && responseData.error?.message?.includes('contents')) {
-                        // Jika struktur riwayat rusak, reset memori dan minta user ulang
+                    if (response.status === 400) {
                         aiChatHistory = [];
                         return "Uh oh, memori percakapan kita sepertinya kusut nih Kak. Sari udah reset memorinya, coba tanya lagi ya 🥺";
                     }
                     if (response.status === 401 || response.status === 403) {
-                        return "Aduh Kak, API Key Gemini-nya sepertinya tidak valid. Coba cek lagi ya 🥺";
+                        return "Aduh Kak, API Key Gemini-nya sepertinya tidak valid atau limit habis. Coba cek lagi ya 🥺";
                     }
                     if (response.status === 429) {
                         return "Sabar ya Kak, limit API Gemini lagi penuh. Coba lagi beberapa saat lagi 🌸";
@@ -1074,15 +1083,22 @@ Aturan: Jawab maksimal 2-3 kalimat pendek langsung ke intinya. Jangan terlalu pa
                     throw new Error(responseData.error?.message || response.statusText);
                 }
 
-                let replyText = responseData.candidates[0].content.parts[0].text;
+                let replyText = responseData.candidates[0].content?.parts[0]?.text;
+                if (!replyText) {
+                    return "Waduh, pesan Kakak sepertinya kena filter keamanan nih. Coba pakai bahasa yang lain ya 🌸";
+                }
 
-                // Jika berhasil, simpan pesan user dan balasan AI ke memori lokal
-                aiChatHistory.push({ role: "user", parts: [{ text: message }] });
+                // Simpan ke memori lokal
+                if (aiChatHistory.length === 0) {
+                    aiChatHistory.push({ role: "user", parts: [{ text: sysPrompt + message }] });
+                } else {
+                    aiChatHistory.push({ role: "user", parts: [{ text: message }] });
+                }
                 aiChatHistory.push({ role: "model", parts: [{ text: replyText }] });
 
-                // Batasi memori maksimal 20 percakapan terakhir agar request tidak kepanjangan
-                if (aiChatHistory.length > 20) {
-                    aiChatHistory = aiChatHistory.slice(-20);
+                // Batasi memori maksimal 16 percakapan terakhir agar tidak berat
+                if (aiChatHistory.length > 16) {
+                    aiChatHistory = aiChatHistory.slice(-16);
                 }
 
                 return replyText;
