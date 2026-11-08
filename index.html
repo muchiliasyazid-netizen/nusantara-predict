@@ -1138,7 +1138,7 @@ Aturan membalas: Jawab dengan singkat, asyik, dan langsung ke poinnya. Jangan le
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        system_instruction: { parts: [{ text: sysPrompt }] },
+                        systemInstruction: { parts: [{ text: sysPrompt }] },
                         contents: aiChatHistory,
                         generationConfig: {
                             temperature: 0.7,
