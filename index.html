@@ -42,7 +42,6 @@
         .force-hide { display: none !important; }
         .force-show { display: block !important; }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative">
 
@@ -576,7 +575,7 @@
         const DB_MATCHES = [
             { id: 1, title: 'Timnas Indonesia vs Arab Saudi', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.80', o2: '1.60', teams: ['Indonesia Menang', 'Seri', 'Arab Saudi Menang'] },
             { id: 2, title: 'Arsenal vs Manchester City', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.60', o2: '2.40', teams: ['Arsenal Menang', 'Seri', 'Man City Menang'] },
-            { id: 3, title: 'Persija Jakarta vs Persib Bandung', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.10', o2: '2.80', teams: ['Persija Menang', 'Seri', 'Persib Menang'] },
+            { id: 3, title: 'Persija Jakarta vs Persib Jakarta', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.10', o2: '2.80', teams: ['Persija Menang', 'Seri', 'Persib Menang'] },
             { id: 6, title: 'Real Madrid vs Barcelona', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.85', o2: '2.10', teams: ['Real Madrid Menang', 'Seri', 'Barcelona Menang'] },
             { id: 7, title: 'Manchester United vs Liverpool', category: 'Sepak Bola', catKey: 'cat_football', o1: '3.10', o2: '1.75', teams: ['Man United Menang', 'Seri', 'Liverpool Menang'] },
             { id: 8, title: 'Bayern Munich vs B. Dortmund', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.40', o2: '3.50', teams: ['Bayern Menang', 'Seri', 'Dortmund Menang'] },
@@ -1032,7 +1031,6 @@ User facts: Total Predictions: ${totalPred}, Favorite Category: ${favCat}, Favor
 Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make it too long.`;
 
             try {
-                // Menggunakan model gemini-3.5-flash-lite agar respon stabil, cepat, dan up-to-date
                 const response = await fetch(
                     `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
                     {
@@ -1103,22 +1101,31 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
         async function connectWallet() {
             const walletBtn = document.getElementById('wallet-text');
             
-            // Mencari spesifik Slush Wallet, abaikan MetaMask
-            let provider = null;
-            if (typeof window.slush !== 'undefined') {
-                provider = window.slush;
-            } else if (typeof window.ethereum !== 'undefined' && window.ethereum.isSlushWallet) {
-                provider = window.ethereum;
-            }
+            // Slush Wallet berjalan di jaringan SUI
+            // Kita cari object 'slush' atau 'suiWallet' di browser
+            let provider = window.slush || window.suiWallet;
             
             if (provider) {
                 try {
                     showToast("⏳ Sedang menghubungkan Slush Wallet...");
                     
-                    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                    let accounts = [];
                     
-                    if (accounts.length > 0) {
-                        userWalletAddress = accounts[0];
+                    // Meminta izin koneksi ke dompet SUI
+                    if (typeof provider.requestPermissions === 'function') {
+                        await provider.requestPermissions();
+                    } else if (typeof provider.connect === 'function') {
+                        await provider.connect();
+                    }
+
+                    // Mengambil data akun wallet-nya
+                    if (typeof provider.getAccounts === 'function') {
+                        accounts = await provider.getAccounts();
+                    }
+                    
+                    // Format response Sui biasanya berupa array string atau object
+                    if (accounts && accounts.length > 0) {
+                        userWalletAddress = typeof accounts[0] === 'string' ? accounts[0] : accounts[0].address;
                         
                         const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
                         
@@ -1131,22 +1138,24 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
                         }
                         
                         showToast(t("toast_wallet_ok"));
+                    } else {
+                        showToast("❌ Tidak ada alamat wallet yang dipilih.");
                     }
                 } catch (error) {
                     console.error("Wallet connection failed:", error);
-                    showToast(t("toast_wallet_err"));
+                    showToast("❌ Koneksi ditolak oleh Slush Wallet.");
                 }
             } else {
                 showToast(t("toast_wallet_ext"));
             }
         }
 
-        const activeSlushProvider = typeof window.slush !== 'undefined' ? window.slush : (typeof window.ethereum !== 'undefined' && window.ethereum.isSlushWallet ? window.ethereum : null);
-        
-        if (activeSlushProvider) {
+        // Listener jika pengguna mengganti akun di dalam extension Slush Wallet
+        const activeSlushProvider = window.slush || window.suiWallet;
+        if (activeSlushProvider && typeof activeSlushProvider.on === 'function') {
             activeSlushProvider.on('accountsChanged', function (accounts) {
-                if (accounts.length > 0) {
-                    userWalletAddress = accounts[0];
+                if (accounts && accounts.length > 0) {
+                    userWalletAddress = typeof accounts[0] === 'string' ? accounts[0] : accounts[0].address;
                     const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
                     document.getElementById('wallet-text').innerText = shortAddress;
                     if (SESSION_USER) {
