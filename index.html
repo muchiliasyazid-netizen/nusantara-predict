@@ -1148,7 +1148,13 @@ Aturan membalas: Jawab dengan singkat, asyik, dan langsung ke poinnya. Jangan le
                 });
 
                 const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
+                
+                // DETEKSI ERROR DARI GOOGLE
+                if (!response.ok || data.error) {
+                    const errorMsg = data.error ? data.error.message : response.statusText;
+                    console.error("❌ Detail Error Gemini API:", data.error || data);
+                    throw new Error(errorMsg);
+                }
 
                 const replyText = data.candidates[0].content.parts[0].text;
                 
@@ -1157,8 +1163,23 @@ Aturan membalas: Jawab dengan singkat, asyik, dan langsung ke poinnya. Jangan le
 
                 return replyText;
             } catch (error) {
-                console.error("Gemini API Error:", error);
-                return "Aduh Kak, koneksi otak Sari ke jaringan AI lagi gangguan nih. Coba sapa Sari lagi beberapa menit ya! 🥺";
+                console.error("🚨 Sari Gagal Merespons:", error.message);
+                
+                // PENTING: Hapus pesan user terakhir dari memori jika API gagal, agar urutan (user-model-user) tidak rusak!
+                if(aiChatHistory.length > 0 && aiChatHistory[aiChatHistory.length - 1].role === "user") {
+                    aiChatHistory.pop();
+                }
+                
+                // Tampilkan pesan error spesifik langsung di UI chat
+                if(error.message.includes("API_KEY_INVALID") || error.message.includes("API key not valid")) {
+                    return "Maaf Kak, API Key-nya ditolak sama server Google. Pastikan tidak ada spasi yang ikut ter-copy ya! 🥺";
+                } else if(error.message.includes("ACCESS_TOKEN_TYPE_UNSUPPORTED") || error.message.includes("401")) {
+                    return "Aduh Kak, server Google menolak akses (Error 401). Ini kadang terjadi pada API Key format baru ('AQ.'). Coba buat kunci baru lagi di AI Studio atau pastikan project Google Cloud-nya aktif ya! 🥺";
+                } else if(error.message.includes("400") || error.message.includes("Bad Request")) {
+                     return "Duh, ada yang salah sama data yang dikirim ke otak Sari (Error 400). Coba muat ulang (refresh) halaman ini ya Kak! 🔄";
+                } else {
+                    return `Aduh Kak, koneksi otak Sari gangguan. *(Pesan Error: ${error.message})* 🥺`;
+                }
             }
         }
 
