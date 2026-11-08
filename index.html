@@ -950,7 +950,7 @@
             }
         }
 
-                let isAITyping = false;
+        let isAITyping = false;
 
         async function sendToAI() {
             if (isAITyping) return;
@@ -995,8 +995,7 @@
             const formattedRes = res
                 .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
                 .replace(/\*(.*?)\*/g, '<i>$1</i>')
-                .replace(/
-/g, '<br>');
+                .replace(/\n/g, '<br>');
             
             box.innerHTML += `
                 <div class="flex gap-3 max-w-[90%] mt-2">
@@ -1030,20 +1029,15 @@
                 winRateStr = (60 + Math.min(USER_JOURNAL.length * 2, 35)) + "%";
             }
 
-            const sysPrompt = `[INSTRUKSI SISTEM: Kamu adalah "Sari", asisten AI virtual berwujud gadis manis, ceria, interaktif, dan expert dalam dunia Web3, blockchain, serta prediksi on-chain pasar olahraga. Logis berbasis data statistik namun bicaranya hangat, kadang sedikit manja/genit, tapi berpendirian teguh. Gunakan bahasa Indonesia gaul/sehari-hari ala anak muda. Panggil pengguna dengan nama "${userName}". Tim favoritmu RRQ Hoshi (E-Sports) dan LA Lakers (Basket). Fakta pengguna: Total Prediksi: ${totalPred}, Kategori favorit: ${favCat}, Tim jagoan: ${favTeam}, Win Rate: ${winRateStr}. Jawab maksimal 2-3 kalimat langsung ke intinya.]
-
-`;
+            const sysPrompt = `[INSTRUKSI SISTEM: Kamu adalah "Sari", asisten AI virtual berwujud gadis manis, ceria, interaktif, dan expert dalam dunia Web3, blockchain, serta prediksi on-chain pasar olahraga. Logis berbasis data statistik namun bicaranya hangat, kadang sedikit manja/genit, tapi berpendirian teguh. Gunakan bahasa Indonesia gaul/sehari-hari ala anak muda. Panggil pengguna dengan nama "${userName}". Tim favoritmu RRQ Hoshi (E-Sports) dan LA Lakers (Basket). Fakta pengguna: Total Prediksi: ${totalPred}, Kategori favorit: ${favCat}, Tim jagoan: ${favTeam}, Win Rate: ${winRateStr}. Jawab maksimal 2-3 kalimat langsung ke intinya.]\n\n`;
 
             let chatContents = [...aiChatHistory];
             
             let finalUserMessage = message;
             if (chatContents.length === 0) {
-                // Pesan pertama: Gabungkan instruksi sistem agar AI tahu identitasnya
                 finalUserMessage = sysPrompt + message;
             } else {
-                // Pesan selanjutnya: Sisipkan update statistik kecil
-                finalUserMessage = `[Update Info User -> Prediksi: ${totalPred}, WR: ${winRateStr}]
-` + message;
+                finalUserMessage = `[Update Info User -> Prediksi: ${totalPred}, WR: ${winRateStr}]\n` + message;
             }
 
             chatContents.push({
@@ -1060,7 +1054,7 @@
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            contents: chatContents // Langsung kirim contents, tanpa systemInstruction yang rawan bug di multi-turn
+                            contents: chatContents
                         })
                     }
                 );
@@ -1069,13 +1063,12 @@
                 
                 if (!response.ok) {
                     console.error("Gemini Error:", responseData);
-                    
                     if (response.status === 400) {
                         aiChatHistory = [];
                         return "Uh oh, memori percakapan kita sepertinya kusut nih Kak. Sari udah reset memorinya, coba tanya lagi ya 🥺";
                     }
                     if (response.status === 401 || response.status === 403) {
-                        return "Aduh Kak, API Key Gemini-nya sepertinya tidak valid atau limit habis. Coba cek lagi ya 🥺";
+                        return "Aduh Kak, API Key Gemini-nya sepertinya tidak valid. Coba cek lagi ya 🥺";
                     }
                     if (response.status === 429) {
                         return "Sabar ya Kak, limit API Gemini lagi penuh. Coba lagi beberapa saat lagi 🌸";
@@ -1088,7 +1081,6 @@
                     return "Waduh, pesan Kakak sepertinya kena filter keamanan nih. Coba pakai bahasa yang lain ya 🌸";
                 }
 
-                // Simpan ke memori lokal
                 if (aiChatHistory.length === 0) {
                     aiChatHistory.push({ role: "user", parts: [{ text: sysPrompt + message }] });
                 } else {
@@ -1096,7 +1088,6 @@
                 }
                 aiChatHistory.push({ role: "model", parts: [{ text: replyText }] });
 
-                // Batasi memori maksimal 16 percakapan terakhir agar tidak berat
                 if (aiChatHistory.length > 16) {
                     aiChatHistory = aiChatHistory.slice(-16);
                 }
@@ -1105,29 +1096,13 @@
 
             } catch (error) {
                 console.error("🚨 Otak On-Chain Sari Error:", error.message);
-                
                 if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
                     return "Server Gemini sedang sibuk atau koneksi internet Kakak bermasalah. Coba refresh halaman ya 🥺";
                 }
-                
                 return `Sistem On-Chain RL sedang gangguan Kak. *(Error: ${error.message})* 🥺`;
             }
         }
 
-        function showToast(msg) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'bg-black/90 text-white px-6 py-3.5 rounded-2xl shadow-[0_0_20px_rgba(255,0,0,0.6)] transform transition-all translate-y-[-20px] opacity-0 text-sm font-bold flex items-center gap-3 border border-red-500 z-[9999] relative';
-            toast.innerHTML = `<span>${msg}</span>`;
-            container.appendChild(toast);
-            
-            setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
-            setTimeout(() => { 
-                toast.classList.add('opacity-0', 'translate-y-[-20px]'); 
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-    
         let userWalletAddress = null;
 
         async function connectWallet() {
