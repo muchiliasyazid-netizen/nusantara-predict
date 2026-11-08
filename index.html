@@ -623,11 +623,45 @@
         // DATA MASTER PERTANDINGAN
         // ----------------------------------------------------
         const DB_MATCHES = [
+            // SEPAK BOLA
             { id: 1, title: 'Timnas Indonesia vs Arab Saudi', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.80', o2: '1.60', teams: ['Indonesia Menang', 'Seri', 'Arab Saudi Menang'] },
             { id: 2, title: 'Arsenal vs Manchester City', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.60', o2: '2.40', teams: ['Arsenal Menang', 'Seri', 'Man City Menang'] },
             { id: 3, title: 'Persija Jakarta vs Persib Bandung', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.10', o2: '2.80', teams: ['Persija Menang', 'Seri', 'Persib Menang'] },
+            { id: 6, title: 'Real Madrid vs Barcelona', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.85', o2: '2.10', teams: ['Real Madrid Menang', 'Seri', 'Barcelona Menang'] },
+            { id: 7, title: 'Manchester United vs Liverpool', category: 'Sepak Bola', catKey: 'cat_football', o1: '3.10', o2: '1.75', teams: ['Man United Menang', 'Seri', 'Liverpool Menang'] },
+            { id: 8, title: 'Bayern Munich vs B. Dortmund', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.40', o2: '3.50', teams: ['Bayern Menang', 'Seri', 'Dortmund Menang'] },
+            { id: 9, title: 'Juventus vs AC Milan', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.20', o2: '2.50', teams: ['Juventus Menang', 'Seri', 'AC Milan Menang'] },
+            { id: 10, title: 'PSG vs Marseille', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.30', o2: '4.20', teams: ['PSG Menang', 'Seri', 'Marseille Menang'] },
+            { id: 11, title: 'Inter Milan vs AS Roma', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.95', o2: '2.90', teams: ['Inter Menang', 'Seri', 'AS Roma Menang'] },
+            { id: 12, title: 'Chelsea vs Tottenham', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.40', o2: '2.30', teams: ['Chelsea Menang', 'Seri', 'Tottenham Menang'] },
+            { id: 29, title: 'Persebaya vs Arema FC', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.15', o2: '2.35', teams: ['Persebaya Menang', 'Seri', 'Arema Menang'] },
+            { id: 30, title: 'Atletico Madrid vs Sevilla', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.75', o2: '2.80', teams: ['Atletico Menang', 'Seri', 'Sevilla Menang'] },
+            
+            // BASKET
             { id: 4, title: 'LA Lakers vs G.S. Warriors', category: 'Basket', catKey: 'cat_basket', o1: '1.90', o2: '1.85', teams: ['Lakers Menang', 'Warriors Menang'] },
-            { id: 5, title: 'RRQ Hoshi vs ONIC Esports', category: 'E-Sports', catKey: 'cat_esport', o1: '1.75', o2: '2.05', teams: ['RRQ Menang', 'ONIC Menang'] }
+            { id: 13, title: 'Boston Celtics vs Miami Heat', category: 'Basket', catKey: 'cat_basket', o1: '1.60', o2: '2.40', teams: ['Celtics Menang', 'Heat Menang'] },
+            { id: 14, title: 'Chicago Bulls vs NY Knicks', category: 'Basket', catKey: 'cat_basket', o1: '2.10', o2: '1.75', teams: ['Bulls Menang', 'Knicks Menang'] },
+            { id: 15, title: 'Denver Nuggets vs Phoenix Suns', category: 'Basket', catKey: 'cat_basket', o1: '1.80', o2: '1.95', teams: ['Nuggets Menang', 'Suns Menang'] },
+            { id: 16, title: 'Dallas Mavericks vs LA Clippers', category: 'Basket', catKey: 'cat_basket', o1: '2.05', o2: '1.80', teams: ['Mavericks Menang', 'Clippers Menang'] },
+            { id: 17, title: 'Milwaukee Bucks vs 76ers', category: 'Basket', catKey: 'cat_basket', o1: '1.70', o2: '2.20', teams: ['Bucks Menang', '76ers Menang'] },
+            { id: 18, title: 'Pelita Jaya vs Satria Muda', category: 'Basket', catKey: 'cat_basket', o1: '1.85', o2: '1.90', teams: ['Pelita Jaya Menang', 'Satria Muda Menang'] },
+            { id: 19, title: 'Prawira Bandung vs Dewa United', category: 'Basket', catKey: 'cat_basket', o1: '2.30', o2: '1.65', teams: ['Prawira Menang', 'Dewa United Menang'] },
+            { id: 31, title: 'Toronto Raptors vs Brooklyn Nets', category: 'Basket', catKey: 'cat_basket', o1: '2.50', o2: '1.55', teams: ['Raptors Menang', 'Nets Menang'] },
+            { id: 32, title: 'Bima Perkasa vs PSS Sleman', category: 'Basket', catKey: 'cat_basket', o1: '1.95', o2: '1.85', teams: ['Bima Perkasa Menang', 'PSS Sleman Menang'] },
+            
+            // E-SPORTS
+            { id: 5, title: 'RRQ Hoshi vs ONIC Esports', category: 'E-Sports', catKey: 'cat_esport', o1: '1.75', o2: '2.05', teams: ['RRQ Menang', 'ONIC Menang'] },
+            { id: 20, title: 'EVOS Legends vs Alter Ego', category: 'E-Sports', catKey: 'cat_esport', o1: '1.90', o2: '1.85', teams: ['EVOS Menang', 'Alter Ego Menang'] },
+            { id: 21, title: 'T1 vs Gen.G (LoL)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.65', o2: '2.20', teams: ['T1 Menang', 'Gen.G Menang'] },
+            { id: 22, title: 'Team Spirit vs Gaimin Gladiators', category: 'E-Sports', catKey: 'cat_esport', o1: '2.10', o2: '1.75', teams: ['Team Spirit Menang', 'Gaimin Menang'] },
+            { id: 23, title: 'NaVi vs FaZe Clan (CS2)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.80', o2: '1.95', teams: ['NaVi Menang', 'FaZe Menang'] },
+            { id: 24, title: 'Paper Rex vs Sentinels (Valorant)', category: 'E-Sports', catKey: 'cat_esport', o1: '2.00', o2: '1.80', teams: ['Paper Rex Menang', 'Sentinels Menang'] },
+            { id: 25, title: 'Fnatic vs LOUD (Valorant)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.75', o2: '2.10', teams: ['Fnatic Menang', 'LOUD Menang'] },
+            { id: 26, title: 'BTR Red Aliens vs Morph Team', category: 'E-Sports', catKey: 'cat_esport', o1: '1.50', o2: '2.60', teams: ['BTR Menang', 'Morph Menang'] },
+            { id: 27, title: 'Liquid vs OG (Dota 2)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.85', o2: '1.90', teams: ['Liquid Menang', 'OG Menang'] },
+            { id: 28, title: 'DRX vs JD Gaming (LoL)', category: 'E-Sports', catKey: 'cat_esport', o1: '2.40', o2: '1.60', teams: ['DRX Menang', 'JD Gaming Menang'] },
+            { id: 33, title: 'Karmine Corp vs MAD Lions', category: 'E-Sports', catKey: 'cat_esport', o1: '2.15', o2: '1.70', teams: ['KC Menang', 'MAD Menang'] },
+            { id: 34, title: 'BREN Esports vs Blacklist Int', category: 'E-Sports', catKey: 'cat_esport', o1: '1.80', o2: '2.00', teams: ['BREN Menang', 'Blacklist Menang'] }
         ];
 
         let SESSION_USER = null;
@@ -1051,32 +1085,33 @@
         }
     
         // ----------------------------------------------------
-        // WEB3 & CRYPTO WALLET (SLUSH WALLET)
+        // WEB3 & CRYPTO WALLET (HANYA SLUSH WALLET)
         // ----------------------------------------------------
         let userWalletAddress = null;
 
         async function connectWallet() {
             const walletBtn = document.getElementById('wallet-text');
             
-            // Cek apakah Slush Wallet / Web3 Provider tersedia di browser
-            if (typeof window.ethereum !== 'undefined') {
+            // Pengecekan eksklusif HANYA untuk Slush Wallet
+            // Slush Wallet biasanya menyuntikkan window.slush atau menetapkan isSlushWallet pada window.ethereum
+            const isSlushWallet = typeof window.slush !== 'undefined' || (typeof window.ethereum !== 'undefined' && window.ethereum.isSlushWallet);
+            
+            if (isSlushWallet) {
                 try {
-                    showToast("⏳ Sedang menghubungkan dompet...");
+                    showToast("⏳ Sedang menghubungkan Slush Wallet...");
                     
-                    // Meminta akses akun ke Slush Wallet
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const provider = window.slush || window.ethereum;
+                    const accounts = await provider.request({ method: 'eth_requestAccounts' });
                     
                     if (accounts.length > 0) {
                         userWalletAddress = accounts[0];
                         
-                        // Mempersingkat tampilan address (misal: 0x1234...ABCD)
                         const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
                         
                         walletBtn.innerText = shortAddress;
                         document.getElementById('btn-connect-wallet').classList.remove('from-purple-600', 'to-blue-600');
                         document.getElementById('btn-connect-wallet').classList.add('from-green-600', 'to-emerald-600');
                         
-                        // Simpan info wallet ke Firebase milik user
                         if (SESSION_USER) {
                             db.ref('users_data/' + SESSION_USER + '/wallet').set(userWalletAddress);
                         }
@@ -1088,15 +1123,16 @@
                     showToast(t("toast_wallet_err"));
                 }
             } else {
+                // Tolak dompet lain dan beri peringatan
                 showToast(t("toast_wallet_ext"));
-                // Opsional: Buka tab baru ke halaman download Slush Wallet
-                // window.open('https://metamask.io/download/', '_blank');
             }
         }
 
         // Listener jika user mengganti akun langsung dari ekstensi Slush Wallet
-        if (typeof window.ethereum !== 'undefined') {
-            window.ethereum.on('accountsChanged', function (accounts) {
+        const activeSlushProvider = window.slush || (typeof window.ethereum !== 'undefined' && window.ethereum.isSlushWallet ? window.ethereum : null);
+        
+        if (activeSlushProvider) {
+            activeSlushProvider.on('accountsChanged', function (accounts) {
                 if (accounts.length > 0) {
                     userWalletAddress = accounts[0];
                     const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
@@ -1105,7 +1141,6 @@
                         db.ref('users_data/' + SESSION_USER + '/wallet').set(userWalletAddress);
                     }
                 } else {
-                    // User mendisconnect wallet dari Slush Wallet
                     userWalletAddress = null;
                     document.getElementById('wallet-text').innerText = t("btn_wallet");
                     document.getElementById('btn-connect-wallet').classList.add('from-purple-600', 'to-blue-600');
