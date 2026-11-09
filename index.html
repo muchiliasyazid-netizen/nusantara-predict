@@ -50,10 +50,8 @@
         window.availableSuiWallets = [];
         const { get, on } = getWallets();
         
-        // Ambil dompet yang sudah terdeteksi saat halaman dimuat
         window.availableSuiWallets = get(); 
         
-        // Dengarkan secara live jika ekstensi dompet selesai dimuat oleh browser
         on('register', (...wallets) => {
             window.availableSuiWallets.push(...wallets);
         });
@@ -189,7 +187,7 @@
                     <div class="glass p-8 rounded-[2rem] flex flex-col md:flex-row items-center justify-between border border-red-500/30 relative overflow-hidden bg-gradient-to-br from-red-900/40 to-black/60 shadow-2xl">
                         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-yellow-500 to-red-600"></div>
                         <div class="z-10">
-                            <h2 class="text-3xl md:text-5xl font-black mb-3"><span data-i18n="hero_greet">Hello,</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-yellow-300" id="hero-name">Analis</span>!</h2>
+                            <h2 class="text-3xl md:text-5xl font-black mb-3"><span data-i18n="hero_greet">Hello,</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-yellow-300" id="hero-name">Analyst</span>!</h2>
                             <p class="text-gray-300 max-w-xl text-sm md:text-base leading-relaxed" data-i18n="hero_desc">Global sports markets are highly fluctuating. Use your analysis, simulate on-chain picks, and collect prediction points to climb the leaderboard in Nusantara Predict.</p>
                         </div>
                         <div class="mt-6 md:mt-0 relative z-10">
@@ -199,9 +197,9 @@
                     </div>
 
                     <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                        <button class="filter-btn active-filter px-6 py-2.5 rounded-full font-bold text-sm border-2 border-red-500 bg-red-600 text-white shadow-[0_0_15px_rgba(255,0,0,0.4)] whitespace-nowrap transition" onclick="filterMarket('Semua', this)"><span data-i18n="filter_all">🔥 All Events</span></button>
-                        <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('Sepak Bola', this)"><span data-i18n="filter_soc">⚽ Football</span></button>
-                        <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('Basket', this)"><span data-i18n="filter_bb">🏀 Basketball</span></button>
+                        <button class="filter-btn active-filter px-6 py-2.5 rounded-full font-bold text-sm border-2 border-red-500 bg-red-600 text-white shadow-[0_0_15px_rgba(255,0,0,0.4)] whitespace-nowrap transition" onclick="filterMarket('All', this)"><span data-i18n="filter_all">🔥 All Events</span></button>
+                        <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('Football', this)"><span data-i18n="filter_soc">⚽ Football</span></button>
+                        <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('Basketball', this)"><span data-i18n="filter_bb">🏀 Basketball</span></button>
                         <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('E-Sports', this)"><span data-i18n="filter_es">🎮 E-Sports</span></button>
                     </div>
 
@@ -275,7 +273,7 @@
                                     <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-300 to-yellow-600 flex items-center justify-center font-black text-black text-xl shadow-lg">1</div>
                                     <div class="flex-1">
                                         <div class="font-bold text-lg text-white">Raja_Prediksi99</div>
-                                        <div class="text-xs text-yellow-200">1,402 Prediksi Akurat</div>
+                                        <div class="text-xs text-yellow-200" data-i18n="ld_user1_sub">1,402 Accurate Predictions</div>
                                     </div>
                                     <div class="text-right">
                                         <div class="text-xl font-black text-green-400">94%</div>
@@ -286,7 +284,7 @@
                                     <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center font-black text-black text-xl shadow-lg">2</div>
                                     <div class="flex-1">
                                         <div class="font-bold text-lg text-white">SobatOnChain</div>
-                                        <div class="text-xs text-gray-300">950 Prediksi Akurat</div>
+                                        <div class="text-xs text-gray-300" data-i18n="ld_user2_sub">950 Accurate Predictions</div>
                                     </div>
                                     <div class="text-right">
                                         <div class="text-xl font-black text-green-400">89%</div>
@@ -297,7 +295,7 @@
                                     <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center font-black text-black text-xl shadow-lg">3</div>
                                     <div class="flex-1">
                                         <div class="font-bold text-lg text-white">CryptoNusa</div>
-                                        <div class="text-xs text-orange-200">820 Prediksi Akurat</div>
+                                        <div class="text-xs text-orange-200" data-i18n="ld_user3_sub">820 Accurate Predictions</div>
                                     </div>
                                     <div class="text-right">
                                         <div class="text-xl font-black text-green-400">86%</div>
@@ -397,7 +395,6 @@
         }
         const db = firebase.database();
 
-        // ========== API KEY & MODEL GEMINI ==========
         const part1 = "AQ.Ab8RN6KUPKG3";
         const part2 = "E3uIVJzEVlSPIKX";
         const part3 = "0tgqGqHT7ZxR-dn";
@@ -454,10 +451,13 @@
                 ld_tot: "Total Prediksi",
                 ld_wr: "Akurasi (WR)",
                 ld_top: "Top 3 Analis Global",
+                ld_user1_sub: "1,402 Prediksi Akurat",
+                ld_user2_sub: "950 Prediksi Akurat",
+                ld_user3_sub: "820 Prediksi Akurat",
                 ai_plc: "Tanya Sari...",
                 ai_greet: "Halo Kakak! Aku Sari. Butuh bocoran pergerakan uang on-chain hari ini? Tanya aja ke Sari ya! 🌸",
-                cat_football: "Sepak Bola",
-                cat_basket: "Basket",
+                cat_football: "Football",
+                cat_basket: "Basketball",
                 cat_esport: "E-Sports",
                 status_wait: "Tersinkron",
                 toast_login_ok: "✅ Berhasil Masuk! Selamat Datang, Kak ",
@@ -468,7 +468,7 @@
                 toast_pred_ok: "✅ Mantap Kak! Prediksinya udah masuk jurnal Cloud.",
                 toast_post_ok: "✅ Postingan terkirim ke semua pengguna global!",
                 toast_fb_err: "⚠️ Gagal terhubung ke server! Cek API Key Firebase Kakak ya.",
-                btn_wallet: "Sambung Dompet",
+                btn_wallet: "Connect Wallet",
                 toast_wallet_ok: "🔗 Dompet Crypto berhasil tersambung, Kak!",
                 toast_wallet_err: "❌ Yah, Slush Wallet-nya belum terpasang atau ditolak nih Kak.",
                 toast_wallet_ext: "⚠️ Kakak perlu install ekstensi Slush Wallet dulu ya di browser!",
@@ -521,6 +521,9 @@
                 ld_tot: "Total Predictions",
                 ld_wr: "Accuracy (WR)",
                 ld_top: "Top 3 Global Analysts",
+                ld_user1_sub: "1,402 Accurate Predictions",
+                ld_user2_sub: "950 Accurate Predictions",
+                ld_user3_sub: "820 Accurate Predictions",
                 ai_plc: "Ask Sari...",
                 ai_greet: "Hi there! I'm Sari. Need any leaks on today's on-chain money movement? Just ask me! 🌸",
                 cat_football: "Football",
@@ -569,7 +572,7 @@
             document.getElementById('ai-greet-txt').innerText = t('ai_greet');
 
             if(SESSION_USER) {
-                renderMarket(window.activeCategory || 'Semua');
+                renderMarket(window.activeCategory || 'All');
                 renderJournal();
                 const actDict = { 
                     market: t("header_market"), 
@@ -590,46 +593,46 @@
         }
 
         const DB_MATCHES = [
-            { id: 1, title: 'Timnas Indonesia vs Arab Saudi', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.80', o2: '1.60', teams: ['Indonesia Menang', 'Seri', 'Arab Saudi Menang'] },
-            { id: 2, title: 'Arsenal vs Manchester City', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.60', o2: '2.40', teams: ['Arsenal Menang', 'Seri', 'Man City Menang'] },
-            { id: 3, title: 'Persija Jakarta vs Persib Bandung', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.10', o2: '2.80', teams: ['Persija Menang', 'Seri', 'Persib Menang'] },
-            { id: 6, title: 'Real Madrid vs Barcelona', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.85', o2: '2.10', teams: ['Real Madrid Menang', 'Seri', 'Barcelona Menang'] },
-            { id: 7, title: 'Manchester United vs Liverpool', category: 'Sepak Bola', catKey: 'cat_football', o1: '3.10', o2: '1.75', teams: ['Man United Menang', 'Seri', 'Liverpool Menang'] },
-            { id: 8, title: 'Bayern Munich vs B. Dortmund', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.40', o2: '3.50', teams: ['Bayern Menang', 'Seri', 'Dortmund Menang'] },
-            { id: 9, title: 'Juventus vs AC Milan', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.20', o2: '2.50', teams: ['Juventus Menang', 'Seri', 'AC Milan Menang'] },
-            { id: 10, title: 'PSG vs Marseille', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.30', o2: '4.20', teams: ['PSG Menang', 'Seri', 'Marseille Menang'] },
-            { id: 11, title: 'Inter Milan vs AS Roma', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.95', o2: '2.90', teams: ['Inter Menang', 'Seri', 'AS Roma Menang'] },
-            { id: 12, title: 'Chelsea vs Tottenham', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.40', o2: '2.30', teams: ['Chelsea Menang', 'Seri', 'Tottenham Menang'] },
-            { id: 29, title: 'Persebaya vs Arema FC', category: 'Sepak Bola', catKey: 'cat_football', o1: '2.15', o2: '2.35', teams: ['Persebaya Menang', 'Seri', 'Arema Menang'] },
-            { id: 30, title: 'Atletico Madrid vs Sevilla', category: 'Sepak Bola', catKey: 'cat_football', o1: '1.75', o2: '2.80', teams: ['Atletico Menang', 'Seri', 'Sevilla Menang'] },
-            { id: 4, title: 'LA Lakers vs G.S. Warriors', category: 'Basket', catKey: 'cat_basket', o1: '1.90', o2: '1.85', teams: ['Lakers Menang', 'Warriors Menang'] },
-            { id: 13, title: 'Boston Celtics vs Miami Heat', category: 'Basket', catKey: 'cat_basket', o1: '1.60', o2: '2.40', teams: ['Celtics Menang', 'Heat Menang'] },
-            { id: 14, title: 'Chicago Bulls vs NY Knicks', category: 'Basket', catKey: 'cat_basket', o1: '2.10', o2: '1.75', teams: ['Bulls Menang', 'Knicks Menang'] },
-            { id: 15, title: 'Denver Nuggets vs Phoenix Suns', category: 'Basket', catKey: 'cat_basket', o1: '1.80', o2: '1.95', teams: ['Nuggets Menang', 'Suns Menang'] },
-            { id: 16, title: 'Dallas Mavericks vs LA Clippers', category: 'Basket', catKey: 'cat_basket', o1: '2.05', o2: '1.80', teams: ['Mavericks Menang', 'Clippers Menang'] },
-            { id: 17, title: 'Milwaukee Bucks vs 76ers', category: 'Basket', catKey: 'cat_basket', o1: '1.70', o2: '2.20', teams: ['Bucks Menang', '76ers Menang'] },
-            { id: 18, title: 'Pelita Jaya vs Satria Muda', category: 'Basket', catKey: 'cat_basket', o1: '1.85', o2: '1.90', teams: ['Pelita Jaya Menang', 'Satria Muda Menang'] },
-            { id: 19, title: 'Prawira Bandung vs Dewa United', category: 'Basket', catKey: 'cat_basket', o1: '2.30', o2: '1.65', teams: ['Prawira Menang', 'Dewa United Menang'] },
-            { id: 31, title: 'Toronto Raptors vs Brooklyn Nets', category: 'Basket', catKey: 'cat_basket', o1: '2.50', o2: '1.55', teams: ['Raptors Menang', 'Nets Menang'] },
-            { id: 32, title: 'Bima Perkasa vs PSS Sleman', category: 'Basket', catKey: 'cat_basket', o1: '1.95', o2: '1.85', teams: ['Bima Perkasa Menang', 'PSS Sleman Menang'] },
-            { id: 5, title: 'RRQ Hoshi vs ONIC Esports', category: 'E-Sports', catKey: 'cat_esport', o1: '1.75', o2: '2.05', teams: ['RRQ Menang', 'ONIC Menang'] },
-            { id: 20, title: 'EVOS Legends vs Alter Ego', category: 'E-Sports', catKey: 'cat_esport', o1: '1.90', o2: '1.85', teams: ['EVOS Menang', 'Alter Ego Menang'] },
-            { id: 21, title: 'T1 vs Gen.G (LoL)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.65', o2: '2.20', teams: ['T1 Menang', 'Gen.G Menang'] },
-            { id: 22, title: 'Team Spirit vs Gaimin Gladiators', category: 'E-Sports', catKey: 'cat_esport', o1: '2.10', o2: '1.75', teams: ['Team Spirit Menang', 'Gaimin Menang'] },
-            { id: 23, title: 'NaVi vs FaZe Clan (CS2)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.80', o2: '1.95', teams: ['NaVi Menang', 'FaZe Menang'] },
-            { id: 24, title: 'Paper Rex vs Sentinels (Valorant)', category: 'E-Sports', catKey: 'cat_esport', o1: '2.00', o2: '1.80', teams: ['Paper Rex Menang', 'Sentinels Menang'] },
-            { id: 25, title: 'Fnatic vs LOUD (Valorant)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.75', o2: '2.10', teams: ['Fnatic Menang', 'LOUD Menang'] },
-            { id: 26, title: 'BTR Red Aliens vs Morph Team', category: 'E-Sports', catKey: 'cat_esport', o1: '1.50', o2: '2.60', teams: ['BTR Menang', 'Morph Menang'] },
-            { id: 27, title: 'Liquid vs OG (Dota 2)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.85', o2: '1.90', teams: ['Liquid Menang', 'OG Menang'] },
-            { id: 28, title: 'DRX vs JD Gaming (LoL)', category: 'E-Sports', catKey: 'cat_esport', o1: '2.40', o2: '1.60', teams: ['DRX Menang', 'JD Gaming Menang'] },
-            { id: 33, title: 'Karmine Corp vs MAD Lions', category: 'E-Sports', catKey: 'cat_esport', o1: '2.15', o2: '1.70', teams: ['KC Menang', 'MAD Menang'] },
-            { id: 34, title: 'BREN Esports vs Blacklist Int', category: 'E-Sports', catKey: 'cat_esport', o1: '1.80', o2: '2.00', teams: ['BREN Menang', 'Blacklist Menang'] }
+            { id: 1, title: 'Indonesia vs Saudi Arabia', category: 'Football', catKey: 'cat_football', o1: '2.80', o2: '1.60', teams: ['Indonesia Win', 'Draw', 'Saudi Arabia Win'] },
+            { id: 2, title: 'Arsenal vs Manchester City', category: 'Football', catKey: 'cat_football', o1: '2.60', o2: '2.40', teams: ['Arsenal Win', 'Draw', 'Man City Win'] },
+            { id: 3, title: 'Persija Jakarta vs Persib Bandung', category: 'Football', catKey: 'cat_football', o1: '2.10', o2: '2.80', teams: ['Persija Win', 'Draw', 'Persib Win'] },
+            { id: 6, title: 'Real Madrid vs Barcelona', category: 'Football', catKey: 'cat_football', o1: '1.85', o2: '2.10', teams: ['Real Madrid Win', 'Draw', 'Barcelona Win'] },
+            { id: 7, title: 'Manchester United vs Liverpool', category: 'Football', catKey: 'cat_football', o1: '3.10', o2: '1.75', teams: ['Man United Win', 'Draw', 'Liverpool Win'] },
+            { id: 8, title: 'Bayern Munich vs B. Dortmund', category: 'Football', catKey: 'cat_football', o1: '1.40', o2: '3.50', teams: ['Bayern Win', 'Draw', 'Dortmund Win'] },
+            { id: 9, title: 'Juventus vs AC Milan', category: 'Football', catKey: 'cat_football', o1: '2.20', o2: '2.50', teams: ['Juventus Win', 'Draw', 'AC Milan Win'] },
+            { id: 10, title: 'PSG vs Marseille', category: 'Football', catKey: 'cat_football', o1: '1.30', o2: '4.20', teams: ['PSG Win', 'Draw', 'Marseille Win'] },
+            { id: 11, title: 'Inter Milan vs AS Roma', category: 'Football', catKey: 'cat_football', o1: '1.95', o2: '2.90', teams: ['Inter Win', 'Draw', 'AS Roma Win'] },
+            { id: 12, title: 'Chelsea vs Tottenham', category: 'Football', catKey: 'cat_football', o1: '2.40', o2: '2.30', teams: ['Chelsea Win', 'Draw', 'Tottenham Win'] },
+            { id: 29, title: 'Persebaya vs Arema FC', category: 'Football', catKey: 'cat_football', o1: '2.15', o2: '2.35', teams: ['Persebaya Win', 'Draw', 'Arema Win'] },
+            { id: 30, title: 'Atletico Madrid vs Sevilla', category: 'Football', catKey: 'cat_football', o1: '1.75', o2: '2.80', teams: ['Atletico Win', 'Draw', 'Sevilla Win'] },
+            { id: 4, title: 'LA Lakers vs G.S. Warriors', category: 'Basketball', catKey: 'cat_basket', o1: '1.90', o2: '1.85', teams: ['Lakers Win', 'Warriors Win'] },
+            { id: 13, title: 'Boston Celtics vs Miami Heat', category: 'Basketball', catKey: 'cat_basket', o1: '1.60', o2: '2.40', teams: ['Celtics Win', 'Heat Win'] },
+            { id: 14, title: 'Chicago Bulls vs NY Knicks', category: 'Basketball', catKey: 'cat_basket', o1: '2.10', o2: '1.75', teams: ['Bulls Win', 'Knicks Win'] },
+            { id: 15, title: 'Denver Nuggets vs Phoenix Suns', category: 'Basketball', catKey: 'cat_basket', o1: '1.80', o2: '1.95', teams: ['Nuggets Win', 'Suns Win'] },
+            { id: 16, title: 'Dallas Mavericks vs LA Clippers', category: 'Basketball', catKey: 'cat_basket', o1: '2.05', o2: '1.80', teams: ['Mavericks Win', 'Clippers Win'] },
+            { id: 17, title: 'Milwaukee Bucks vs 76ers', category: 'Basketball', catKey: 'cat_basket', o1: '1.70', o2: '2.20', teams: ['Bucks Win', '76ers Win'] },
+            { id: 18, title: 'Pelita Jaya vs Satria Muda', category: 'Basketball', catKey: 'cat_basket', o1: '1.85', o2: '1.90', teams: ['Pelita Jaya Win', 'Satria Muda Win'] },
+            { id: 19, title: 'Prawira Bandung vs Dewa United', category: 'Basketball', catKey: 'cat_basket', o1: '2.30', o2: '1.65', teams: ['Prawira Win', 'Dewa United Win'] },
+            { id: 31, title: 'Toronto Raptors vs Brooklyn Nets', category: 'Basketball', catKey: 'cat_basket', o1: '2.50', o2: '1.55', teams: ['Raptors Win', 'Nets Win'] },
+            { id: 32, title: 'Bima Perkasa vs PSS Sleman', category: 'Basketball', catKey: 'cat_basket', o1: '1.95', o2: '1.85', teams: ['Bima Perkasa Win', 'PSS Sleman Win'] },
+            { id: 5, title: 'RRQ Hoshi vs ONIC Esports', category: 'E-Sports', catKey: 'cat_esport', o1: '1.75', o2: '2.05', teams: ['RRQ Win', 'ONIC Win'] },
+            { id: 20, title: 'EVOS Legends vs Alter Ego', category: 'E-Sports', catKey: 'cat_esport', o1: '1.90', o2: '1.85', teams: ['EVOS Win', 'Alter Ego Win'] },
+            { id: 21, title: 'T1 vs Gen.G (LoL)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.65', o2: '2.20', teams: ['T1 Win', 'Gen.G Win'] },
+            { id: 22, title: 'Team Spirit vs Gaimin Gladiators', category: 'E-Sports', catKey: 'cat_esport', o1: '2.10', o2: '1.75', teams: ['Team Spirit Win', 'Gaimin Win'] },
+            { id: 23, title: 'NaVi vs FaZe Clan (CS2)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.80', o2: '1.95', teams: ['NaVi Win', 'FaZe Win'] },
+            { id: 24, title: 'Paper Rex vs Sentinels (Valorant)', category: 'E-Sports', catKey: 'cat_esport', o1: '2.00', o2: '1.80', teams: ['Paper Rex Win', 'Sentinels Win'] },
+            { id: 25, title: 'Fnatic vs LOUD (Valorant)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.75', o2: '2.10', teams: ['Fnatic Win', 'LOUD Win'] },
+            { id: 26, title: 'BTR Red Aliens vs Morph Team', category: 'E-Sports', catKey: 'cat_esport', o1: '1.50', o2: '2.60', teams: ['BTR Win', 'Morph Win'] },
+            { id: 27, title: 'Liquid vs OG (Dota 2)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.85', o2: '1.90', teams: ['Liquid Win', 'OG Win'] },
+            { id: 28, title: 'DRX vs JD Gaming (LoL)', category: 'E-Sports', catKey: 'cat_esport', o1: '2.40', o2: '1.60', teams: ['DRX Win', 'JD Gaming Win'] },
+            { id: 33, title: 'Karmine Corp vs MAD Lions', category: 'E-Sports', catKey: 'cat_esport', o1: '2.15', o2: '1.70', teams: ['KC Win', 'MAD Win'] },
+            { id: 34, title: 'BREN Esports vs Blacklist Int', category: 'E-Sports', catKey: 'cat_esport', o1: '1.80', o2: '2.00', teams: ['BREN Win', 'Blacklist Win'] }
         ];
 
         let SESSION_USER = null;
         let USER_JOURNAL = [];
         let FORUM_POSTS = [];
-        window.activeCategory = 'Semua';
+        window.activeCategory = 'All';
         
         let forumListener = null;
         let journalListener = null;
@@ -647,7 +650,7 @@
                 app.classList.remove('hidden');
                 setTimeout(() => app.classList.remove('opacity-0'), 50);
                 loadDashboardData();
-                restoreWalletState(); // Memulihkan sesi dompet
+                restoreWalletState();
             } else {
                 document.getElementById('auth-screen').classList.remove('force-hide');
                 document.getElementById('app-screen').classList.add('hidden', 'opacity-0');
@@ -685,17 +688,27 @@
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value;
             
-            showToast(currentLang === 'en' ? "⏳ Wait a moment, verifying with server..." : "⏳ Sebentar ya Kak, Sari cek ke server dulu...");
+            showToast(currentLang === 'en' ? "⏳ Verifying with server..." : "⏳ Verifikasi ke server...");
             
             db.ref('users/' + u).once('value').then((snapshot) => {
-                if(snapshot.exists() && snapshot.val() === p) {
-                    localStorage.setItem('nusa_active_user', u);
-                    showToast(t("toast_login_ok") + u + " ✨");
-                    initApp();
+                if(snapshot.exists()) {
+                    let dbPass = snapshot.val();
+                    // Handle if password stored as object or string
+                    if (typeof dbPass === 'object' && dbPass !== null) {
+                        dbPass = dbPass.password || Object.values(dbPass)[0];
+                    }
+                    if(String(dbPass) === String(p)) {
+                        localStorage.setItem('nusa_active_user', u);
+                        showToast(t("toast_login_ok") + u + " ✨");
+                        initApp();
+                    } else {
+                        showToast(t("toast_login_err"));
+                    }
                 } else {
                     showToast(t("toast_login_err"));
                 }
             }).catch(err => {
+                console.error("Login error:", err);
                 showToast(t("toast_fb_err"));
             });
         });
@@ -705,7 +718,7 @@
             const u = document.getElementById('reg-username').value.trim();
             const p = document.getElementById('reg-password').value;
             
-            showToast(currentLang === 'en' ? "⏳ Registering on global system..." : "⏳ Sedang mendaftarkan Kakak di sistem global...");
+            showToast(currentLang === 'en' ? "⏳ Registering account..." : "⏳ Mendaftarkan akun...");
             
             db.ref('users/' + u).once('value').then((snapshot) => {
                 if(snapshot.exists()) {
@@ -718,6 +731,7 @@
                     });
                 }
             }).catch(err => {
+                console.error("Register error:", err);
                 showToast(t("toast_fb_err"));
             });
         });
@@ -725,7 +739,7 @@
         function executeLogout() {
             if(confirm(t("confirm_logout"))) {
                 localStorage.removeItem('nusa_active_user');
-                localStorage.removeItem('nusa_wallet_address'); // Hapus sesi dompet juga
+                localStorage.removeItem('nusa_wallet_address');
                 document.getElementById('login-username').value = '';
                 document.getElementById('login-password').value = '';
                 
@@ -750,7 +764,7 @@
             document.getElementById('display-initial').innerText = SESSION_USER.charAt(0).toUpperCase();
             document.getElementById('forum-initial').innerText = SESSION_USER.charAt(0).toUpperCase();
 
-            renderMarket(window.activeCategory || 'Semua');
+            renderMarket(window.activeCategory || 'All');
             
             if(journalListener) db.ref('journals/' + SESSION_USER).off('value', journalListener);
             journalListener = db.ref('journals/' + SESSION_USER).on('value', (snapshot) => {
@@ -799,7 +813,7 @@
         function renderMarket(cat) {
             const container = document.getElementById('matches-container');
             container.innerHTML = '';
-            const data = (cat === 'Semua') ? DB_MATCHES : DB_MATCHES.filter(m => m.category === cat);
+            const data = (cat === 'All') ? DB_MATCHES : DB_MATCHES.filter(m => m.category === cat);
             
             data.forEach(m => {
                 const catName = t(m.catKey);
@@ -839,7 +853,11 @@
             sel.innerHTML = '';
             ACTIVE_MATCH.teams.forEach(te => {
                 let tmStr = te;
-                if(currentLang === 'en') tmStr = tmStr.replace('Menang', 'Win').replace('Seri', 'Draw');
+                if(currentLang === 'en') {
+                    tmStr = tmStr.replace('Menang', 'Win').replace('Seri', 'Draw');
+                } else {
+                    tmStr = tmStr.replace('Win', 'Menang').replace('Draw', 'Seri');
+                }
                 sel.innerHTML += `<option value="${tmStr}">${tmStr}</option>`;
             });
             
@@ -1006,8 +1024,7 @@
             const formattedRes = res
                 .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
                 .replace(/\*(.*?)\*/g, '<i>$1</i>')
-                .replace(/
-/g, '<br>');
+                .replace(/\n/g, '<br>');
             
             box.innerHTML += `
                 <div class="flex gap-3 max-w-[90%] mt-2">
@@ -1027,7 +1044,7 @@
             
             let favCat = currentLang === 'en' ? "None yet" : "Belum ada", favTeam = currentLang === 'en' ? "None yet" : "Belum ada", totalPred = USER_JOURNAL ? USER_JOURNAL.length : 0;
             if (USER_JOURNAL && USER_JOURNAL.length > 0) {
-                let catCounts = { 'Sepak Bola': 0, 'Basket': 0, 'E-Sports': 0 };
+                let catCounts = { 'Football': 0, 'Basketball': 0, 'E-Sports': 0 };
                 let teamCounts = {};
                 USER_JOURNAL.forEach(j => {
                     const match = DB_MATCHES.find(m => m.title === j.title);
@@ -1060,8 +1077,8 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
                         body: JSON.stringify({
                             contents: [
                                 {
-                                    role: "user",
-                                    parts: [{ text: sysPrompt + "\n\nPertanyaan user: " + message }]
+                                 role: "user",
+                                 parts: [{ text: sysPrompt + "\n\nPertanyaan user: " + message }]
                                 }
                             ]
                         })
@@ -1117,7 +1134,6 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
     
         let userWalletAddress = null;
 
-        // FUNGSI RESTORE WALLET SAAT REFRESH
         function restoreWalletState() {
             const savedWallet = localStorage.getItem('nusa_wallet_address');
             if (savedWallet) {
@@ -1131,11 +1147,8 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
             }
         }
 
-        // FUNGSI KONEKSI WALLET MODERN (VIA WALLET STANDARD)
         async function connectWallet() {
             const walletBtn = document.getElementById('wallet-text');
-            
-            // Mengambil data dari array yang dikumpulkan oleh script <head>
             const wallets = window.availableSuiWallets || [];
             let provider = wallets.find(w => w.name.toLowerCase().includes('slush') || w.name.toLowerCase().includes('sui'));
 
@@ -1147,20 +1160,15 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
             try {
                 showToast((currentLang === 'en' ? "⏳ Connecting to " : "⏳ Menghubungkan ke ") + provider.name + "...");
                 
-                // Ambil fitur koneksi standar yang didukung Slush Wallet
                 const connectFeature = provider.features['standard:connect'];
                 if (!connectFeature) {
                     throw new Error("Wallet ini belum mendukung standar Web3 modern.");
                 }
 
-                // Kirim permintaan koneksi ke ekstensi (popup akan terbuka)
                 const response = await connectFeature.connect();
                 
                 if (response.accounts && response.accounts.length > 0) {
-                    // Berhasil tersambung, ekstrak address
                     userWalletAddress = response.accounts[0].address;
-                    
-                    // SIMPAN KE MEMORI BROWSER AGAR TIDAK HILANG SAAT REFRESH
                     localStorage.setItem('nusa_wallet_address', userWalletAddress);
                     
                     const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
