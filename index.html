@@ -574,6 +574,7 @@
             if(SESSION_USER) {
                 renderMarket(window.activeCategory || 'All');
                 renderJournal();
+                restoreWalletState(); // FIX: Pastikan wallet text tidak tertimpa oleh i18n
                 const actDict = { 
                     market: t("header_market"), 
                     journal: t("jour_title"), 
