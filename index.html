@@ -455,7 +455,7 @@
                 btn_wallet: "Sambung Dompet",
                 toast_wallet_ok: "🔗 Dompet Crypto berhasil tersambung, Kak!",
                 toast_wallet_err: "❌ Yah, Slush Wallet-nya belum terpasang atau ditolak nih Kak.",
-                toast_wallet_ext: "⚠️ Ekstensi dompet belum terpasang di browser ini!",
+                toast_wallet_ext: "⚠️ Kakak perlu install ekstensi Slush Wallet dulu ya di browser!",
                 confirm_logout: "Kakak yakin ingin keluar?",
                 confirm_reset: "PERINGATAN: Semua poin dan jurnal Kakak akan terhapus permanen dari SERVER. Lanjut?"
             },
@@ -522,7 +522,7 @@
                 btn_wallet: "Connect Wallet",
                 toast_wallet_ok: "🔗 Crypto Wallet successfully connected, Kak!",
                 toast_wallet_err: "❌ Oops, Slush Wallet is not installed or connection rejected.",
-                toast_wallet_ext: "⚠️ You need to install a wallet extension first!",
+                toast_wallet_ext: "⚠️ You need to install the Slush Wallet browser extension first!",
                 confirm_logout: "Are you sure you want to log out?",
                 confirm_reset: "WARNING: All your points and journals will be permanently deleted from the SERVER. Continue?"
             }
@@ -1080,81 +1080,85 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
                 return `Sistem On-Chain RL sedang gangguan Kak. *(Error: ${error.message})* 🥺`;
             }
         }
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-black/90 text-white px-6 py-3.5 rounded-2xl shadow-[0_0_20px_rgba(255,0,0,0.6)] transform transition-all translate-y-[-20px] opacity-0 text-sm font-bold flex items-center gap-3 border border-red-500 z-[9999] relative';
+            toast.innerHTML = `<span>${msg}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.remove('translate-y-[-20px]', 'opacity-0'), 10);
+            setTimeout(() => { 
+                toast.classList.add('opacity-0', 'translate-y-[-20px]'); 
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
     
         let userWalletAddress = null;
 
-        // FUNGSI DIAGNOSTIK KONEKSI WALLET
+        // FUNGSI KONEKSI SLUSH WALLET (MURNI SUI, TANPA METAMASK)
         async function connectWallet() {
             const walletBtn = document.getElementById('wallet-text');
             
-            // 1. Pengecekan URL Lokal (Penyebab utama wallet diblokir)
+            // Cek URL lokal (Mencegah pemblokiran browser)
             if (window.location.protocol === 'file:') {
-                alert("⚠️ ERROR: Kakak membuka file HTML secara lokal (file:///). Ekstensi wallet otomatis memblokir file lokal demi keamanan. Silakan jalankan menggunakan 'Live Server' (http://127.0.0.1...).");
+                alert("⚠️ ERROR: Kakak membuka file HTML secara lokal (file:///). Silakan jalankan menggunakan 'Live Server' (http://127.0.0.1...).");
                 return;
             }
 
-            // 2. Deteksi Objek Ekstensi di Browser
-            let provider = null;
-            let providerName = "";
-
-            if (window.slush) { provider = window.slush; providerName = "Slush (window.slush)"; }
-            else if (window.suiWallet) { provider = window.suiWallet; providerName = "SUI (window.suiWallet)"; }
-            else if (window.ethereum) { provider = window.ethereum; providerName = "Ethereum/EVM (window.ethereum)"; }
+            // Target murni objek SUI / Slush Wallet
+            let provider = window.slush || window.suiWallet || window.slushWallet;
 
             if (!provider) {
-                alert("❌ Gagal: Tidak ada dompet kripto yang terdeteksi di browser ini! Pastikan ekstensi Slush Wallet sudah di-pin, aktif, dan diizinkan (site access) membaca halaman web ini.");
+                alert("❌ Slush Wallet tidak terdeteksi!\n\nPastikan ekstensi Slush Wallet sudah terpasang dan aktif di browser ini.");
                 showToast(t("toast_wallet_ext"));
                 return;
             }
 
             try {
-                alert(`✅ Sistem dompet terdeteksi sebagai: ${providerName}. Sedang meminta izin koneksi...`);
+                showToast("⏳ Menghubungkan ke Slush Wallet...");
                 let accounts = [];
 
-                // 3. Eksekusi koneksi berdasarkan tipe provider
-                if (providerName.includes("Ethereum")) {
-                    accounts = await provider.request({ method: 'eth_requestAccounts' });
-                } else {
-                    if (typeof provider.requestPermissions === 'function') await provider.requestPermissions();
-                    else if (typeof provider.connect === 'function') await provider.connect();
-
-                    if (typeof provider.getAccounts === 'function') {
-                        accounts = await provider.getAccounts();
-                    } else if (typeof provider.request === 'function') {
-                        accounts = await provider.request({ method: 'sui_accounts' });
-                    }
+                if (typeof provider.requestPermissions === 'function') {
+                    await provider.requestPermissions();
+                } else if (typeof provider.connect === 'function') {
+                    await provider.connect();
                 }
 
-                // 4. Proses data akun yang didapat
+                if (typeof provider.getAccounts === 'function') {
+                    accounts = await provider.getAccounts();
+                } else if (typeof provider.request === 'function') {
+                    accounts = await provider.request({ method: 'sui_accounts' });
+                }
+
                 if (accounts && accounts.length > 0) {
                     userWalletAddress = typeof accounts[0] === 'string' ? accounts[0] : accounts[0].address;
                     
-                    if (userWalletAddress) {
-                        const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
-                        
-                        walletBtn.innerText = shortAddress;
-                        document.getElementById('btn-connect-wallet').classList.remove('from-purple-600', 'to-blue-600');
-                        document.getElementById('btn-connect-wallet').classList.add('from-green-600', 'to-emerald-600');
-                        
-                        if (SESSION_USER) {
-                            db.ref('users_data/' + SESSION_USER + '/wallet').set(userWalletAddress);
-                        }
-                        
-                        showToast("✅ Berhasil terhubung: " + shortAddress);
+                    const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
+                    
+                    walletBtn.innerText = shortAddress;
+                    document.getElementById('btn-connect-wallet').classList.remove('from-purple-600', 'to-blue-600');
+                    document.getElementById('btn-connect-wallet').classList.add('from-green-600', 'to-emerald-600');
+                    
+                    if (SESSION_USER) {
+                        db.ref('users_data/' + SESSION_USER + '/wallet').set(userWalletAddress);
                     }
+                    
+                    showToast("✅ Slush Wallet Berhasil Tersambung!");
                 } else {
-                    alert("❌ Berhasil terhubung ke ekstensi, tapi tidak ada alamat dompet (Address) yang dikembalikan.");
+                    alert("❌ Berhasil terhubung, tapi alamat wallet tidak ditemukan.");
                 }
             } catch (error) {
-                console.error("Wallet Error:", error);
-                alert("❌ Koneksi dibatalkan atau gagal! Error Sistem: " + error.message);
+                console.error("Slush Wallet Error:", error);
+                alert("❌ Koneksi dibatalkan atau ditolak oleh Slush Wallet: " + (error.message || error));
             }
         }
 
-        // Listener jika pengguna mengganti akun di dalam extension Wallet
-        const activeProvider = window.slush || window.suiWallet || window.ethereum;
-        if (activeProvider && typeof activeProvider.on === 'function') {
-            activeProvider.on('accountsChanged', function (accounts) {
+        // Listener perubahan akun Slush Wallet
+        const activeSlushProvider = window.slush || window.suiWallet;
+        if (activeSlushProvider && typeof activeSlushProvider.on === 'function') {
+            activeSlushProvider.on('accountsChanged', function (accounts) {
                 if (accounts && accounts.length > 0) {
                     userWalletAddress = typeof accounts[0] === 'string' ? accounts[0] : accounts[0].address;
                     const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
