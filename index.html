@@ -56,6 +56,36 @@
             window.availableSuiWallets.push(...wallets);
         });
     </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
+    <style id="nusa-theme">
+        :root{--nila:#0E1A33;--sogan:#B5461F;--kunyit:#E9B44C;--krem:#F3E9D2;--laut:#6FB7D1}
+        body{font-family:'Figtree','Segoe UI',sans-serif!important;color:var(--krem);background-color:var(--nila)!important;background-attachment:fixed!important;background-size:72px 72px!important;
+          background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cg fill='none' stroke='%23E9B44C' stroke-opacity='.09' stroke-width='1.2'%3E%3Cellipse cx='36' cy='18' rx='9' ry='18'/%3E%3Cellipse cx='36' cy='54' rx='9' ry='18'/%3E%3Cellipse cx='18' cy='36' rx='18' ry='9'/%3E%3Cellipse cx='54' cy='36' rx='18' ry='9'/%3E%3C/g%3E%3C/svg%3E")!important}
+        h1,h2,h3,h4{font-family:'Bricolage Grotesque','Figtree',sans-serif;letter-spacing:-.01em}
+        .glass{background:rgba(14,26,51,.84)!important;border:1px solid rgba(233,180,76,.2)!important;box-shadow:none!important;backdrop-filter:blur(8px)}
+        .glass-panel{background:rgba(9,16,32,.92)!important;border-color:rgba(233,180,76,.15)!important}
+        #auth-screen{background:rgba(7,13,26,.96)!important}
+        [class*="from-red-"],[class*="from-blue-"]{--tw-gradient-from:var(--sogan)!important;--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to,transparent)!important}
+        [class*="to-red-"]{--tw-gradient-to:#7E2F12!important}
+        [class*="from-blue-"],[class*="from-purple-"]{--tw-gradient-from:#2F6F8F!important;--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to,transparent)!important}
+        [class*="to-blue-"]{--tw-gradient-to:#1B4560!important}
+        .bg-clip-text{--tw-gradient-from:var(--kunyit)!important;--tw-gradient-to:var(--krem)!important}
+        .text-red-200,.text-red-300,.text-red-400{color:var(--kunyit)!important}
+        .text-blue-300,.text-blue-400{color:var(--laut)!important}
+        .bg-red-600,.hover\:bg-red-600:hover,.hover\:bg-red-500:hover{background:var(--sogan)!important}
+        [class*="bg-red-900"]{background:rgba(181,70,31,.2)!important}
+        [class*="border-red-"]{border-color:rgba(233,180,76,.3)!important}
+        [class*="shadow-[0_0"]{box-shadow:none!important}
+        .text-glow{text-shadow:none!important}
+        .rounded-3xl,.rounded-\[2rem\]{border-radius:16px!important}.rounded-2xl{border-radius:12px!important}.rounded-xl{border-radius:8px!important}
+        .uppercase{text-transform:none!important}.tracking-widest,.tracking-wider{letter-spacing:.01em!important}
+        #matches-container .bg-black\/60{border-style:dashed!important;border-color:rgba(233,180,76,.35)!important}
+        .glass .h-1.absolute{height:10px!important;background-color:transparent!important;background-image:linear-gradient(135deg,var(--kunyit) 25%,transparent 25%),linear-gradient(225deg,var(--kunyit) 25%,transparent 25%)!important;background-size:16px 16px!important;opacity:.85}
+        :focus-visible{outline:2px solid var(--kunyit);outline-offset:2px}
+        @media(prefers-reduced-motion:reduce){.mascot-float,.animate-pulse,.animate-bounce{animation:none!important}}
+    </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative">
 
@@ -170,8 +200,8 @@
                         </div>
                     </div>
                     
-                    <button id="btn-connect-wallet" onclick="connectWallet()" class="hidden md:flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-4 py-1.5 rounded-full text-xs font-bold border border-white/20 shadow-[0_0_10px_rgba(150,50,255,0.4)] transition transform hover:-translate-y-0.5">
-                        <i class="fab fa-ethereum"></i> <span id="wallet-text" data-i18n="btn_wallet">Connect Wallet</span>
+                    <button id="btn-connect-wallet" onclick="connectWallet()" class="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-4 py-1.5 rounded-full text-xs font-bold border border-white/20 shadow-[0_0_10px_rgba(150,50,255,0.4)] transition transform hover:-translate-y-0.5">
+                        <i class="fab fa-ethereum"></i> <span id="wallet-text" class="hidden sm:inline" data-i18n="btn_wallet">Connect Wallet</span>
                     </button>
 
                     <div class="flex items-center gap-2 md:gap-3 bg-black/40 py-1.5 px-1.5 pr-2 md:pr-4 rounded-full border border-white/10 shadow-inner">
@@ -407,6 +437,13 @@
         const GEMINI_API_KEY = part1 + part2 + part3 + part4;
         
         let aiChatHistory = [];
+        const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const toArr = v => Array.isArray(v) ? v.filter(Boolean) : (v ? Object.values(v) : []);
+        const USER_RE = /^[A-Za-z0-9_-]{2,24}$/;
+        async function hashPw(u, p) {
+            const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('nusa:' + u.toLowerCase() + ':' + p));
+            return 'h1:' + [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join('');
+        }
 
         // I18N
         const i18n = {
@@ -438,6 +475,7 @@
                 card_bookie: "Bookmaker",
                 card_onchain: "On-Chain",
                 card_btn: "Tentukan Pilihan",
+                card_demo: "Odds contoh",
                 mod_title: "Buat Prediksi",
                 mod_q: "Siapa yang akan menang?",
                 mod_conf: "Tingkat Keyakinan",
@@ -508,6 +546,7 @@
                 card_bookie: "Bookmaker",
                 card_onchain: "On-Chain",
                 card_btn: "Make a Pick",
+                card_demo: "Sample odds",
                 mod_title: "Make Prediction",
                 mod_q: "Who will win?",
                 mod_conf: "Confidence Level",
@@ -689,57 +728,43 @@
             }
         }
 
-        document.getElementById('form-login').addEventListener('submit', (e) => {
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
             e.preventDefault();
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-password').value;
-            
+            if (!USER_RE.test(u)) { showToast(t("toast_login_err")); return; }
             showToast(currentLang === 'en' ? "⏳ Verifying with server..." : "⏳ Verifikasi ke server...");
-            
-            db.ref('users/' + u).once('value').then((snapshot) => {
-                if(snapshot.exists()) {
-                    let dbPass = snapshot.val();
-                    // Handle if password stored as object or string
-                    if (typeof dbPass === 'object' && dbPass !== null) {
-                        dbPass = dbPass.password || Object.values(dbPass)[0];
-                    }
-                    if(String(dbPass) === String(p)) {
-                        localStorage.setItem('nusa_active_user', u);
-                        showToast(t("toast_login_ok") + u + " ✨");
-                        initApp();
-                    } else {
-                        showToast(t("toast_login_err"));
-                    }
-                } else {
-                    showToast(t("toast_login_err"));
-                }
-            }).catch(err => {
-                console.error("Login error:", err);
-                showToast(t("toast_fb_err"));
-            });
+            try {
+                const snap = await db.ref('users/' + u).once('value');
+                if (!snap.exists()) { showToast(t("toast_login_err")); return; }
+                let stored = snap.val();
+                if (typeof stored === 'object' && stored !== null) stored = stored.password || Object.values(stored)[0];
+                stored = String(stored);
+                const h = await hashPw(u, p);
+                if (stored === h || stored === p) {
+                    if (stored === p) await db.ref('users/' + u).set(h); // upgrade akun lama dari teks biasa ke hash
+                    localStorage.setItem('nusa_active_user', u);
+                    showToast(t("toast_login_ok") + u + " ✨");
+                    initApp();
+                } else showToast(t("toast_login_err"));
+            } catch (err) { console.error("Login error:", err); showToast(t("toast_fb_err")); }
         });
 
-        document.getElementById('form-register').addEventListener('submit', (e) => {
+        document.getElementById('form-register').addEventListener('submit', async (e) => {
             e.preventDefault();
             const u = document.getElementById('reg-username').value.trim();
             const p = document.getElementById('reg-password').value;
-            
+            if (!USER_RE.test(u)) { showToast(currentLang === 'en' ? "⚠️ Username: 2-24 letters, numbers, _ or -" : "⚠️ Username: 2-24 huruf, angka, _ atau -"); return; }
+            if (p.length < 6) { showToast(currentLang === 'en' ? "⚠️ Password must be at least 6 characters" : "⚠️ Kata sandi minimal 6 karakter"); return; }
             showToast(currentLang === 'en' ? "⏳ Registering account..." : "⏳ Mendaftarkan akun...");
-            
-            db.ref('users/' + u).once('value').then((snapshot) => {
-                if(snapshot.exists()) {
-                    showToast(t("toast_reg_err"));
-                } else {
-                    db.ref('users/' + u).set(p).then(() => {
-                        localStorage.setItem('nusa_active_user', u);
-                        showToast(t("toast_reg_ok") + u + " 🥰");
-                        initApp();
-                    });
-                }
-            }).catch(err => {
-                console.error("Register error:", err);
-                showToast(t("toast_fb_err"));
-            });
+            try {
+                const snap = await db.ref('users/' + u).once('value');
+                if (snap.exists()) { showToast(t("toast_reg_err")); return; }
+                await db.ref('users/' + u).set(await hashPw(u, p));
+                localStorage.setItem('nusa_active_user', u);
+                showToast(t("toast_reg_ok") + u + " 🥰");
+                initApp();
+            } catch (err) { console.error("Register error:", err); showToast(t("toast_fb_err")); }
         });
 
         function executeLogout() {
@@ -774,7 +799,7 @@
             
             if(journalListener) db.ref('journals/' + SESSION_USER).off('value', journalListener);
             journalListener = db.ref('journals/' + SESSION_USER).on('value', (snapshot) => {
-                USER_JOURNAL = snapshot.val() || [];
+                USER_JOURNAL = toArr(snapshot.val());
                 renderJournal();
                 updateUserStats();
             });
@@ -782,7 +807,7 @@
             if(forumListener) db.ref('forum').off('value', forumListener);
             forumListener = db.ref('forum').on('value', (snapshot) => {
                 if(snapshot.exists()) {
-                    FORUM_POSTS = snapshot.val();
+                    FORUM_POSTS = toArr(snapshot.val());
                 } else {
                     FORUM_POSTS = [
                         { user: 'Sari AI 🌸', text: currentLang === 'en' ? 'Welcome to the Global Forum! Discussions here are saved to the server and can be read by analysts worldwide ✨' : 'Selamat datang di Forum Global Kak! Diskusi yang tertulis di sini akan masuk ke server dan bisa dibaca oleh semua analis di seluruh dunia lho ✨', time: 'System', ai: true }
@@ -828,7 +853,7 @@
                         <img src="4.png" class="absolute -bottom-10 -right-10 w-40 h-40 opacity-10 pointer-events-none">
                         <div class="flex justify-between items-center mb-4 relative z-10">
                             <span class="text-[10px] font-black tracking-widest uppercase bg-red-900/40 text-red-300 px-3 py-1 rounded border border-red-500/20">${catName}</span>
-                            <span class="text-xs text-green-400 font-bold bg-green-900/30 px-2 py-1 rounded border border-green-500/30">Live Data</span>
+                            <span class="text-xs text-green-400 font-bold bg-green-900/30 px-2 py-1 rounded border border-green-500/30">${t("card_demo")}</span>
                         </div>
                         <h4 class="font-black text-xl mb-6 text-white group-hover:text-red-300 transition leading-tight flex-1 relative z-10">${m.title}</h4>
                         <div class="flex justify-between bg-black/60 rounded-2xl p-4 border border-white/10 mb-6 shadow-inner mt-auto relative z-10">
@@ -889,10 +914,8 @@
             const conf = document.getElementById('mp-confidence').value;
             const timeStr = new Date().toLocaleString(currentLang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', hour:'2-digit', minute:'2-digit'});
             
-            if(!USER_JOURNAL) USER_JOURNAL = [];
-            USER_JOURNAL.unshift({ title: ACTIVE_MATCH.title, pick: sel, conf: conf, time: timeStr });
-            
-            db.ref('journals/' + SESSION_USER).set(USER_JOURNAL).then(() => {
+            const entry = { title: ACTIVE_MATCH.title, pick: sel, conf: conf, time: timeStr };
+            db.ref('journals/' + SESSION_USER).transaction(cur => { const a = toArr(cur); a.unshift(entry); return a; }).then(() => {
                 closeModal('modal-predict');
                 showToast(t("toast_pred_ok"));
             }).catch(err => {
@@ -911,18 +934,18 @@
             USER_JOURNAL.forEach(j => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-white/5 transition">
-                        <td class="p-5 font-bold text-white max-w-[200px] truncate">${j.title}</td>
-                        <td class="p-5 text-red-400 font-black">${j.pick}</td>
+                        <td class="p-5 font-bold text-white max-w-[200px] truncate">${esc(j.title)}</td>
+                        <td class="p-5 text-red-400 font-black">${esc(j.pick)}</td>
                         <td class="p-5">
                             <div class="flex items-center justify-center gap-2">
                                 <div class="w-16 h-2 bg-black rounded-full overflow-hidden border border-white/20">
-                                    <div class="bg-gradient-to-r from-red-500 to-yellow-400 h-full" style="width: ${j.conf}%"></div>
+                                    <div class="bg-gradient-to-r from-red-500 to-yellow-400 h-full" style="width: ${Number(j.conf)||0}%"></div>
                                 </div>
-                                <span class="text-xs font-bold text-gray-300">${j.conf}%</span>
+                                <span class="text-xs font-bold text-gray-300">${Number(j.conf)||0}%</span>
                             </div>
                         </td>
                         <td class="p-5"><span class="bg-blue-900/40 text-blue-300 border border-blue-500/30 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider"><i class="fas fa-cloud text-blue-400 mr-1"></i> ${t("status_wait")}</span></td>
-                        <td class="p-5 text-right text-gray-400 text-xs font-bold">${j.time}</td>
+                        <td class="p-5 text-right text-gray-400 text-xs font-bold">${esc(j.time)}</td>
                     </tr>
                 `;
             });
@@ -942,18 +965,18 @@
             FORUM_POSTS.forEach(p => {
                 const avatar = p.ai 
                     ? `<img src="2.png" class="w-12 h-12 rounded-full border-2 border-red-500 bg-black/50 shadow-lg shrink-0 object-contain p-0.5">`
-                    : `<div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 border-2 border-gray-400 flex items-center justify-center font-black text-xl shadow-lg shrink-0 text-white">${p.user.charAt(0).toUpperCase()}</div>`;
+                    : `<div class="w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 border-2 border-gray-400 flex items-center justify-center font-black text-xl shadow-lg shrink-0 text-white">${esc(String(p.user).charAt(0).toUpperCase())}</div>`;
                 
                 feed.innerHTML += `
                     <div class="glass p-5 rounded-2xl border border-white/5">
                         <div class="flex items-center gap-4 mb-3">
                             ${avatar}
                             <div>
-                                <div class="font-bold text-white flex items-center gap-2">${p.user} ${p.ai ? '<i class="fas fa-certificate text-pink-400 text-xs"></i>' : ''}</div>
-                                <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">${p.time}</div>
+                                <div class="font-bold text-white flex items-center gap-2">${esc(p.user)} ${p.ai ? '<i class="fas fa-certificate text-pink-400 text-xs"></i>' : ''}</div>
+                                <div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">${esc(p.time)}</div>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-200 leading-relaxed">${p.text}</p>
+                        <p class="text-sm text-gray-200 leading-relaxed">${esc(p.text)}</p>
                     </div>
                 `;
             });
@@ -966,11 +989,8 @@
             
             const timeStr = new Date().toLocaleString(currentLang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', hour:'2-digit', minute:'2-digit'});
             
-            if(!FORUM_POSTS) FORUM_POSTS = [];
-            FORUM_POSTS.unshift({ user: SESSION_USER, text: txt, time: timeStr, ai: false });
-            if(FORUM_POSTS.length > 50) FORUM_POSTS.pop();
-            
-            db.ref('forum').set(FORUM_POSTS).then(() => {
+            const post = { user: SESSION_USER, text: txt, time: timeStr, ai: false };
+            db.ref('forum').transaction(cur => { const a = toArr(cur); a.unshift(post); return a.slice(0, 50); }).then(() => {
                 input.value = '';
                 showToast(t("toast_post_ok"));
             }).catch(err => {
@@ -1000,7 +1020,7 @@
             box.innerHTML += `
                 <div class="flex justify-end gap-3 max-w-[100%] mt-2">
                     <div class="bg-white/10 border border-white/20 text-white text-sm p-3 rounded-2xl rounded-tr-none shadow-md">
-                        ${txt}
+                        ${esc(txt)}
                     </div>
                 </div>
             `;
@@ -1027,7 +1047,7 @@
             const typingEl = document.getElementById(typingId);
             if(typingEl) typingEl.remove();
             
-            const formattedRes = res
+            const formattedRes = esc(res)
                 .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
                 .replace(/\*(.*?)\*/g, '<i>$1</i>')
                 .replace(/\n/g, '<br>');
@@ -1081,12 +1101,8 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            contents: [
-                                {
-                                 role: "user",
-                                 parts: [{ text: sysPrompt + "\n\nPertanyaan user: " + message }]
-                                }
-                            ]
+                            systemInstruction: { parts: [{ text: sysPrompt }] },
+                            contents: [...aiChatHistory, { role: "user", parts: [{ text: message }] }]
                         })
                     }
                 );
