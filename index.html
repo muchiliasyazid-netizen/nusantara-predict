@@ -194,7 +194,7 @@
                     </button>
 
                     <div class="hidden md:flex flex-col items-end mr-2">
-                        <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold" data-i18n="header_pts">Total On-Chain Points</div>
+                        <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold" data-i18n="header_pts">Total Points</div>
                         <div class="font-black text-xl text-yellow-400 drop-shadow-[0_0_8px_rgba(255,200,0,0.5)] flex items-center gap-2">
                             <i class="fas fa-coins text-sm"></i> <span id="display-pts">0</span>
                         </div>
@@ -231,17 +231,19 @@
                         </div>
                     </div>
 
+                    <div id="data-note" class="flex flex-wrap items-center gap-3 text-xs text-gray-400"></div>
+
                     <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                         <button class="filter-btn active-filter px-6 py-2.5 rounded-full font-bold text-sm border-2 border-red-500 bg-red-600 text-white shadow-[0_0_15px_rgba(255,0,0,0.4)] whitespace-nowrap transition" onclick="filterMarket('All', this)"><span data-i18n="filter_all">🔥 All Events</span></button>
                         <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('Football', this)"><span data-i18n="filter_soc">⚽ Football</span></button>
                         <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('Basketball', this)"><span data-i18n="filter_bb">🏀 Basketball</span></button>
-                        <button class="filter-btn px-6 py-2.5 rounded-full font-bold text-sm border border-white/20 bg-black/40 text-gray-400 hover:text-white hover:bg-white/10 whitespace-nowrap transition" onclick="filterMarket('E-Sports', this)"><span data-i18n="filter_es">🎮 E-Sports</span></button>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="matches-container"></div>
                 </div>
 
                 <div id="view-journal" class="tab-view hidden max-w-7xl mx-auto space-y-6">
+                    <div id="mem-panel"></div>
                     <div class="glass rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
                         <div class="bg-gradient-to-r from-red-900/50 to-black p-6 border-b border-red-500/30 flex items-center gap-4">
                             <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center text-white text-xl shadow-lg"><i class="fas fa-book-medical"></i></div>
@@ -287,7 +289,7 @@
                         <div class="md:col-span-1 glass p-6 rounded-3xl border border-red-500/30 text-center flex flex-col items-center bg-gradient-to-b from-black to-red-950/40">
                             <img src="8.png" class="w-24 h-24 mb-4 drop-shadow-[0_0_20px_rgba(255,0,0,0.5)]">
                             <div class="text-sm font-bold text-red-400 uppercase tracking-widest mb-1" data-i18n="ld_rank">Your Rank</div>
-                            <h3 class="text-3xl font-black text-white mb-6">#42</h3>
+                            <h3 class="text-3xl font-black text-white mb-6" id="stat-rank">—</h3>
                             
                             <div class="w-full space-y-4">
                                 <div class="bg-black/50 p-4 rounded-xl border border-white/10 text-left flex justify-between items-center">
@@ -296,48 +298,23 @@
                                 </div>
                                 <div class="bg-black/50 p-4 rounded-xl border border-white/10 text-left flex justify-between items-center">
                                     <span class="text-gray-400 text-xs uppercase font-bold" data-i18n="ld_wr">Accuracy (WR)</span>
-                                    <span class="font-black text-lg text-green-400" id="stat-wr">0%</span>
+                                    <span class="font-black text-lg text-green-400" id="stat-wr">—</span>
+                                </div>
+                                <div class="bg-black/50 p-4 rounded-xl border border-white/10 text-left flex justify-between items-center">
+                                    <span class="text-gray-400 text-xs uppercase font-bold" data-i18n="ld_settled">Settled</span>
+                                    <span class="font-black text-lg text-white" id="stat-settled">0</span>
+                                </div>
+                                <div class="bg-black/50 p-4 rounded-xl border border-white/10 text-left flex justify-between items-center">
+                                    <span class="text-gray-400 text-xs uppercase font-bold" data-i18n="ld_pts">Points</span>
+                                    <span class="font-black text-lg text-yellow-400" id="stat-pts">0</span>
                                 </div>
                             </div>
+                            <p class="text-[11px] text-gray-400 mt-4 leading-relaxed text-left" data-i18n="ld_rule"></p>
                         </div>
                         
                         <div class="md:col-span-2 glass p-6 rounded-3xl border border-white/10">
                             <h4 class="font-black text-xl mb-6 flex items-center gap-3"><i class="fas fa-globe-asia text-blue-400"></i> <span data-i18n="ld_top">Top 3 Global Analysts</span></h4>
-                            <div class="space-y-3">
-                                <div class="bg-gradient-to-r from-yellow-900/40 to-black p-4 rounded-2xl border border-yellow-500/30 flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-300 to-yellow-600 flex items-center justify-center font-black text-black text-xl shadow-lg">1</div>
-                                    <div class="flex-1">
-                                        <div class="font-bold text-lg text-white">Raja_Prediksi99</div>
-                                        <div class="text-xs text-yellow-200" data-i18n="ld_user1_sub">1,402 Accurate Predictions</div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xl font-black text-green-400">94%</div>
-                                        <div class="text-[10px] text-gray-400">Win Rate</div>
-                                    </div>
-                                </div>
-                                <div class="bg-gradient-to-r from-gray-800/40 to-black p-4 rounded-2xl border border-gray-400/30 flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center font-black text-black text-xl shadow-lg">2</div>
-                                    <div class="flex-1">
-                                        <div class="font-bold text-lg text-white">SobatOnChain</div>
-                                        <div class="text-xs text-gray-300" data-i18n="ld_user2_sub">950 Accurate Predictions</div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xl font-black text-green-400">89%</div>
-                                        <div class="text-[10px] text-gray-400">Win Rate</div>
-                                    </div>
-                                </div>
-                                <div class="bg-gradient-to-r from-orange-900/40 to-black p-4 rounded-2xl border border-orange-500/30 flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-700 flex items-center justify-center font-black text-black text-xl shadow-lg">3</div>
-                                    <div class="flex-1">
-                                        <div class="font-bold text-lg text-white">CryptoNusa</div>
-                                        <div class="text-xs text-orange-200" data-i18n="ld_user3_sub">820 Accurate Predictions</div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xl font-black text-green-400">86%</div>
-                                        <div class="text-[10px] text-gray-400">Win Rate</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="space-y-3" id="top-list"></div>
                         </div>
                     </div>
                 </div>
@@ -363,6 +340,7 @@
                 </div>
                 
                 <div>
+                    <p id="mp-mem-hint" class="text-xs text-yellow-300/90 bg-black/40 border border-yellow-500/20 rounded-lg p-3 mb-3 leading-relaxed"></p>
                     <div class="flex justify-between items-end mb-3">
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest" data-i18n="mod_conf">Confidence Level</label>
                         <span id="mp-conf-display" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-400">75%</span>
@@ -503,6 +481,20 @@
                 cat_basket: "Basketball",
                 cat_esport: "E-Sports",
                 status_wait: "Tersinkron",
+                mem_title: "Memori Walrus Anda", mem_sub: "Setiap prediksi dan hasilnya ditulis ke Walrus Memory (Mainnet). Dari situ dihitung seberapa layak Anda dipercaya per liga.",
+                mem_empty: "Belum ada hasil yang tersimpan. Skor kredibilitas muncul setelah pertandingan pertama Anda selesai.", mem_writes: "tulisan memori", mem_cp: "checkpoint Sui (Tatum)",
+                mem_src_walrus: "Sumber: recall dari Walrus Memory", mem_src_local: "Sumber: hitungan lokal (backend memori tidak terjangkau)", mem_refresh: "Muat ulang",
+                mem_over: "terlalu percaya diri", mem_acc: "akurasi", mem_avgconf: "rata-rata keyakinan",
+                mem_hint_none: "Memori Walrus: belum cukup riwayat di liga ini. Mulai dengan keyakinan 75%.",
+                mem_hint: "Memori Walrus: di liga ini Anda benar {wins} dari {n} prediksi ({hit}%), rata-rata keyakinan {conf}%. Keyakinan awal disetel ke {v}%.",
+                status_pending: "Menunggu hasil", status_won: "Menang", status_lost: "Kalah", status_void: "Dibatalkan", status_legacy: "Tidak terverifikasi",
+                opt_win: "Menang", opt_draw: "Seri",
+                mk_loading: "Memuat jadwal pertandingan asli...", mk_empty: "Belum ada pertandingan mendatang dari sumber data.", mk_err: "Gagal memuat jadwal. Periksa koneksi lalu coba lagi.",
+                mk_src: "Jadwal: TheSportsDB · Odds on-chain: Polymarket · Odds bookmaker: The Odds API", mk_refresh: "Muat ulang", mk_key_add: "Isi API Key Odds", mk_key_set: "Ganti API Key Odds",
+                odds_key_prompt: "Masukkan API key The Odds API (the-odds-api.com). Kosongkan untuk menghapus.",
+                toast_started: "⏱️ Pertandingan sudah dimulai, prediksi ditutup.", toast_dup: "⚠️ Kamu sudah memprediksi pertandingan ini.",
+                ld_settled: "Sudah Selesai", ld_pts: "Poin", ld_empty: "Belum ada analis dengan prediksi yang sudah selesai.", ld_acc: "prediksi benar",
+                ld_rule: "Poin hanya diberikan setelah pertandingan selesai: tebakan benar = keyakinan × odds (× 1 jika odds tidak tersedia), tebakan salah = −½ keyakinan. Peringkat dan akurasi hanya dihitung dari prediksi yang sudah selesai.",
                 toast_login_ok: "✅ Berhasil Masuk! Selamat Datang, Kak ",
                 toast_login_err: "❌ Akun tidak ditemukan atau kata sandi salah.",
                 toast_reg_err: "⚠️ Nama pengguna sudah dipakai! Pilih yang lain ya Kak.",
@@ -536,7 +528,7 @@
                 nav_reset: "Reset History",
                 nav_logout: "Log Out",
                 header_market: "Active Sports Markets",
-                header_pts: "Total On-Chain Points",
+                header_pts: "Total Points",
                 hero_greet: "Hello,",
                 hero_desc: "Global sports markets are highly fluctuating. Use your analysis, simulate on-chain picks, and collect prediction points to climb the leaderboard in Nusantara Predict.",
                 filter_all: "🔥 All Events",
@@ -574,6 +566,20 @@
                 cat_basket: "Basketball",
                 cat_esport: "E-Sports",
                 status_wait: "Synced",
+                mem_title: "Your Walrus Memory", mem_sub: "Every prediction and its result is written to Walrus Memory (Mainnet). Your credibility per league is computed from it.",
+                mem_empty: "No results stored yet. Credibility scores appear after your first match settles.", mem_writes: "memory writes", mem_cp: "Sui checkpoint (Tatum)",
+                mem_src_walrus: "Source: recalled from Walrus Memory", mem_src_local: "Source: local calculation (memory backend unreachable)", mem_refresh: "Refresh",
+                mem_over: "overconfident", mem_acc: "accuracy", mem_avgconf: "avg confidence",
+                mem_hint_none: "Walrus Memory: not enough history in this league yet. Starting at 75% confidence.",
+                mem_hint: "Walrus Memory: in this league you were right {wins} of {n} picks ({hit}%), avg confidence {conf}%. Starting confidence set to {v}%.",
+                status_pending: "Awaiting result", status_won: "Won", status_lost: "Lost", status_void: "Void", status_legacy: "Unverified",
+                opt_win: "Win", opt_draw: "Draw",
+                mk_loading: "Loading real fixtures...", mk_empty: "No upcoming matches from the data source.", mk_err: "Failed to load fixtures. Check your connection and retry.",
+                mk_src: "Fixtures: TheSportsDB · On-chain odds: Polymarket · Bookmaker odds: The Odds API", mk_refresh: "Refresh", mk_key_add: "Add Odds API Key", mk_key_set: "Change Odds API Key",
+                odds_key_prompt: "Enter your The Odds API key (the-odds-api.com). Leave empty to remove.",
+                toast_started: "⏱️ This match has already started, predictions are closed.", toast_dup: "⚠️ You already predicted this match.",
+                ld_settled: "Settled", ld_pts: "Points", ld_empty: "No analyst has a settled prediction yet.", ld_acc: "correct picks",
+                ld_rule: "Points are only awarded once a match finishes: correct pick = confidence × odds (× 1 if odds are unavailable), wrong pick = −½ confidence. Rank and accuracy count settled predictions only.",
                 toast_login_ok: "✅ Login Success! Welcome, ",
                 toast_login_err: "❌ Account not found or wrong password.",
                 toast_reg_err: "⚠️ Username already taken! Choose another.",
@@ -618,6 +624,8 @@
             if(SESSION_USER) {
                 renderMarket(window.activeCategory || 'All');
                 renderJournal();
+                renderLeaderboard();
+                renderMemPanel();
                 restoreWalletState(); // FIX: Pastikan wallet text tidak tertimpa oleh i18n
                 const actDict = { 
                     market: t("header_market"), 
@@ -637,43 +645,267 @@
             setLang(currentLang === 'id' ? 'en' : 'id');
         }
 
-        const DB_MATCHES = [
-            { id: 1, title: 'Indonesia vs Saudi Arabia', category: 'Football', catKey: 'cat_football', o1: '2.80', o2: '1.60', teams: ['Indonesia Win', 'Draw', 'Saudi Arabia Win'] },
-            { id: 2, title: 'Arsenal vs Manchester City', category: 'Football', catKey: 'cat_football', o1: '2.60', o2: '2.40', teams: ['Arsenal Win', 'Draw', 'Man City Win'] },
-            { id: 3, title: 'Persija Jakarta vs Persib Bandung', category: 'Football', catKey: 'cat_football', o1: '2.10', o2: '2.80', teams: ['Persija Win', 'Draw', 'Persib Win'] },
-            { id: 6, title: 'Real Madrid vs Barcelona', category: 'Football', catKey: 'cat_football', o1: '1.85', o2: '2.10', teams: ['Real Madrid Win', 'Draw', 'Barcelona Win'] },
-            { id: 7, title: 'Manchester United vs Liverpool', category: 'Football', catKey: 'cat_football', o1: '3.10', o2: '1.75', teams: ['Man United Win', 'Draw', 'Liverpool Win'] },
-            { id: 8, title: 'Bayern Munich vs B. Dortmund', category: 'Football', catKey: 'cat_football', o1: '1.40', o2: '3.50', teams: ['Bayern Win', 'Draw', 'Dortmund Win'] },
-            { id: 9, title: 'Juventus vs AC Milan', category: 'Football', catKey: 'cat_football', o1: '2.20', o2: '2.50', teams: ['Juventus Win', 'Draw', 'AC Milan Win'] },
-            { id: 10, title: 'PSG vs Marseille', category: 'Football', catKey: 'cat_football', o1: '1.30', o2: '4.20', teams: ['PSG Win', 'Draw', 'Marseille Win'] },
-            { id: 11, title: 'Inter Milan vs AS Roma', category: 'Football', catKey: 'cat_football', o1: '1.95', o2: '2.90', teams: ['Inter Win', 'Draw', 'AS Roma Win'] },
-            { id: 12, title: 'Chelsea vs Tottenham', category: 'Football', catKey: 'cat_football', o1: '2.40', o2: '2.30', teams: ['Chelsea Win', 'Draw', 'Tottenham Win'] },
-            { id: 29, title: 'Persebaya vs Arema FC', category: 'Football', catKey: 'cat_football', o1: '2.15', o2: '2.35', teams: ['Persebaya Win', 'Draw', 'Arema Win'] },
-            { id: 30, title: 'Atletico Madrid vs Sevilla', category: 'Football', catKey: 'cat_football', o1: '1.75', o2: '2.80', teams: ['Atletico Win', 'Draw', 'Sevilla Win'] },
-            { id: 4, title: 'LA Lakers vs G.S. Warriors', category: 'Basketball', catKey: 'cat_basket', o1: '1.90', o2: '1.85', teams: ['Lakers Win', 'Warriors Win'] },
-            { id: 13, title: 'Boston Celtics vs Miami Heat', category: 'Basketball', catKey: 'cat_basket', o1: '1.60', o2: '2.40', teams: ['Celtics Win', 'Heat Win'] },
-            { id: 14, title: 'Chicago Bulls vs NY Knicks', category: 'Basketball', catKey: 'cat_basket', o1: '2.10', o2: '1.75', teams: ['Bulls Win', 'Knicks Win'] },
-            { id: 15, title: 'Denver Nuggets vs Phoenix Suns', category: 'Basketball', catKey: 'cat_basket', o1: '1.80', o2: '1.95', teams: ['Nuggets Win', 'Suns Win'] },
-            { id: 16, title: 'Dallas Mavericks vs LA Clippers', category: 'Basketball', catKey: 'cat_basket', o1: '2.05', o2: '1.80', teams: ['Mavericks Win', 'Clippers Win'] },
-            { id: 17, title: 'Milwaukee Bucks vs 76ers', category: 'Basketball', catKey: 'cat_basket', o1: '1.70', o2: '2.20', teams: ['Bucks Win', '76ers Win'] },
-            { id: 18, title: 'Pelita Jaya vs Satria Muda', category: 'Basketball', catKey: 'cat_basket', o1: '1.85', o2: '1.90', teams: ['Pelita Jaya Win', 'Satria Muda Win'] },
-            { id: 19, title: 'Prawira Bandung vs Dewa United', category: 'Basketball', catKey: 'cat_basket', o1: '2.30', o2: '1.65', teams: ['Prawira Win', 'Dewa United Win'] },
-            { id: 31, title: 'Toronto Raptors vs Brooklyn Nets', category: 'Basketball', catKey: 'cat_basket', o1: '2.50', o2: '1.55', teams: ['Raptors Win', 'Nets Win'] },
-            { id: 32, title: 'Bima Perkasa vs PSS Sleman', category: 'Basketball', catKey: 'cat_basket', o1: '1.95', o2: '1.85', teams: ['Bima Perkasa Win', 'PSS Sleman Win'] },
-            { id: 5, title: 'RRQ Hoshi vs ONIC Esports', category: 'E-Sports', catKey: 'cat_esport', o1: '1.75', o2: '2.05', teams: ['RRQ Win', 'ONIC Win'] },
-            { id: 20, title: 'EVOS Legends vs Alter Ego', category: 'E-Sports', catKey: 'cat_esport', o1: '1.90', o2: '1.85', teams: ['EVOS Win', 'Alter Ego Win'] },
-            { id: 21, title: 'T1 vs Gen.G (LoL)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.65', o2: '2.20', teams: ['T1 Win', 'Gen.G Win'] },
-            { id: 22, title: 'Team Spirit vs Gaimin Gladiators', category: 'E-Sports', catKey: 'cat_esport', o1: '2.10', o2: '1.75', teams: ['Team Spirit Win', 'Gaimin Win'] },
-            { id: 23, title: 'NaVi vs FaZe Clan (CS2)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.80', o2: '1.95', teams: ['NaVi Win', 'FaZe Win'] },
-            { id: 24, title: 'Paper Rex vs Sentinels (Valorant)', category: 'E-Sports', catKey: 'cat_esport', o1: '2.00', o2: '1.80', teams: ['Paper Rex Win', 'Sentinels Win'] },
-            { id: 25, title: 'Fnatic vs LOUD (Valorant)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.75', o2: '2.10', teams: ['Fnatic Win', 'LOUD Win'] },
-            { id: 26, title: 'BTR Red Aliens vs Morph Team', category: 'E-Sports', catKey: 'cat_esport', o1: '1.50', o2: '2.60', teams: ['BTR Win', 'Morph Win'] },
-            { id: 27, title: 'Liquid vs OG (Dota 2)', category: 'E-Sports', catKey: 'cat_esport', o1: '1.85', o2: '1.90', teams: ['Liquid Win', 'OG Win'] },
-            { id: 28, title: 'DRX vs JD Gaming (LoL)', category: 'E-Sports', catKey: 'cat_esport', o1: '2.40', o2: '1.60', teams: ['DRX Win', 'JD Gaming Win'] },
-            { id: 33, title: 'Karmine Corp vs MAD Lions', category: 'E-Sports', catKey: 'cat_esport', o1: '2.15', o2: '1.70', teams: ['KC Win', 'MAD Win'] },
-            { id: 34, title: 'BREN Esports vs Blacklist Int', category: 'E-Sports', catKey: 'cat_esport', o1: '1.80', o2: '2.00', teams: ['BREN Win', 'Blacklist Win'] }
+        // ===== DATA NYATA: jadwal, odds, hasil =====
+        const TSDB = 'https://www.thesportsdb.com/api/v1/json/3/';
+        const LEAGUES = [
+            { id: 4328, name: 'Premier League', cat: 'Football', odds: 'soccer_epl' },
+            { id: 4335, name: 'La Liga', cat: 'Football', odds: 'soccer_spain_la_liga' },
+            { id: 4332, name: 'Serie A', cat: 'Football', odds: 'soccer_italy_serie_a' },
+            { id: 4331, name: 'Bundesliga', cat: 'Football', odds: 'soccer_germany_bundesliga' },
+            { id: 4334, name: 'Ligue 1', cat: 'Football', odds: 'soccer_france_ligue_one' },
+            { id: 4387, name: 'NBA', cat: 'Basketball', odds: 'basketball_nba' }
         ];
+        let DB_MATCHES = [];
+        let MARKET_STATE = 'loading';
+        const catKeyOf = c => c === 'Basketball' ? 'cat_basket' : 'cat_football';
+        async function jget(url) { const r = await fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
+        const normTeam = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\bman\b/g, 'manchester').replace(/\b(fc|cf|afc|sc|bc|club|de|the)\b/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+        const sameTeam = (a, b) => { const x = normTeam(a), y = normTeam(b); return !!x && !!y && (x === y || x.includes(y) || y.includes(x)); };
+        const tsOf = e => {
+            let s = e.strTimestamp || (e.dateEvent ? e.dateEvent + 'T' + (e.strTime || '00:00:00') : '');
+            if (!s) return 0;
+            if (!/[zZ]$|[+-]\d\d:?\d\d$/.test(s)) s += 'Z';
+            const v = Date.parse(s); return isNaN(v) ? 0 : v;
+        };
+        const jparse = v => { try { return typeof v === 'string' ? JSON.parse(v) : (v || []); } catch (e) { return []; } };
+        const toOdds = p => (p > 0.02 && p < 0.99) ? Math.round(100 / p) / 100 : null;
+        const avg = a => a.length ? Math.round(a.reduce((x, y) => x + y, 0) / a.length * 100) / 100 : null;
 
+        async function discoverLeagues() {
+            try {
+                const d = await jget(TSDB + 'search_all_leagues.php?c=Indonesia&s=Soccer');
+                return (d.countries || d.countrys || []).filter(l => /liga 1|super league/i.test(l.strLeague || '')).slice(0, 1)
+                    .map(l => ({ id: l.idLeague, name: l.strLeague, cat: 'Football', odds: null }));
+            } catch (e) { return []; }
+        }
+
+        // Odds bookmaker nyata (butuh API key The Odds API milik pengguna)
+        async function attachBookOdds(list) {
+            const key = localStorage.getItem('nusa_odds_key'); if (!key) return;
+            const sports = [...new Set(list.map(m => m.oddsKey).filter(Boolean))];
+            await Promise.all(sports.map(async sk => {
+                try {
+                    const evs = await jget(`https://api.the-odds-api.com/v4/sports/${sk}/odds/?regions=eu&markets=h2h&oddsFormat=decimal&apiKey=${encodeURIComponent(key)}`);
+                    list.filter(m => m.oddsKey === sk).forEach(m => {
+                        const ev = evs.find(e => sameTeam(e.home_team, m.home) && sameTeam(e.away_team, m.away)); if (!ev) return;
+                        const acc = { home: [], draw: [], away: [] };
+                        ev.bookmakers.forEach(b => {
+                            const mk = b.markets.find(x => x.key === 'h2h'); if (!mk) return;
+                            mk.outcomes.forEach(o => {
+                                if (/^draw$/i.test(o.name)) acc.draw.push(o.price);
+                                else if (sameTeam(o.name, ev.home_team)) acc.home.push(o.price);
+                                else if (sameTeam(o.name, ev.away_team)) acc.away.push(o.price);
+                            });
+                        });
+                        m.bk = { home: avg(acc.home), draw: avg(acc.draw), away: avg(acc.away) };
+                    });
+                } catch (e) { console.warn('Odds API', sk, e.message); }
+            }));
+        }
+
+        // Odds on-chain nyata: harga pasar Polymarket (Polygon) -> odds desimal = 1 / probabilitas
+        async function attachChainOdds(list) {
+            const events = [];
+            const rs = await Promise.allSettled(['soccer', 'nba'].map(tg => jget(`https://gamma-api.polymarket.com/events?active=true&closed=false&limit=200&tag_slug=${tg}`)));
+            rs.forEach(r => { if (r.status === 'fulfilled' && Array.isArray(r.value)) events.push(...r.value); });
+            list.forEach(m => {
+                const nh = normTeam(m.home), na = normTeam(m.away);
+                const ev = events.find(e => { const t = normTeam(e.title); return t.includes(nh) && t.includes(na); });
+                if (!ev) return;
+                const p = { home: null, draw: null, away: null };
+                (ev.markets || []).forEach(mk => {
+                    const outs = jparse(mk.outcomes), pr = jparse(mk.outcomePrices).map(Number);
+                    const q = normTeam(mk.question || mk.groupItemTitle || '');
+                    const iH = outs.findIndex(o => sameTeam(o, m.home)), iA = outs.findIndex(o => sameTeam(o, m.away));
+                    if (iH > -1 && iA > -1) { p.home = pr[iH]; p.away = pr[iA]; }
+                    else if (/\bdraw\b/.test(q)) p.draw = pr[0];
+                    else if (q.includes(nh) && !q.includes(na)) p.home = pr[0];
+                    else if (q.includes(na) && !q.includes(nh)) p.away = pr[0];
+                });
+                const oc = { home: toOdds(p.home), draw: toOdds(p.draw), away: toOdds(p.away) };
+                if (oc.home || oc.draw || oc.away) m.oc = oc;
+            });
+        }
+
+        async function loadMatches(force) {
+            const cat = () => window.activeCategory || 'All';
+            MARKET_STATE = 'loading'; renderMarket(cat());
+            try {
+                if (!force) {
+                    const c = JSON.parse(sessionStorage.getItem('nusa_fx_v2') || 'null');
+                    if (c && Date.now() - c.t < 600000) { DB_MATCHES = c.list; MARKET_STATE = c.list.length ? 'ok' : 'empty'; renderMarket(cat()); return; }
+                }
+                const leagues = LEAGUES.concat(await discoverLeagues());
+                const rs = await Promise.allSettled(leagues.map(l => jget(TSDB + 'eventsnextleague.php?id=' + l.id)));
+                const list = [], now = Date.now();
+                rs.forEach((r, i) => {
+                    if (r.status !== 'fulfilled') return;
+                    const l = leagues[i];
+                    (r.value.events || []).map(e => ({ e, ts: tsOf(e) })).filter(x => x.ts > now).sort((a, b) => a.ts - b.ts).slice(0, 8)
+                        .forEach(({ e, ts }) => list.push({ id: String(e.idEvent), title: `${e.strHomeTeam} vs ${e.strAwayTeam}`, home: e.strHomeTeam, away: e.strAwayTeam, category: l.cat, catKey: catKeyOf(l.cat), league: l.name, oddsKey: l.odds, ts, draw: l.cat === 'Football' }));
+                });
+                if (!list.length && rs.every(r => r.status === 'rejected')) throw new Error('no data');
+                list.sort((a, b) => a.ts - b.ts);
+                await Promise.allSettled([attachBookOdds(list), attachChainOdds(list)]);
+                DB_MATCHES = list; MARKET_STATE = list.length ? 'ok' : 'empty';
+                try { sessionStorage.setItem('nusa_fx_v2', JSON.stringify({ t: Date.now(), list })); } catch (e) {}
+            } catch (err) { console.error('loadMatches', err); MARKET_STATE = 'error'; }
+            renderMarket(cat());
+        }
+
+        function setOddsKey() {
+            const k = prompt(t('odds_key_prompt'), localStorage.getItem('nusa_odds_key') || '');
+            if (k === null) return;
+            if (k.trim()) localStorage.setItem('nusa_odds_key', k.trim()); else localStorage.removeItem('nusa_odds_key');
+            loadMatches(true);
+        }
+
+        // Penyelesaian hasil: baca skor akhir asli dari TheSportsDB
+        let settling = false, lastSettle = 0, settleTimer = null;
+        function parseResult(e) {
+            const s = String(e.strStatus || '').toLowerCase();
+            if (/postponed|cancel|abandon/.test(s)) return { void: true };
+            const hs = parseInt(e.intHomeScore, 10), as = parseInt(e.intAwayScore, 10);
+            const finished = /\b(ft|aet|aot|pen)\b|finished|after/.test(s);
+            if (!finished || isNaN(hs) || isNaN(as)) return null;
+            return { outcome: hs > as ? 'home' : hs < as ? 'away' : 'draw', score: hs + '-' + as };
+        }
+        async function settlePending() {
+            if (!SESSION_USER || settling || Date.now() - lastSettle < 60000) return;
+            const due = USER_JOURNAL.filter(j => j.status === 'pending' && j.matchId && j.ts && Date.now() > j.ts + 90 * 60000);
+            if (!due.length) return;
+            settling = true; lastSettle = Date.now();
+            try {
+                const results = {};
+                for (const id of [...new Set(due.map(j => j.matchId))].slice(0, 8)) {
+                    try {
+                        const d = await jget(TSDB + 'lookupevent.php?id=' + encodeURIComponent(id));
+                        const r = d.events && d.events[0] ? parseResult(d.events[0]) : null;
+                        if (r) results[id] = r;
+                    } catch (e) { console.warn('settle', id, e.message); }
+                }
+                if (Object.keys(results).length) {
+                    await db.ref('journals/' + SESSION_USER).transaction(cur => {
+                        const a = toArr(cur);
+                        a.forEach(j => {
+                            const r = results[j.matchId];
+                            if (j.status !== 'pending' || !r) return;
+                            if (r.void) { j.status = 'void'; j.pts = 0; return; }
+                            const won = r.outcome === j.pickKey, conf = Number(j.conf) || 0;
+                            j.status = won ? 'won' : 'lost'; j.score = r.score;
+                            j.pts = won ? Math.round(conf * (j.odds > 1 ? j.odds : 1)) : -Math.round(conf / 2);
+                        });
+                        return a;
+                    });
+                }
+            } catch (e) { console.error('settlePending', e); }
+            settling = false;
+        }
+
+        // ===== WALRUS MEMORY (lewat /api/memory) =====
+        const MEM_API = (window.NUSA_API || '') + '/api/memory';
+        let CRED = null, memSyncing = false;
+        async function memCall(body) {
+            const r = await fetch(MEM_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user: SESSION_USER, ...body }) });
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok) { const e = new Error(d.error || 'HTTP ' + r.status); e.status = r.status; throw e; }
+            return d;
+        }
+        function patchEntry(id, fields) {
+            return db.ref('journals/' + SESSION_USER).transaction(cur => {
+                const a = toArr(cur), j = a.find(x => x.id === id);
+                if (!j) return; Object.assign(j, fields); return a;
+            });
+        }
+        // Tulis pick (sebelum kickoff) dan hasil (setelah selesai) ke Walrus Memory
+        async function syncMemory() {
+            if (!SESSION_USER || memSyncing) return;
+            const todo = USER_JOURNAL.filter(j => j.id && j.matchId && ((j.status === 'pending' && !j.memLock) || ((j.status === 'won' || j.status === 'lost') && !j.memSettle)));
+            if (!todo.length) return;
+            memSyncing = true;
+            try {
+                for (const j of todo.slice(0, 6)) {
+                    const entry = { matchId: j.matchId, pickKey: j.pickKey, conf: j.conf, odds: j.odds, cat: j.cat };
+                    try {
+                        if (j.status === 'pending') {
+                            const d = await memCall({ action: 'lock', entry });
+                            await patchEntry(j.id, { memLock: d.job_id || 'ok', cp: d.checkpoint ? d.checkpoint.seq : '' });
+                        } else {
+                            const d = await memCall({ action: 'settle', entry });
+                            await patchEntry(j.id, { memSettle: d.job_id || (d.void ? 'void' : 'ok') });
+                        }
+                    } catch (e) {
+                        if (e.status === 409 || e.status === 400) await patchEntry(j.id, j.status === 'pending' ? { memLock: 'skip' } : { memSettle: 'skip' });
+                        else { console.warn('memory sync', e.message); break; }
+                    }
+                    await new Promise(r => setTimeout(r, 3000)); // batas relayer: ~24 tulisan/menit
+                }
+            } finally { memSyncing = false; }
+            if (todo.length > 6) setTimeout(syncMemory, 5000);
+            loadCredibility(true);
+        }
+        function credFromJournal() {
+            const rows = {};
+            USER_JOURNAL.filter(j => j.status === 'won' || j.status === 'lost').forEach(j => {
+                const k = (j.cat || '') + '|' + (j.league || '');
+                const r = rows[k] || (rows[k] = { cat: j.cat || '', league: j.league || '', n: 0, wins: 0, cs: 0 });
+                r.n++; r.wins += j.status === 'won' ? 1 : 0; r.cs += Number(j.conf) || 0;
+            });
+            return Object.values(rows).map(r => ({ cat: r.cat, league: r.league, n: r.n, wins: r.wins, avgConf: r.cs / r.n }));
+        }
+        async function loadCredibility(force) {
+            if (!SESSION_USER) return null;
+            if (!force && CRED && Date.now() - CRED.t < 60000) return CRED;
+            try { CRED = { ...(await memCall({ action: 'profile' })), t: Date.now() }; }
+            catch (e) { CRED = { rows: credFromJournal(), source: 'local', blobs: [], t: Date.now() }; }
+            renderMemPanel();
+            return CRED;
+        }
+        function credFor(cat, league) {
+            if (!CRED || !CRED.rows) return null;
+            let rs = CRED.rows.filter(r => r.cat === cat && r.league === league);
+            if (!rs.length) rs = CRED.rows.filter(r => r.cat === cat);
+            if (!rs.length) return null;
+            const n = rs.reduce((a, r) => a + r.n, 0), wins = rs.reduce((a, r) => a + r.wins, 0), cs = rs.reduce((a, r) => a + r.avgConf * r.n, 0);
+            return { n, wins, cred: (wins + 1) / (n + 2), avgConf: cs / n };
+        }
+        // Memori mengubah produk: keyakinan awal di modal disetel dari rekam jejak Anda
+        function applyMemoryHint(m) {
+            const el = document.getElementById('mp-mem-hint'), sl = document.getElementById('mp-confidence');
+            if (!el || !sl || !m) return;
+            const c = credFor(m.category, m.league);
+            if (!c || c.n < 2) { el.textContent = t('mem_hint_none'); sl.value = 75; }
+            else {
+                const v = Math.min(100, Math.max(10, Math.round(c.cred * 100))); sl.value = v;
+                el.textContent = t('mem_hint').replace('{wins}', c.wins).replace('{n}', c.n).replace('{hit}', Math.round(c.wins / c.n * 100)).replace('{conf}', Math.round(c.avgConf)).replace('{v}', v);
+            }
+            document.getElementById('mp-conf-display').innerText = sl.value + '%';
+        }
+        function renderMemPanel() {
+            const el = document.getElementById('mem-panel'); if (!el) return;
+            const ok = v => v && v !== 'skip' && v !== 'void';
+            const writes = USER_JOURNAL.reduce((a, j) => a + (ok(j.memLock) ? 1 : 0) + (ok(j.memSettle) ? 1 : 0), 0);
+            const last = USER_JOURNAL.find(j => j.cp);
+            const rows = ((CRED && CRED.rows) || []).slice().sort((a, b) => b.n - a.n).slice(0, 6);
+            const list = rows.length ? rows.map(r => {
+                const hit = Math.round(r.wins / r.n * 100), conf = Math.round(r.avgConf), over = conf - hit > 15 && r.n >= 3;
+                return `<div class="bg-black/40 border border-white/10 rounded-xl p-3 flex items-center justify-between gap-3">
+                    <div class="min-w-0"><div class="font-bold text-white truncate">${esc(r.league || '—')}</div><div class="text-[11px] text-gray-400">${r.wins}/${r.n} · ${t('mem_avgconf')} ${conf}%</div></div>
+                    <div class="text-right shrink-0"><div class="font-black text-lg text-green-400">${hit}%</div><div class="text-[10px] ${over ? 'text-yellow-400 font-bold' : 'text-gray-500'}">${over ? t('mem_over') : t('mem_acc')}</div></div></div>`;
+            }).join('') : `<div class="text-sm text-gray-500 font-bold p-2">${t('mem_empty')}</div>`;
+            el.innerHTML = `<div class="glass rounded-3xl p-6 border border-white/10 space-y-4">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div><h3 class="text-xl font-black"><i class="fas fa-brain text-yellow-400"></i> ${t('mem_title')}</h3><p class="text-xs text-gray-400 max-w-xl">${t('mem_sub')}</p></div>
+                    <div class="text-right text-xs text-gray-300 font-bold"><div>${writes} ${t('mem_writes')}</div>${last ? `<div class="text-gray-500">${t('mem_cp')} #${esc(last.cp)}</div>` : ''}</div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">${list}</div>
+                <div class="flex items-center justify-between text-[11px] text-gray-500">
+                    <span>${CRED && CRED.source === 'local' ? t('mem_src_local') : t('mem_src_walrus')}</span>
+                    <button onclick="loadCredibility(true)" class="px-3 py-1 rounded-lg border border-white/20 bg-black/40 text-gray-300 hover:text-white transition"><i class="fas fa-rotate"></i> ${t('mem_refresh')}</button>
+                </div></div>`;
+        }
+
+        let lbListener = null;
         let SESSION_USER = null;
         let USER_JOURNAL = [];
         let FORUM_POSTS = [];
@@ -681,6 +913,7 @@
         
         let forumListener = null;
         let journalListener = null;
+        let LB = [];
 
         window.onload = () => {
             setLang('en');
@@ -771,6 +1004,7 @@
             if(confirm(t("confirm_logout"))) {
                 localStorage.removeItem('nusa_active_user');
                 localStorage.removeItem('nusa_wallet_address');
+                if(lbListener) { db.ref('leaderboard').off('value', lbListener); lbListener = null; }
                 document.getElementById('login-username').value = '';
                 document.getElementById('login-password').value = '';
                 
@@ -802,9 +1036,22 @@
                 USER_JOURNAL = toArr(snapshot.val());
                 renderJournal();
                 updateUserStats();
+                settlePending();
             });
 
             if(forumListener) db.ref('forum').off('value', forumListener);
+            lastPub = ''; LB = [];
+            if(lbListener) db.ref('leaderboard').off('value', lbListener);
+            lbListener = db.ref('leaderboard').on('value', (snap) => {
+                const v = snap.val() || {};
+                LB = Object.keys(v).map(u => ({ user: u, ...v[u] })).filter(r => r.settled > 0)
+                    .sort((a, b) => (b.pts - a.pts) || (b.wins - a.wins));
+                renderLeaderboard();
+            });
+            loadMatches(false);
+            loadCredibility(true);
+            if(!settleTimer) settleTimer = setInterval(settlePending, 300000);
+
             forumListener = db.ref('forum').on('value', (snapshot) => {
                 if(snapshot.exists()) {
                     FORUM_POSTS = toArr(snapshot.val());
@@ -841,57 +1088,80 @@
             renderMarket(cat);
         }
 
+        function renderNote() {
+            const el = document.getElementById('data-note'); if (!el) return;
+            const hasKey = !!localStorage.getItem('nusa_odds_key');
+            const b = 'px-3 py-1 rounded-lg border border-white/20 bg-black/40 text-gray-300 hover:text-white hover:bg-white/10 transition';
+            el.innerHTML = `<span>${t('mk_src')}</span>
+                <button onclick="loadMatches(true)" class="${b}"><i class="fas fa-rotate"></i> ${t('mk_refresh')}</button>
+                <button onclick="setOddsKey()" class="${b}"><i class="fas fa-key"></i> ${hasKey ? t('mk_key_set') : t('mk_key_add')}</button>`;
+        }
+
+        function oddsCell(o, draw) {
+            if (!o) return '<span class="text-gray-500">—</span>';
+            const f = v => v ? Number(v).toFixed(2) : '—';
+            return draw ? `${f(o.home)} / ${f(o.draw)} / ${f(o.away)}` : `${f(o.home)} / ${f(o.away)}`;
+        }
+
         function renderMarket(cat) {
+            renderNote();
             const container = document.getElementById('matches-container');
-            container.innerHTML = '';
+            const msg = k => `<div class="col-span-full p-10 text-center text-gray-400 font-bold">${t(k)}</div>`;
+            if (MARKET_STATE === 'loading') { container.innerHTML = msg('mk_loading'); return; }
+            if (MARKET_STATE === 'error') { container.innerHTML = msg('mk_err'); return; }
             const data = (cat === 'All') ? DB_MATCHES : DB_MATCHES.filter(m => m.category === cat);
-            
-            data.forEach(m => {
-                const catName = t(m.catKey);
-                container.innerHTML += `
+            if (!data.length) { container.innerHTML = msg('mk_empty'); return; }
+            const loc = currentLang === 'id' ? 'id-ID' : 'en-US';
+            container.innerHTML = data.map(m => {
+                const when = new Date(m.ts).toLocaleString(loc, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                const legend = m.draw ? '1 / X / 2' : '1 / 2';
+                return `
                     <div class="glass p-6 rounded-3xl border border-white/5 hover:border-red-500/50 transition duration-300 flex flex-col group h-full relative overflow-hidden">
                         <img src="4.png" class="absolute -bottom-10 -right-10 w-40 h-40 opacity-10 pointer-events-none">
-                        <div class="flex justify-between items-center mb-4 relative z-10">
-                            <span class="text-[10px] font-black tracking-widest uppercase bg-red-900/40 text-red-300 px-3 py-1 rounded border border-red-500/20">${catName}</span>
-                            <span class="text-xs text-green-400 font-bold bg-green-900/30 px-2 py-1 rounded border border-green-500/30">${t("card_demo")}</span>
+                        <div class="flex justify-between items-center mb-4 relative z-10 gap-2">
+                            <span class="text-[10px] font-black tracking-widest uppercase bg-red-900/40 text-red-300 px-3 py-1 rounded border border-red-500/20">${t(m.catKey)} · ${esc(m.league)}</span>
+                            <span class="text-xs text-gray-300 font-bold">${esc(when)}</span>
                         </div>
-                        <h4 class="font-black text-xl mb-6 text-white group-hover:text-red-300 transition leading-tight flex-1 relative z-10">${m.title}</h4>
+                        <h4 class="font-black text-xl mb-6 text-white group-hover:text-red-300 transition leading-tight flex-1 relative z-10">${esc(m.title)}</h4>
                         <div class="flex justify-between bg-black/60 rounded-2xl p-4 border border-white/10 mb-6 shadow-inner mt-auto relative z-10">
                             <div class="text-center w-1/2 border-r border-white/10">
-                                <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">${t("card_bookie")}</div>
-                                <div class="font-black text-red-400 text-xl">${m.o1}</div>
+                                <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">${t("card_bookie")} (${legend})</div>
+                                <div class="font-black text-red-400 text-base">${oddsCell(m.bk, m.draw)}</div>
                             </div>
                             <div class="text-center w-1/2">
-                                <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">${t("card_onchain")}</div>
-                                <div class="font-black text-blue-400 text-xl">${m.o2}</div>
+                                <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">${t("card_onchain")} (${legend})</div>
+                                <div class="font-black text-blue-400 text-base">${oddsCell(m.oc, m.draw)}</div>
                             </div>
                         </div>
-                        <button onclick="openModalPredict(${m.id})" class="w-full bg-white/5 hover:bg-red-600 text-white py-3.5 rounded-xl font-bold transition border border-white/10 hover:border-transparent mt-auto active:scale-95 uppercase tracking-wide text-sm relative z-10">
+                        <button onclick="openModalPredict('${esc(m.id)}')" class="w-full bg-white/5 hover:bg-red-600 text-white py-3.5 rounded-xl font-bold transition border border-white/10 hover:border-transparent mt-auto active:scale-95 uppercase tracking-wide text-sm relative z-10">
                             ${t("card_btn")}
                         </button>
-                    </div>
-                `;
-            });
+                    </div>`;
+            }).join('');
         }
 
         let ACTIVE_MATCH = null;
+        function matchOptions(m) {
+            const oddOf = k => (m.bk && m.bk[k]) || (m.oc && m.oc[k]) || 0;
+            const o = [{ key: 'home', label: `${m.home} ${t('opt_win')}` }];
+            if (m.draw) o.push({ key: 'draw', label: t('opt_draw') });
+            o.push({ key: 'away', label: `${m.away} ${t('opt_win')}` });
+            return o.map(x => ({ ...x, odds: oddOf(x.key) }));
+        }
+
         function openModalPredict(id) {
-            ACTIVE_MATCH = DB_MATCHES.find(x => x.id === id);
+            ACTIVE_MATCH = DB_MATCHES.find(x => x.id === String(id));
             if(!ACTIVE_MATCH) return;
-            
+            if(ACTIVE_MATCH.ts <= Date.now()) { showToast(t('toast_started')); return; }
+            if(USER_JOURNAL.some(j => j.matchId === ACTIVE_MATCH.id)) { showToast(t('toast_dup')); return; }
+
             document.getElementById('mp-title').innerText = ACTIVE_MATCH.title;
+            applyMemoryHint(ACTIVE_MATCH);
+            loadCredibility(false).then(() => { if (ACTIVE_MATCH) applyMemoryHint(ACTIVE_MATCH); });
             const sel = document.getElementById('mp-selection');
-            sel.innerHTML = '';
-            ACTIVE_MATCH.teams.forEach(te => {
-                let tmStr = te;
-                if(currentLang === 'en') {
-                    tmStr = tmStr.replace('Menang', 'Win').replace('Seri', 'Draw');
-                } else {
-                    tmStr = tmStr.replace('Win', 'Menang').replace('Draw', 'Seri');
-                }
-                sel.innerHTML += `<option value="${tmStr}">${tmStr}</option>`;
-            });
-            
+            sel.innerHTML = matchOptions(ACTIVE_MATCH).map(o =>
+                `<option value="${o.key}">${esc(o.label)}${o.odds ? ' @ ' + o.odds.toFixed(2) : ''}</option>`).join('');
+
             const modal = document.getElementById('modal-predict');
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -910,29 +1180,47 @@
 
         function savePredictionToDB() {
             if(!ACTIVE_MATCH) return;
-            const sel = document.getElementById('mp-selection').value;
-            const conf = document.getElementById('mp-confidence').value;
+            const m = ACTIVE_MATCH;
+            if(m.ts <= Date.now()) { showToast(t('toast_started')); return; }
+            const key = document.getElementById('mp-selection').value;
+            const opt = matchOptions(m).find(o => o.key === key);
+            if(!opt) return;
+            const conf = Number(document.getElementById('mp-confidence').value);
             const timeStr = new Date().toLocaleString(currentLang === 'id' ? 'id-ID' : 'en-US', {day: 'numeric', month: 'short', hour:'2-digit', minute:'2-digit'});
-            
-            const entry = { title: ACTIVE_MATCH.title, pick: sel, conf: conf, time: timeStr };
-            db.ref('journals/' + SESSION_USER).transaction(cur => { const a = toArr(cur); a.unshift(entry); return a; }).then(() => {
+
+            const entry = { id: 'p' + Date.now(), matchId: m.id, title: m.title, cat: m.category, league: m.league, pick: opt.label, pickKey: key, conf: conf, odds: opt.odds || 0, ts: m.ts, time: timeStr, status: 'pending' };
+            db.ref('journals/' + SESSION_USER).transaction(cur => {
+                const a = toArr(cur);
+                if(a.some(j => j.matchId === m.id)) return; // batalkan: sudah pernah memprediksi
+                a.unshift(entry); return a;
+            }).then(res => {
                 closeModal('modal-predict');
-                showToast(t("toast_pred_ok"));
+                showToast(res.committed ? t("toast_pred_ok") : t("toast_dup"));
             }).catch(err => {
                 showToast(t("toast_fb_err"));
             });
         }
 
+        function statusBadge(j) {
+            const pts = Number(j.pts) || 0;
+            const map = {
+                pending: ['bg-yellow-900/40 text-yellow-300 border-yellow-500/30', 'fa-clock', t('status_pending')],
+                won:     ['bg-green-900/40 text-green-300 border-green-500/30', 'fa-circle-check', `${t('status_won')} +${pts}`],
+                lost:    ['bg-red-900/40 text-red-300 border-red-500/30', 'fa-circle-xmark', `${t('status_lost')} ${pts}`],
+                void:    ['bg-gray-800/60 text-gray-300 border-gray-500/30', 'fa-ban', t('status_void')]
+            };
+            const s = map[j.status] || ['bg-gray-800/60 text-gray-400 border-gray-600/30', 'fa-circle-question', t('status_legacy')];
+            return `<span class="${s[0]} border px-3 py-1 rounded text-[10px] font-black tracking-wider inline-flex items-center gap-1"><i class="fas ${s[1]}"></i> ${esc(s[2])}</span>` +
+                   (j.score ? `<div class="text-[10px] text-gray-500 mt-1 font-bold">${esc(j.score)}</div>` : '');
+        }
+
         function renderJournal() {
             const tbody = document.getElementById('table-journal');
-            tbody.innerHTML = '';
             if(USER_JOURNAL.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500 font-bold">${t("jour_empty")}</td></tr>`;
                 return;
             }
-            
-            USER_JOURNAL.forEach(j => {
-                tbody.innerHTML += `
+            tbody.innerHTML = USER_JOURNAL.map(j => `
                     <tr class="hover:bg-white/5 transition">
                         <td class="p-5 font-bold text-white max-w-[200px] truncate">${esc(j.title)}</td>
                         <td class="p-5 text-red-400 font-black">${esc(j.pick)}</td>
@@ -944,19 +1232,62 @@
                                 <span class="text-xs font-bold text-gray-300">${Number(j.conf)||0}%</span>
                             </div>
                         </td>
-                        <td class="p-5"><span class="bg-blue-900/40 text-blue-300 border border-blue-500/30 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider"><i class="fas fa-cloud text-blue-400 mr-1"></i> ${t("status_wait")}</span></td>
+                        <td class="p-5">${statusBadge(j)}</td>
                         <td class="p-5 text-right text-gray-400 text-xs font-bold">${esc(j.time)}</td>
-                    </tr>
-                `;
-            });
+                    </tr>`).join('');
         }
 
+        function computeStats() {
+            const settled = USER_JOURNAL.filter(j => j.status === 'won' || j.status === 'lost');
+            const wins = settled.filter(j => j.status === 'won').length;
+            const pts = Math.max(0, USER_JOURNAL.reduce((a, j) => a + (Number(j.pts) || 0), 0));
+            return { total: USER_JOURNAL.length, settled: settled.length, wins, pts, wr: settled.length ? Math.round(wins / settled.length * 100) : null };
+        }
+
+        let lastPub = '';
         function updateUserStats() {
-            const total = USER_JOURNAL.length;
-            const pts = total * 50;
-            document.getElementById('display-pts').innerText = pts.toLocaleString();
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-wr').innerText = total > 0 ? (60 + Math.min(total*2, 35)) + "%" : "0%";
+            const s = computeStats();
+            document.getElementById('display-pts').innerText = s.pts.toLocaleString();
+            document.getElementById('stat-total').innerText = s.total;
+            document.getElementById('stat-settled').innerText = s.settled;
+            document.getElementById('stat-pts').innerText = s.pts.toLocaleString();
+            document.getElementById('stat-wr').innerText = s.wr === null ? '—' : s.wr + '%';
+            // publikasikan statistik hasil nyata ke leaderboard global
+            const payload = s.settled > 0 ? { pts: s.pts, settled: s.settled, wins: s.wins } : null;
+            const sig = JSON.stringify(payload);
+            if (sig !== lastPub) {
+                lastPub = sig;
+                const ref = db.ref('leaderboard/' + SESSION_USER);
+                (payload ? ref.set({ ...payload, updated: Date.now() }) : ref.remove()).catch(() => {});
+            }
+            renderLeaderboard();
+            renderMemPanel();
+            syncMemory();
+        }
+
+        function renderLeaderboard() {
+            const rankEl = document.getElementById('stat-rank'), box = document.getElementById('top-list');
+            if (!rankEl || !box) return;
+            const idx = LB.findIndex(r => r.user === SESSION_USER);
+            rankEl.innerText = idx > -1 ? '#' + (idx + 1) : '—';
+            if (!LB.length) { box.innerHTML = `<div class="p-6 text-center text-gray-500 font-bold">${t('ld_empty')}</div>`; return; }
+            const st = [
+                ['from-yellow-900/40', 'border-yellow-500/30', 'from-yellow-300 to-yellow-600', 'text-yellow-200'],
+                ['from-gray-800/40', 'border-gray-400/30', 'from-gray-300 to-gray-500', 'text-gray-300'],
+                ['from-orange-900/40', 'border-orange-500/30', 'from-orange-400 to-orange-700', 'text-orange-200']
+            ];
+            box.innerHTML = LB.slice(0, 3).map((r, i) => `
+                <div class="bg-gradient-to-r ${st[i][0]} to-black p-4 rounded-2xl border ${st[i][1]} flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br ${st[i][2]} flex items-center justify-center font-black text-black text-xl shadow-lg">${i + 1}</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-lg text-white">${esc(r.user)}</div>
+                        <div class="text-xs ${st[i][3]}">${Number(r.wins) || 0} ${t('ld_acc')} · ${(Number(r.pts) || 0).toLocaleString()} pts</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xl font-black text-green-400">${r.settled ? Math.round((r.wins || 0) / r.settled * 100) : 0}%</div>
+                        <div class="text-[10px] text-gray-400">Win Rate</div>
+                    </div>
+                </div>`).join('');
         }
 
         function renderForum() {
@@ -1073,14 +1404,17 @@
                 let catCounts = { 'Football': 0, 'Basketball': 0, 'E-Sports': 0 };
                 let teamCounts = {};
                 USER_JOURNAL.forEach(j => {
-                    const match = DB_MATCHES.find(m => m.title === j.title);
-                    if (match && catCounts[match.category] !== undefined) catCounts[match.category]++;
+                    if (catCounts[j.cat] !== undefined) catCounts[j.cat]++;
                     teamCounts[j.pick] = (teamCounts[j.pick] || 0) + 1;
                 });
                 favCat = Object.keys(catCounts).reduce((a, b) => catCounts[a] > catCounts[b] ? a : b);
                 favTeam = Object.keys(teamCounts).reduce((a, b) => teamCounts[a] > teamCounts[b] ? a : b);
             }
 
+            const cr = await loadCredibility(false).catch(() => null);
+            const memLine = cr && cr.rows && cr.rows.length
+                ? cr.rows.slice(0, 5).map(r => `${r.cat}/${r.league || '-'}: ${r.wins}/${r.n} correct (${Math.round(r.wins / r.n * 100)}%), avg confidence ${Math.round(r.avgConf)}%`).join('; ')
+                : 'no settled predictions yet';
             const langInstruction = currentLang === 'en' 
                 ? "You MUST reply in English. Use friendly, sweet, and casual conversational English (youthful style)." 
                 : "Gunakan bahasa Indonesia sehari-hari ala anak muda.";
@@ -1090,6 +1424,7 @@ Your persona: Data-driven yet warm, slightly playful/cute, but firm.
 ${langInstruction} Call the user by name "${userName}".
 Your facts: Favorite team is RRQ Hoshi (E-Sports) and LA Lakers (Basket).
 User facts: Total Predictions: ${totalPred}, Favorite Category: ${favCat}, Favorite Team: ${favTeam}.
+Walrus Memory track record (settled predictions only): ${memLine}. Use it when advising: if average confidence is well above accuracy, tell them to lower confidence in that league.
 Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make it too long.`;
 
             try {

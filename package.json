@@ -1,0 +1,6 @@
+{
+  "name": "nusantara-predict",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": { "@mysten-incubation/memwal": "^0.1.8" }
+}
