@@ -42,6 +42,22 @@
         .force-hide { display: none !important; }
         .force-show { display: block !important; }
     </style>
+
+    <!-- SCRIPT WALLET STANDARD UNTUK SUI/SLUSH WALLET MODERN -->
+    <script type="module">
+        import { getWallets } from 'https://cdn.jsdelivr.net/npm/@wallet-standard/app/+esm';
+        
+        window.availableSuiWallets = [];
+        const { get, on } = getWallets();
+        
+        // Ambil dompet yang sudah terdeteksi saat halaman dimuat
+        window.availableSuiWallets = get(); 
+        
+        // Dengarkan secara live jika ekstensi dompet selesai dimuat oleh browser
+        on('register', (...wallets) => {
+            window.availableSuiWallets.push(...wallets);
+        });
+    </script>
 </head>
 <body class="antialiased min-h-screen flex flex-col relative">
 
@@ -1097,43 +1113,34 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
     
         let userWalletAddress = null;
 
-        // FUNGSI KONEKSI SLUSH WALLET (MURNI SUI, TANPA METAMASK)
+        // FUNGSI KONEKSI WALLET MODERN (VIA WALLET STANDARD)
         async function connectWallet() {
             const walletBtn = document.getElementById('wallet-text');
             
-            // Cek URL lokal (Mencegah pemblokiran browser)
-            if (window.location.protocol === 'file:') {
-                alert("⚠️ ERROR: Kakak membuka file HTML secara lokal (file:///). Silakan jalankan menggunakan 'Live Server' (http://127.0.0.1...).");
-                return;
-            }
-
-            // Target murni objek SUI / Slush Wallet
-            let provider = window.slush || window.suiWallet || window.slushWallet;
+            // Mengambil data dari array yang dikumpulkan oleh script <head>
+            const wallets = window.availableSuiWallets || [];
+            let provider = wallets.find(w => w.name.toLowerCase().includes('slush') || w.name.toLowerCase().includes('sui'));
 
             if (!provider) {
-                alert("❌ Slush Wallet tidak terdeteksi!\n\nPastikan ekstensi Slush Wallet sudah terpasang dan aktif di browser ini.");
-                showToast(t("toast_wallet_ext"));
+                alert("❌ Slush Wallet tidak terdeteksi!\n\nPastikan ekstensi dompet Kakak sudah aktif dan halaman ini di-refresh.");
                 return;
             }
 
             try {
-                showToast("⏳ Menghubungkan ke Slush Wallet...");
-                let accounts = [];
-
-                if (typeof provider.requestPermissions === 'function') {
-                    await provider.requestPermissions();
-                } else if (typeof provider.connect === 'function') {
-                    await provider.connect();
+                showToast("⏳ Menghubungkan ke " + provider.name + "...");
+                
+                // Ambil fitur koneksi standar yang didukung Slush Wallet
+                const connectFeature = provider.features['standard:connect'];
+                if (!connectFeature) {
+                    throw new Error("Wallet ini belum mendukung standar Web3 modern.");
                 }
 
-                if (typeof provider.getAccounts === 'function') {
-                    accounts = await provider.getAccounts();
-                } else if (typeof provider.request === 'function') {
-                    accounts = await provider.request({ method: 'sui_accounts' });
-                }
-
-                if (accounts && accounts.length > 0) {
-                    userWalletAddress = typeof accounts[0] === 'string' ? accounts[0] : accounts[0].address;
+                // Kirim permintaan koneksi ke ekstensi (popup akan terbuka)
+                const response = await connectFeature.connect();
+                
+                if (response.accounts && response.accounts.length > 0) {
+                    // Berhasil tersambung, ekstrak address
+                    userWalletAddress = response.accounts[0].address;
                     
                     const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
                     
@@ -1145,36 +1152,14 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
                         db.ref('users_data/' + SESSION_USER + '/wallet').set(userWalletAddress);
                     }
                     
-                    showToast("✅ Slush Wallet Berhasil Tersambung!");
+                    showToast("✅ " + provider.name + " Berhasil Tersambung!");
                 } else {
-                    alert("❌ Berhasil terhubung, tapi alamat wallet tidak ditemukan.");
+                    alert("❌ Berhasil terhubung, tapi akun dompet kosong/tidak ada alamat.");
                 }
             } catch (error) {
                 console.error("Slush Wallet Error:", error);
-                alert("❌ Koneksi dibatalkan atau ditolak oleh Slush Wallet: " + (error.message || error));
+                alert("❌ Koneksi dibatalkan atau ditolak oleh pengguna: " + (error.message || error));
             }
-        }
-
-        // Listener perubahan akun Slush Wallet
-        const activeSlushProvider = window.slush || window.suiWallet;
-        if (activeSlushProvider && typeof activeSlushProvider.on === 'function') {
-            activeSlushProvider.on('accountsChanged', function (accounts) {
-                if (accounts && accounts.length > 0) {
-                    userWalletAddress = typeof accounts[0] === 'string' ? accounts[0] : accounts[0].address;
-                    const shortAddress = userWalletAddress.substring(0, 6) + "..." + userWalletAddress.substring(userWalletAddress.length - 4);
-                    document.getElementById('wallet-text').innerText = shortAddress;
-                    document.getElementById('btn-connect-wallet').classList.remove('from-purple-600', 'to-blue-600');
-                    document.getElementById('btn-connect-wallet').classList.add('from-green-600', 'to-emerald-600');
-                    if (SESSION_USER) {
-                        db.ref('users_data/' + SESSION_USER + '/wallet').set(userWalletAddress);
-                    }
-                } else {
-                    userWalletAddress = null;
-                    document.getElementById('wallet-text').innerText = t("btn_wallet");
-                    document.getElementById('btn-connect-wallet').classList.add('from-purple-600', 'to-blue-600');
-                    document.getElementById('btn-connect-wallet').classList.remove('from-green-600', 'to-emerald-600');
-                }
-            });
         }
     </script>
 </body>
