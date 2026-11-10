@@ -80,6 +80,14 @@ function cleanEntry(en) {
   if (!(conf >= 10 && conf <= 100)) return null;
   return { matchId: String(en.matchId), pickKey: en.pickKey, cat: en.cat, conf, odds: odds >= 0 && odds <= 50 ? odds : 0 };
 }
+const hits = new Map();   // pembatas sederhana per IP (per instance serverless, best effort)
+function limited(req, max) {
+  const ip = String(req.headers['x-forwarded-for'] || (req.socket && req.socket.remoteAddress) || 'x').split(',')[0].trim();
+  const now = Date.now(), arr = (hits.get(ip) || []).filter(t => now - t < 60000);
+  arr.push(now); hits.set(ip, arr);
+  if (hits.size > 5000) hits.clear();
+  return arr.length > max;
+}
 const bad = (res, code, msg) => res.status(code).json({ error: msg });
 
 module.exports = async (req, res) => {
@@ -91,6 +99,7 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return bad(res, 405, 'POST only');
   let b = req.body; if (typeof b === 'string') { try { b = JSON.parse(b); } catch (e) { b = {}; } } b = b || {};
   const c = cfg();
+  if (limited(req, b.action === 'health' ? 120 : 60)) return bad(res, 429, 'too many requests');
   if (b.action === 'health') return res.json({ walrus: !!(c.key && c.accountId), tatum: !!process.env.TATUM_API_KEY });
   const user = String(b.user || '');
   if (!USER_RE.test(user)) return bad(res, 400, 'bad user');
