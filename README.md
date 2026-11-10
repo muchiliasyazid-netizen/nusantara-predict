@@ -13,13 +13,22 @@ Aplikasi prediksi olahraga yang belajar dari rekam jejak pemainnya.
 
 Namespace Walrus per pengguna: `nusa-<username>`. Kunci delegasi hanya ada di env var server.
 
-## Deploy (Vercel)
+## Deploy (frontend di GitHub Pages, backend di Vercel)
+GitHub Pages hanya menyajikan file statis, jadi `api/memory.js` perlu dijalankan di layanan serverless.
+Kunci Walrus tidak boleh ada di frontend.
 1. Buat akun Walrus Memory di https://memory.walrus.xyz → catat **delegate private key** dan **account object ID**.
-   Isi akun dengan sedikit SUI Mainnet.
-2. Buat API key gratis di https://dashboard.tatum.io.
-3. Push folder ini ke repo GitHub publik, import ke Vercel.
-4. Isi Environment Variables sesuai `.env.example`, lalu deploy.
-5. Cek `POST /api/memory` dengan body `{"action":"health"}` → harus `{"walrus":true,"tatum":true}`.
+   Isi akun dengan sedikit SUI Mainnet. Buat API key Tatum di https://dashboard.tatum.io.
+2. Push folder ini ke repo GitHub **publik** (wajib untuk hackathon). Aktifkan Pages: Settings → Pages → Deploy from branch → `main` / root.
+3. Di https://vercel.com masuk dengan akun GitHub → Add New Project → pilih repo yang sama → Deploy.
+   (Tidak perlu CLI; Vercel otomatis mengenali folder `api/`.)
+4. Vercel → Project Settings → Environment Variables: isi seperti `.env.example` lalu Redeploy.
+   Isi `ALLOWED_ORIGIN` dengan `https://<username>.github.io` agar hanya situs Anda yang boleh memanggil.
+5. Uji: `curl -X POST https://<proyek>.vercel.app/api/memory -H 'content-type: application/json' -d '{"action":"health"}'`
+   → harus `{"walrus":true,"tatum":true}`.
+6. Hubungkan frontend: di `index.html` ubah `window.NUSA_API = localStorage.getItem('nusa_api') || ''` menjadi
+   `|| 'https://<proyek>.vercel.app'`, commit, tunggu Pages ter-update.
+   (Untuk uji cepat tanpa commit: buka konsol browser, jalankan `localStorage.setItem('nusa_api','https://<proyek>.vercel.app')`, refresh.)
+Alternatif tanpa Pages: pakai URL Vercel dari langkah 3 sebagai situs utama; `NUSA_API` boleh dibiarkan kosong.
 
 ## Bagian yang belum teruji
 Dibuat tanpa akses internet, jadi hanya logika server yang diuji dengan data tiruan. Sebelum mengirim, buktikan sendiri:

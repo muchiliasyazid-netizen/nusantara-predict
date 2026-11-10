@@ -3,7 +3,7 @@
 // Kunci delegasi Walrus HANYA ada di sini (env var), tidak pernah dikirim ke browser.
 
 const USER_RE = /^[A-Za-z0-9_-]{2,24}$/;
-const TSDB = 'https://www.thesportsdb.com/api/v1/json/3/';
+const TSDB = 'https://www.thesportsdb.com/api/v1/json/' + (process.env.THESPORTSDB_KEY || '123') + '/'; // key lama "3" sudah dinonaktifkan
 const CATS = ['Football', 'Basketball'];
 const PICKS = ['home', 'draw', 'away'];
 const cfg = () => ({
@@ -83,6 +83,11 @@ function cleanEntry(en) {
 const bad = (res, code, msg) => res.status(code).json({ error: msg });
 
 module.exports = async (req, res) => {
+  // CORS: frontend (GitHub Pages) dan backend berada di domain berbeda
+  res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return bad(res, 405, 'POST only');
   let b = req.body; if (typeof b === 'string') { try { b = JSON.parse(b); } catch (e) { b = {}; } } b = b || {};
   const c = cfg();

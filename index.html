@@ -388,6 +388,11 @@
         </button>
     </div>
 
+    <script>
+        // URL backend memori (api/memory.js). Kosongkan bila frontend dan backend satu domain (mis. di Vercel).
+        // Untuk GitHub Pages isi dengan URL backend, contoh: 'https://nusantara-predict.vercel.app'
+        window.NUSA_API = localStorage.getItem('nusa_api') || '';
+    </script>
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
@@ -489,7 +494,7 @@
                 mem_hint: "Memori Walrus: di liga ini Anda benar {wins} dari {n} prediksi ({hit}%), rata-rata keyakinan {conf}%. Keyakinan awal disetel ke {v}%.",
                 status_pending: "Menunggu hasil", status_won: "Menang", status_lost: "Kalah", status_void: "Dibatalkan", status_legacy: "Tidak terverifikasi",
                 opt_win: "Menang", opt_draw: "Seri",
-                mk_loading: "Memuat jadwal pertandingan asli...", mk_empty: "Belum ada pertandingan mendatang dari sumber data.", mk_err: "Gagal memuat jadwal. Periksa koneksi lalu coba lagi.",
+                mk_loading: "Memuat jadwal pertandingan asli...", mk_empty: "Belum ada pertandingan mendatang dari sumber data.", mk_err: "Gagal memuat jadwal. Periksa koneksi atau API key TheSportsDB lalu coba lagi.", mk_tsdb_key: "Key TheSportsDB", tsdb_key_prompt: "Masukkan API key TheSportsDB milik Anda (kosongkan untuk memakai key gratis 123).",
                 mk_src: "Jadwal: TheSportsDB · Odds on-chain: Polymarket · Odds bookmaker: The Odds API", mk_refresh: "Muat ulang", mk_key_add: "Isi API Key Odds", mk_key_set: "Ganti API Key Odds",
                 odds_key_prompt: "Masukkan API key The Odds API (the-odds-api.com). Kosongkan untuk menghapus.",
                 toast_started: "⏱️ Pertandingan sudah dimulai, prediksi ditutup.", toast_dup: "⚠️ Kamu sudah memprediksi pertandingan ini.",
@@ -574,7 +579,7 @@
                 mem_hint: "Walrus Memory: in this league you were right {wins} of {n} picks ({hit}%), avg confidence {conf}%. Starting confidence set to {v}%.",
                 status_pending: "Awaiting result", status_won: "Won", status_lost: "Lost", status_void: "Void", status_legacy: "Unverified",
                 opt_win: "Win", opt_draw: "Draw",
-                mk_loading: "Loading real fixtures...", mk_empty: "No upcoming matches from the data source.", mk_err: "Failed to load fixtures. Check your connection and retry.",
+                mk_loading: "Loading real fixtures...", mk_empty: "No upcoming matches from the data source.", mk_err: "Failed to load fixtures. Check your connection or TheSportsDB key and retry.", mk_tsdb_key: "TheSportsDB key", tsdb_key_prompt: "Enter your TheSportsDB API key (leave empty to use the free key 123).",
                 mk_src: "Fixtures: TheSportsDB · On-chain odds: Polymarket · Bookmaker odds: The Odds API", mk_refresh: "Refresh", mk_key_add: "Add Odds API Key", mk_key_set: "Change Odds API Key",
                 odds_key_prompt: "Enter your The Odds API key (the-odds-api.com). Leave empty to remove.",
                 toast_started: "⏱️ This match has already started, predictions are closed.", toast_dup: "⚠️ You already predicted this match.",
@@ -646,7 +651,7 @@
         }
 
         // ===== DATA NYATA: jadwal, odds, hasil =====
-        const TSDB = 'https://www.thesportsdb.com/api/v1/json/3/';
+        const TSDB = { toString() { return 'https://www.thesportsdb.com/api/v1/json/' + (localStorage.getItem('nusa_tsdb_key') || '123') + '/'; } };
         const LEAGUES = [
             { id: 4328, name: 'Premier League', cat: 'Football', odds: 'soccer_epl' },
             { id: 4335, name: 'La Liga', cat: 'Football', odds: 'soccer_spain_la_liga' },
@@ -736,7 +741,14 @@
                     if (c && Date.now() - c.t < 600000) { DB_MATCHES = c.list; MARKET_STATE = c.list.length ? 'ok' : 'empty'; renderMarket(cat()); return; }
                 }
                 const leagues = LEAGUES.concat(await discoverLeagues());
-                const rs = await Promise.allSettled(leagues.map(l => jget(TSDB + 'eventsnextleague.php?id=' + l.id)));
+                const sy = new Date().getFullYear(), season = new Date().getMonth() >= 6 ? `${sy}-${sy + 1}` : `${sy - 1}-${sy}`;
+                const rs = await Promise.allSettled(leagues.map(async l => {
+                    const [a, b] = await Promise.allSettled([jget(TSDB + 'eventsnextleague.php?id=' + l.id), jget(TSDB + 'eventsseason.php?id=' + l.id + '&s=' + season)]);
+                    if (a.status === 'rejected' && b.status === 'rejected') throw a.reason;
+                    const seen = new Set(), ev = [];
+                    [a, b].forEach(x => x.status === 'fulfilled' && (x.value.events || []).forEach(e => { if (!seen.has(e.idEvent)) { seen.add(e.idEvent); ev.push(e); } }));
+                    return { events: ev };
+                }));
                 const list = [], now = Date.now();
                 rs.forEach((r, i) => {
                     if (r.status !== 'fulfilled') return;
@@ -751,6 +763,13 @@
                 try { sessionStorage.setItem('nusa_fx_v2', JSON.stringify({ t: Date.now(), list })); } catch (e) {}
             } catch (err) { console.error('loadMatches', err); MARKET_STATE = 'error'; }
             renderMarket(cat());
+        }
+
+        function setTsdbKey() {
+            const k = prompt(t('tsdb_key_prompt'), localStorage.getItem('nusa_tsdb_key') || '');
+            if (k === null) return;
+            if (k.trim()) localStorage.setItem('nusa_tsdb_key', k.trim()); else localStorage.removeItem('nusa_tsdb_key');
+            loadMatches(true);
         }
 
         function setOddsKey() {
@@ -1094,6 +1113,7 @@
             const b = 'px-3 py-1 rounded-lg border border-white/20 bg-black/40 text-gray-300 hover:text-white hover:bg-white/10 transition';
             el.innerHTML = `<span>${t('mk_src')}</span>
                 <button onclick="loadMatches(true)" class="${b}"><i class="fas fa-rotate"></i> ${t('mk_refresh')}</button>
+                <button onclick="setTsdbKey()" class="${b}"><i class="fas fa-database"></i> ${t('mk_tsdb_key')}</button>
                 <button onclick="setOddsKey()" class="${b}"><i class="fas fa-key"></i> ${hasKey ? t('mk_key_set') : t('mk_key_add')}</button>`;
         }
 
