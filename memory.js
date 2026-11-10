@@ -51,7 +51,7 @@ async function writeMem(m, text) {
   let confirmed = false;
   if (id) {
     try {
-      await Promise.race([m.waitForRememberJob(id), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 12000))]);
+      await Promise.race([m.waitForRememberJob(id), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 7000))]);
       confirmed = true;
     } catch (e) { /* job tetap berjalan di relayer */ }
   }
