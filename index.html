@@ -413,11 +413,7 @@
         }
         const db = firebase.database();
 
-        const part1 = "AQ.Ab8RN6KUPKG3";
-        const part2 = "E3uIVJzEVlSPIKX";
-        const part3 = "0tgqGqHT7ZxR-dn";
-        const part4 = "EKN6dxMQ";
-        const GEMINI_API_KEY = part1 + part2 + part3 + part4;
+        // Kunci Gemini ada di server (api/chat.js, env GEMINI_API_KEY), bukan di browser.
         
         let aiChatHistory = [];
         const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -489,7 +485,7 @@
                 mem_title: "Memori Walrus Anda", mem_sub: "Setiap prediksi dan hasilnya ditulis ke Walrus Memory (Mainnet). Dari situ dihitung seberapa layak Anda dipercaya per liga.",
                 mem_empty: "Belum ada hasil yang tersimpan. Skor kredibilitas muncul setelah pertandingan pertama Anda selesai.", mem_writes: "tulisan memori", mem_cp: "checkpoint Sui (Tatum)",
                 mem_src_walrus: "Sumber: recall dari Walrus Memory", mem_src_local: "Sumber: hitungan lokal (backend memori tidak terjangkau)", mem_refresh: "Muat ulang",
-                mem_over: "terlalu percaya diri", mem_acc: "akurasi", mem_avgconf: "rata-rata keyakinan",
+                mem_locked: "Terkunci di Walrus", mem_settled: "Hasil tertulis di Walrus", mem_overall: "Ringkasan kalibrasi", mem_gap: "selisih", mem_cal_good: "Terkalibrasi baik", mem_cal_over: "Cenderung terlalu percaya diri", mem_cal_under: "Cenderung terlalu rendah hati", mem_cal_few: "Butuh minimal 3 hasil untuk menilai kalibrasi", mem_export: "Unduh bukti (JSON)", mem_blobs: "Blob Walrus terbaru", mem_legend: "Bar hijau = akurasi, garis kuning = rata-rata keyakinan", mem_over: "terlalu percaya diri", mem_acc: "akurasi", mem_avgconf: "rata-rata keyakinan",
                 mem_hint_none: "Memori Walrus: belum cukup riwayat di liga ini. Mulai dengan keyakinan 75%.",
                 mem_hint: "Memori Walrus: di liga ini Anda benar {wins} dari {n} prediksi ({hit}%), rata-rata keyakinan {conf}%. Keyakinan awal disetel ke {v}%.",
                 status_pending: "Menunggu hasil", status_won: "Menang", status_lost: "Kalah", status_void: "Dibatalkan", status_legacy: "Tidak terverifikasi",
@@ -574,7 +570,7 @@
                 mem_title: "Your Walrus Memory", mem_sub: "Every prediction and its result is written to Walrus Memory (Mainnet). Your credibility per league is computed from it.",
                 mem_empty: "No results stored yet. Credibility scores appear after your first match settles.", mem_writes: "memory writes", mem_cp: "Sui checkpoint (Tatum)",
                 mem_src_walrus: "Source: recalled from Walrus Memory", mem_src_local: "Source: local calculation (memory backend unreachable)", mem_refresh: "Refresh",
-                mem_over: "overconfident", mem_acc: "accuracy", mem_avgconf: "avg confidence",
+                mem_locked: "Locked on Walrus", mem_settled: "Result written to Walrus", mem_overall: "Calibration summary", mem_gap: "gap", mem_cal_good: "Well calibrated", mem_cal_over: "Tends to be overconfident", mem_cal_under: "Tends to be underconfident", mem_cal_few: "Needs at least 3 results to judge calibration", mem_export: "Download proof (JSON)", mem_blobs: "Latest Walrus blobs", mem_legend: "Green bar = accuracy, yellow tick = average confidence", mem_over: "overconfident", mem_acc: "accuracy", mem_avgconf: "avg confidence",
                 mem_hint_none: "Walrus Memory: not enough history in this league yet. Starting at 75% confidence.",
                 mem_hint: "Walrus Memory: in this league you were right {wins} of {n} picks ({hit}%), avg confidence {conf}%. Starting confidence set to {v}%.",
                 status_pending: "Awaiting result", status_won: "Won", status_lost: "Lost", status_void: "Void", status_legacy: "Unverified",
@@ -823,7 +819,7 @@
 
         // ===== WALRUS MEMORY (lewat /api/memory) =====
         const MEM_API = (window.NUSA_API || '') + '/api/memory';
-        let CRED = null, memSyncing = false;
+        let CRED = null, HEALTH = null, memSyncing = false;
         async function memCall(body) {
             const r = await fetch(MEM_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user: SESSION_USER, ...body }) });
             const d = await r.json().catch(() => ({}));
@@ -878,6 +874,7 @@
             try { CRED = { ...(await memCall({ action: 'profile' })), t: Date.now() }; }
             catch (e) { CRED = { rows: credFromJournal(), source: 'local', blobs: [], t: Date.now() }; }
             renderMemPanel();
+            if (force || !HEALTH) memCall({ action: 'health' }).then(x => { HEALTH = x; renderMemPanel(); }).catch(() => { HEALTH = { walrus: false, tatum: false }; renderMemPanel(); });
             return CRED;
         }
         function credFor(cat, league) {
@@ -900,27 +897,65 @@
             }
             document.getElementById('mp-conf-display').innerText = sl.value + '%';
         }
+        function exportProof() {
+            const data = {
+                user: SESSION_USER, exportedAt: new Date().toISOString(),
+                entries: USER_JOURNAL.filter(j => j.memLock || j.memSettle).map(j => ({
+                    matchId: j.matchId, title: j.title, pick: j.pick, confidence: j.conf, status: j.status,
+                    lockJob: j.memLock || null, settleJob: j.memSettle || null, suiCheckpoint: j.cp || null
+                }))
+            };
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+            a.download = 'nusa-memory-proof-' + SESSION_USER + '.json';
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+        }
         function renderMemPanel() {
             const el = document.getElementById('mem-panel'); if (!el) return;
             const ok = v => v && v !== 'skip' && v !== 'void';
             const writes = USER_JOURNAL.reduce((a, j) => a + (ok(j.memLock) ? 1 : 0) + (ok(j.memSettle) ? 1 : 0), 0);
             const last = USER_JOURNAL.find(j => j.cp);
-            const rows = ((CRED && CRED.rows) || []).slice().sort((a, b) => b.n - a.n).slice(0, 6);
+            const all = ((CRED && CRED.rows) || []).slice().sort((a, b) => b.n - a.n);
+            const rows = all.slice(0, 6);
+            const N = all.reduce((a, r) => a + r.n, 0), W = all.reduce((a, r) => a + r.wins, 0), CS = all.reduce((a, r) => a + r.avgConf * r.n, 0);
+            let summary = '';
+            if (N > 0) {
+                const hit = Math.round(W / N * 100), conf = Math.round(CS / N), gap = conf - hit;
+                const verdict = N < 3 ? t('mem_cal_few') : gap > 15 ? t('mem_cal_over') : gap < -15 ? t('mem_cal_under') : t('mem_cal_good');
+                const vcls = N < 3 ? 'text-gray-400' : gap > 15 ? 'text-yellow-400' : gap < -15 ? 'text-blue-300' : 'text-green-400';
+                const box = (lbl, val, cls, sub) => `<div class="bg-black/40 border border-white/10 rounded-xl p-3 text-center"><div class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">${lbl}</div><div class="text-2xl font-black ${cls}">${val}</div><div class="text-[10px] text-gray-500">${sub}</div></div>`;
+                summary = `<div><div class="text-[11px] text-gray-400 font-bold mb-2">${t('mem_overall')}</div>
+                    <div class="grid grid-cols-3 gap-3">${box(t('mem_acc'), hit + '%', 'text-green-400', W + '/' + N)}${box(t('mem_avgconf'), conf + '%', 'text-yellow-300', '')}${box(t('mem_gap'), (gap > 0 ? '+' : '') + gap, vcls, '')}</div>
+                    <div class="text-xs font-bold mt-2 ${vcls}">${verdict}</div></div>`;
+            }
             const list = rows.length ? rows.map(r => {
                 const hit = Math.round(r.wins / r.n * 100), conf = Math.round(r.avgConf), over = conf - hit > 15 && r.n >= 3;
-                return `<div class="bg-black/40 border border-white/10 rounded-xl p-3 flex items-center justify-between gap-3">
-                    <div class="min-w-0"><div class="font-bold text-white truncate">${esc(r.league || '—')}</div><div class="text-[11px] text-gray-400">${r.wins}/${r.n} · ${t('mem_avgconf')} ${conf}%</div></div>
-                    <div class="text-right shrink-0"><div class="font-black text-lg text-green-400">${hit}%</div><div class="text-[10px] ${over ? 'text-yellow-400 font-bold' : 'text-gray-500'}">${over ? t('mem_over') : t('mem_acc')}</div></div></div>`;
+                return `<div class="bg-black/40 border border-white/10 rounded-xl p-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0"><div class="font-bold text-white truncate">${esc(r.league || '—')}</div><div class="text-[11px] text-gray-400">${r.wins}/${r.n} · ${t('mem_avgconf')} ${conf}%</div></div>
+                        <div class="text-right shrink-0"><div class="font-black text-lg text-green-400">${hit}%</div><div class="text-[10px] ${over ? 'text-yellow-400 font-bold' : 'text-gray-500'}">${over ? t('mem_over') : t('mem_acc')}</div></div>
+                    </div>
+                    <div class="relative h-2 bg-black rounded-full border border-white/10 mt-3"><div class="h-full bg-green-500/80 rounded-full" style="width:${hit}%"></div><div class="absolute -top-1 h-4 w-0.5 bg-yellow-400" style="left:${Math.min(99, conf)}%"></div></div></div>`;
             }).join('') : `<div class="text-sm text-gray-500 font-bold p-2">${t('mem_empty')}</div>`;
+            const dot = (on, name) => `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-white/10 bg-black/40 text-[10px] font-bold text-gray-300"><i class="fas fa-circle text-[7px] ${on ? 'text-green-400' : 'text-red-400'}"></i>${name}</span>`;
+            const health = HEALTH ? dot(HEALTH.walrus, 'Walrus') + dot(HEALTH.tatum, 'Tatum') : '';
+            const blobs = ((CRED && CRED.blobs) || []).slice(0, 3).map(b => { const s = String(b); return `<code class="px-2 py-0.5 rounded bg-black/50 border border-white/10 text-[10px] text-gray-400">${esc(s.length > 18 ? s.slice(0, 10) + '…' + s.slice(-6) : s)}</code>`; }).join(' ');
             el.innerHTML = `<div class="glass rounded-3xl p-6 border border-white/10 space-y-4">
                 <div class="flex flex-wrap items-start justify-between gap-3">
-                    <div><h3 class="text-xl font-black"><i class="fas fa-brain text-yellow-400"></i> ${t('mem_title')}</h3><p class="text-xs text-gray-400 max-w-xl">${t('mem_sub')}</p></div>
+                    <div><h3 class="text-xl font-black"><i class="fas fa-brain text-yellow-400"></i> ${t('mem_title')}</h3><p class="text-xs text-gray-400 max-w-xl">${t('mem_sub')}</p><div class="flex flex-wrap gap-2 mt-2">${health}</div></div>
                     <div class="text-right text-xs text-gray-300 font-bold"><div>${writes} ${t('mem_writes')}</div>${last ? `<div class="text-gray-500">${t('mem_cp')} #${esc(last.cp)}</div>` : ''}</div>
                 </div>
+                ${summary}
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">${list}</div>
-                <div class="flex items-center justify-between text-[11px] text-gray-500">
+                ${rows.length ? `<div class="text-[10px] text-gray-500">${t('mem_legend')}</div>` : ''}
+                ${blobs ? `<div class="flex flex-wrap items-center gap-2 text-[10px] text-gray-500"><span class="font-bold">${t('mem_blobs')}:</span>${blobs}</div>` : ''}
+                <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-500">
                     <span>${CRED && CRED.source === 'local' ? t('mem_src_local') : t('mem_src_walrus')}</span>
-                    <button onclick="loadCredibility(true)" class="px-3 py-1 rounded-lg border border-white/20 bg-black/40 text-gray-300 hover:text-white transition"><i class="fas fa-rotate"></i> ${t('mem_refresh')}</button>
+                    <span class="flex gap-2">
+                        <button onclick="exportProof()" class="px-3 py-1 rounded-lg border border-white/20 bg-black/40 text-gray-300 hover:text-white transition"><i class="fas fa-download"></i> ${t('mem_export')}</button>
+                        <button onclick="loadCredibility(true)" class="px-3 py-1 rounded-lg border border-white/20 bg-black/40 text-gray-300 hover:text-white transition"><i class="fas fa-rotate"></i> ${t('mem_refresh')}</button>
+                    </span>
                 </div></div>`;
         }
 
@@ -1229,9 +1264,12 @@
                 lost:    ['bg-red-900/40 text-red-300 border-red-500/30', 'fa-circle-xmark', `${t('status_lost')} ${pts}`],
                 void:    ['bg-gray-800/60 text-gray-300 border-gray-500/30', 'fa-ban', t('status_void')]
             };
+            const okv = v => v && v !== 'skip' && v !== 'void';
+            const mb = (okv(j.memLock) ? `<div class="text-[10px] text-yellow-300/80 mt-1 font-bold"><i class="fas fa-lock"></i> ${t('mem_locked')}${j.cp ? ' · #' + esc(j.cp) : ''}</div>` : '') +
+                       (okv(j.memSettle) ? `<div class="text-[10px] text-green-300/80 mt-0.5 font-bold"><i class="fas fa-check-double"></i> ${t('mem_settled')}</div>` : '');
             const s = map[j.status] || ['bg-gray-800/60 text-gray-400 border-gray-600/30', 'fa-circle-question', t('status_legacy')];
             return `<span class="${s[0]} border px-3 py-1 rounded text-[10px] font-black tracking-wider inline-flex items-center gap-1"><i class="fas ${s[1]}"></i> ${esc(s[2])}</span>` +
-                   (j.score ? `<div class="text-[10px] text-gray-500 mt-1 font-bold">${esc(j.score)}</div>` : '');
+                   (j.score ? `<div class="text-[10px] text-gray-500 mt-1 font-bold">${esc(j.score)}</div>` : '') + mb;
         }
 
         function renderJournal() {
@@ -1448,21 +1486,13 @@ Walrus Memory track record (settled predictions only): ${memLine}. Use it when a
 Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make it too long.`;
 
             try {
-                const response = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
-                    {
-                        method: "POST",
-                        headers: { 
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            systemInstruction: { parts: [{ text: sysPrompt }] },
-                            contents: [...aiChatHistory, { role: "user", parts: [{ text: message }] }]
-                        })
-                    }
-                );
+                const response = await fetch((window.NUSA_API || '') + '/api/chat', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ system: sysPrompt, contents: [...aiChatHistory, { role: "user", parts: [{ text: message }] }] })
+                });
 
-                const responseData = await response.json();
+                const responseData = await response.json().catch(() => ({}));
                 
                 if (!response.ok) {
                     console.error("Gemini Error:", responseData);
@@ -1475,7 +1505,7 @@ Rule: Answer in maximum 2-3 short sentences directly to the point. Do not make i
                     throw new Error(responseData.error?.message || response.statusText);
                 }
 
-                let replyText = responseData.candidates[0].content.parts[0].text;
+                let replyText = responseData.text;
 
                 aiChatHistory.push({ role: "user", parts: [{ text: message }] });
                 aiChatHistory.push({ role: "model", parts: [{ text: replyText }] });
